@@ -28,3 +28,6 @@ INCLUDEPATH += $$PWD/../../../../usr/local/include/GLFW
 DEPENDPATH += $$PWD/../../../../usr/local/include/GLFW
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/libglfw3.a
+
+DISTFILES += \
+    settings.ini
