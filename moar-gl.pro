@@ -11,6 +11,9 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
+DISTFILES += \
+    settings.ini
+
 SOURCES += main.cpp
 
 # GLEW
@@ -29,5 +32,10 @@ DEPENDPATH += $$PWD/../../../../usr/local/include/GLFW
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/libglfw3.a
 
-DISTFILES += \
-    settings.ini
+# SOIL
+unix:!macx: LIBS += -L$$PWD/external/SOIL/lib -lSOIL
+
+INCLUDEPATH += $$PWD/external/SOIL/src
+DEPENDPATH += $$PWD/external/SOIL/src
+
+unix:!macx: PRE_TARGETDEPS += $$PWD/external/SOIL/lib/libSOIL.a
