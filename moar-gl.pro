@@ -17,25 +17,25 @@ DISTFILES += \
 SOURCES += main.cpp
 
 # GLEW
-unix:!macx: LIBS += -L$$PWD/../../../../usr/lib64/ -lGLEW
+unix:!macx: LIBS += -L$$PWD/moar-gl-external/GLEW/ -lGLEW
 
-INCLUDEPATH += $$PWD/../../../../usr/include/GL
-DEPENDPATH += $$PWD/../../../../usr/include/GL
+INCLUDEPATH += $$PWD/moar-gl-external/GLEW/GL
+DEPENDPATH += $$PWD/moar-gl-external/GLEW/GL
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../usr/lib64/libGLEW.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/moar-gl-external/GLEW/libGLEW.a
 
 # GLFW
-unix:!macx: LIBS += -L$$PWD/../../../../usr/local/lib/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL
+unix:!macx: LIBS += -L$$PWD/moar-gl-external/GLFW/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL
 
-INCLUDEPATH += $$PWD/../../../../usr/local/include/GLFW
-DEPENDPATH += $$PWD/../../../../usr/local/include/GLFW
+INCLUDEPATH += $$PWD/moar-gl-external/GLFW/include
+DEPENDPATH += $$PWD/moar-gl-external/GLFW/include
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../../../../usr/local/lib/libglfw3.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/moar-gl-external/GLFW/libglfw3.a
 
 # SOIL
-unix:!macx: LIBS += -L$$PWD/external/SOIL/lib -lSOIL
+unix:!macx: LIBS += -L$$PWD/moar-gl-external/SOIL/ -lSOIL
 
-INCLUDEPATH += $$PWD/external/SOIL/src
-DEPENDPATH += $$PWD/external/SOIL/src
+INCLUDEPATH += $$PWD/moar-gl-external/SOIL/include
+DEPENDPATH += $$PWD/moar-gl-external/SOIL/include
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/external/SOIL/lib/libSOIL.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/moar-gl-external/SOIL/libSOIL.a

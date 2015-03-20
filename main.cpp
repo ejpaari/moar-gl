@@ -1,8 +1,8 @@
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/ini_parser.hpp"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
 
 #include <iostream>
 
@@ -152,7 +152,7 @@ int main(/*int argc, char* argv[]*/)
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textures[0]);
-    image = SOIL_load_image("../moar-gl/external/SOIL/img_test.png", &width, &height, 0, SOIL_LOAD_RGB);
+    image = SOIL_load_image("../moar-gl/moar-gl-external/SOIL/img_test.png", &width, &height, 0, SOIL_LOAD_RGB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     SOIL_free_image_data(image);
     glUniform1i(glGetUniformLocation(shaderProgram, "myTexture"), 0);
