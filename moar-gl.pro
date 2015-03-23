@@ -8,13 +8,23 @@ TARGET = moar-gl
 
 CONFIG += console
 CONFIG -= app_bundle
+CONFIG += c++11
 
 TEMPLATE = app
 
 DISTFILES += \
     settings.ini
 
-SOURCES += main.cpp
+SOURCES += \
+    engine/engine.cpp \
+    engine/application.cpp \
+    main.cpp \
+    myapp.cpp
+
+HEADERS += \
+    engine/engine.h \
+    engine/application.h \
+    myapp.h
 
 # GLEW
 unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW
