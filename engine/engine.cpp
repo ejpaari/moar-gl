@@ -14,7 +14,7 @@ bool Engine::initialize() {
     }
 
     boost::property_tree::ptree pt;
-    boost::property_tree::ini_parser::read_ini("../moar-gl/settings.ini", pt);
+    boost::property_tree::ini_parser::read_ini("../moar-gl/myapp/settings.ini", pt);
     int openglMajor = pt.get<int>("OpenGL.major");
     int openglMinor = pt.get<int>("OpenGL.minor");
     int screenWidth = pt.get<int>("Window.width");
@@ -81,4 +81,5 @@ void Engine::start() {
         }
     }
 }
-}
+
+} // moar

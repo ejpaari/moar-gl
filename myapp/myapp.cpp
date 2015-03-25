@@ -1,53 +1,28 @@
 #include "myapp.h"
 
+#include <iostream>
+
 namespace {
 
-const GLchar* vertexSource =
-        "#version 450 core\n"
-        "in vec2 position;"
-        "in vec3 color;"
-        "in vec2 texcoord;"
-        "out vec3 Color;"
-        "out vec2 Texcoord;"
-        "void main() {"
-        "   Color = color;"
-        "   Texcoord = texcoord;"
-        "   gl_Position = vec4(position, 0.0, 1.0);"
-        "}";
-
-const GLchar* fragmentSource =
-        "#version 450 core\n"
-        "in vec3 Color;"
-        "in vec2 Texcoord;"
-        "out vec4 outColor;"
-        "uniform sampler2D myTexture;"
-        "void main() {"
-        "   outColor = vec4(Color, 1.0) * texture(myTexture, Texcoord);"
-        "}";
-
-float vertices[] =
-{
+float vertices[] = {
     -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Top-left
     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Top-right
     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
     -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
 };
 
-
 GLuint elements[] = {
     0, 1, 2,
     2, 3, 0
 };
-}
+
+} // anonymous
 
 MyApp::MyApp() {
 
 }
 
 MyApp::~MyApp() {
-    glDeleteProgram(shaderProgram);
-    glDeleteShader(fragmentShader);
-    glDeleteShader(vertexShader);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
 }
@@ -66,20 +41,20 @@ void MyApp::initialize() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
     // Shaders
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
+    bool isGood;
+    isGood = shader.attachShader(GL_VERTEX_SHADER, "../moar-gl/myapp/shaders/test.vert");
+    if (!isGood) {
+        std::cout << "Failed to attach vertex shader." << std::endl;
+    }
 
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
+    isGood = shader.attachShader(GL_FRAGMENT_SHADER, "../moar-gl/myapp/shaders/test.frag");
+    if (!isGood) {
+        std::cout << "Failed to attach fragment shader." << std::endl;
+    }
 
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glBindFragDataLocation(shaderProgram, 0, "outColor");
-    glLinkProgram(shaderProgram);
-    glUseProgram(shaderProgram);
+    shader.linkProgram();
+    shader.useProgram();
+    GLuint shaderProgram = shader.getProgram();
 
     // Attributes
     posAttrib = glGetAttribLocation(shaderProgram, "position");

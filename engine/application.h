@@ -2,7 +2,6 @@
 #define APPLICATION
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <SOIL.h>
 
 namespace moar {
@@ -19,13 +18,13 @@ public:
     void virtual initialize() = 0;
     void virtual run() = 0;
 
-    bool isRunning() { return running; }
+    bool isRunning() const { return running; }
     void quit() { running = false; }
 
 private:
     bool running;
 };
 
-}
+} // moar
 
 #endif // APPLICATION

@@ -1,7 +1,8 @@
 #ifndef MYAPP_H
 #define MYAPP_H
 
-#include "engine/application.h"
+#include "../engine/application.h"
+#include "../engine/shader.h"
 
 class MyApp : public moar::Application {
 public:
@@ -16,9 +17,7 @@ private:
     GLuint vbo;
     GLuint ebo;
 
-    GLuint vertexShader;
-    GLuint fragmentShader;
-    GLuint shaderProgram;
+    moar::Shader shader;
 
     GLint posAttrib;
     GLint colAttrib;
