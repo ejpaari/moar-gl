@@ -4,7 +4,9 @@
 
 namespace moar {
 
-Engine::Engine() {
+Engine::Engine(const std::string& settingsFile) :
+    settingsFile(settingsFile),
+    timeLimit(false, 0.0) {
 }
 
 bool Engine::initialize() {
@@ -14,11 +16,13 @@ bool Engine::initialize() {
     }
 
     boost::property_tree::ptree pt;
-    boost::property_tree::ini_parser::read_ini("../moar-gl/myapp/settings.ini", pt);
+    boost::property_tree::ini_parser::read_ini(settingsFile, pt);
     int openglMajor = pt.get<int>("OpenGL.major");
     int openglMinor = pt.get<int>("OpenGL.minor");
     int screenWidth = pt.get<int>("Window.width");
     int screenHeight = pt.get<int>("Window.height");
+    timeLimit.first = pt.get<bool>("Engine.useTimeLimit");
+    timeLimit.second = pt.get<double>("Engine.timeLimit");
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajor);
@@ -68,7 +72,7 @@ Engine::~Engine() {
     glfwTerminate();
 }
 
-void Engine::start() {
+void Engine::execute() {
     app->initialize();
     while (app->isRunning()) {
         app->run();
@@ -77,6 +81,9 @@ void Engine::start() {
         glfwPollEvents();
 
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
+            app->quit();
+        }
+        if (timeLimit.first && glfwGetTime() >= timeLimit.second) {
             app->quit();
         }
     }

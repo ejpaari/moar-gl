@@ -5,12 +5,14 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <string>
+#include <utility>
 
 namespace moar {
 
 class Engine {
 public:
-    explicit Engine();
+    explicit Engine(const std::string& settingsFile);
     ~Engine();
     Engine(const Engine&) = delete;
     Engine(Engine&&) = delete;
@@ -19,11 +21,13 @@ public:
 
     bool initialize();
     void setApplication(Application* application) { app = application; }
-    void start();
+    void execute();
 
 private:
     Application* app;
     GLFWwindow* window;
+    std::string settingsFile;
+    std::pair<bool, double> timeLimit;
 };
 
 } // moar
