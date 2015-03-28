@@ -9,7 +9,11 @@ Engine::Engine(const std::string& settingsFile) :
     timeLimit(false, 0.0) {
 }
 
-bool Engine::initialize() {
+Engine::~Engine() {
+    glfwTerminate();
+}
+
+bool Engine::init() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return false;
@@ -31,8 +35,7 @@ bool Engine::initialize() {
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     window = glfwCreateWindow(screenWidth, screenHeight, "moar-gl", NULL, NULL);
-    if (window == NULL)
-    {
+    if (window == NULL) {
         std::cerr << "Failed to create window" << std::endl;
         glfwTerminate();
         return false;
@@ -42,8 +45,7 @@ bool Engine::initialize() {
     glfwSetWindowPos(window, 300, 100);
 
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK)
-    {
+    if (glewInit() != GLEW_OK) {
         std::cerr << "Failed to initialize GLEW" << std::endl;
         return false;
     }
@@ -65,11 +67,6 @@ bool Engine::initialize() {
 
     std::cout << "Window resolution: " << screenWidth << " x " << screenHeight << std::endl;
     return true;
-}
-
-Engine::~Engine() {
-    delete app;
-    glfwTerminate();
 }
 
 void Engine::execute() {

@@ -17,8 +17,7 @@ Shader::~Shader() {
 
 bool Shader::attachShader(GLenum shaderType, const char *filename) {
     GLuint shader = glCreateShader(shaderType);
-    if (!shader || !compileShader(shader, filename))
-    {
+    if (!shader || !compileShader(shader, filename)) {
         glDeleteShader(shader);
         return false;
     }

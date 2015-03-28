@@ -4,7 +4,8 @@
 #include <GL/glew.h>
 #include <vector>
 
-namespace moar {
+namespace moar
+{
 
 class Shader
 {

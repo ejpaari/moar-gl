@@ -3,8 +3,7 @@
 namespace moar {
 
 Application::Application() :
-    running(true)
-{
+    running(true) {
 
 }
 

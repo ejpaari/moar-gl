@@ -1,5 +1,5 @@
 # moar-gl
-apt-get install libglew-dev libsoil-dev
+apt-get install libglew-dev libsoil-dev libglm-dev
 
 git clone --recursive https://github.com/ejpaari/moar-gl
 

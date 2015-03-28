@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <utility>
+#include <memory>
 
 namespace moar {
 
@@ -19,12 +20,12 @@ public:
     Engine& operator=(const Engine&) &  = delete;
     Engine& operator=(Engine&&) & = delete;
 
-    bool initialize();
-    void setApplication(Application* application) { app = application; }
+    bool init();
+    void setApplication(std::shared_ptr<Application> application) { app = application; }
     void execute();
 
 private:
-    Application* app;
+    std::shared_ptr<Application> app;
     GLFWwindow* window;
     std::string settingsFile;
     std::pair<bool, double> timeLimit;

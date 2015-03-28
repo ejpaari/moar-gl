@@ -22,13 +22,17 @@ SOURCES += \
     myapp.cpp \
     ../engine/engine.cpp \
     ../engine/application.cpp \
-    ../engine/shader.cpp
+    ../engine/shader.cpp \
+    ../engine/model.cpp \
+    ../engine/mesh.cpp
 
 HEADERS += \
     myapp.h \
     ../engine/engine.h \
     ../engine/application.h \
-    ../engine/shader.h
+    ../engine/shader.h \
+    ../engine/model.h \
+    ../engine/mesh.h
 
 # GLEW
 unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW
@@ -45,9 +49,13 @@ DEPENDPATH += $$PWD/../glfw/include/
 unix:!macx: PRE_TARGETDEPS += $$PWD/../glfw/src/libglfw3.a
 
 # SOIL
-
-
 unix:!macx: LIBS += -L$$PWD/../../../../../usr/lib/ -lSOIL
 
 INCLUDEPATH += $$PWD/../../../../../usr/include/SOIL
 DEPENDPATH += $$PWD/../../../../../usr/include/SOIL
+
+# Assimp
+unix:!macx: LIBS += -L$$PWD/../assimp/lib/ -lassimp
+
+INCLUDEPATH += $$PWD/../assimp/include
+DEPENDPATH += $$PWD/../assimp/include

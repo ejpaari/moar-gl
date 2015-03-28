@@ -3,6 +3,9 @@
 
 #include "../engine/application.h"
 #include "../engine/shader.h"
+#include "../engine/model.h"
+
+#include <glm/glm.hpp>
 
 class MyApp : public moar::Application {
 public:
@@ -13,15 +16,13 @@ public:
     void virtual run() final;
 
 private:
-    GLuint vao;
-    GLuint vbo;
-    GLuint ebo;
-
     moar::Shader shader;
+    moar::Model model;
 
     GLint posAttrib;
-    GLint colAttrib;
-    GLint texAttrib;
+
+    GLint uniView;
+    GLint uniProj;
 
     GLuint textures[1];
 };
