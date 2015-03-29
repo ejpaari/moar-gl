@@ -6,7 +6,8 @@ namespace moar {
 
 Engine::Engine(const std::string& settingsFile) :
     settingsFile(settingsFile),
-    timeLimit(false, 0.0) {
+    useTimeLimit(false),
+    timeLimit(0.0) {
 }
 
 Engine::~Engine() {
@@ -25,8 +26,10 @@ bool Engine::init() {
     int openglMinor = pt.get<int>("OpenGL.minor");
     int screenWidth = pt.get<int>("Window.width");
     int screenHeight = pt.get<int>("Window.height");
-    timeLimit.first = pt.get<bool>("Engine.useTimeLimit");
-    timeLimit.second = pt.get<double>("Engine.timeLimit");
+    int windowPosX = pt.get<int>("Window.Xposition");
+    int windowPosY = pt.get<int>("Window.Yposition");
+    useTimeLimit = pt.get<bool>("Engine.useTimeLimit");
+    timeLimit = pt.get<double>("Engine.timeLimit");
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajor);
@@ -42,7 +45,7 @@ bool Engine::init() {
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetWindowPos(window, 300, 100);
+    glfwSetWindowPos(window, windowPosX, windowPosY);
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
@@ -80,7 +83,7 @@ void Engine::execute() {
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
             app->quit();
         }
-        if (timeLimit.first && glfwGetTime() >= timeLimit.second) {
+        if (useTimeLimit && glfwGetTime() >= timeLimit) {
             app->quit();
         }
     }

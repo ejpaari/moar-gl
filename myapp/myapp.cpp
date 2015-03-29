@@ -13,10 +13,6 @@ MyApp::~MyApp() {
 }
 
 void MyApp::initialize() {
-    // Buffers
-    model.loadModel("../moar-gl/models/monkey.blend");
-
-    // Shaders
     bool isGood;
     isGood = shader.attachShader(GL_VERTEX_SHADER, "../moar-gl/myapp/shaders/test.vert");
     if (!isGood) {
@@ -32,10 +28,8 @@ void MyApp::initialize() {
     shader.useProgram();
     GLuint shaderProgram = shader.getProgram();
 
-    // Attributes
-    posAttrib = glGetAttribLocation(shaderProgram, "position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    model.setShader(shaderProgram);
+    model.loadModel("../moar-gl/models/monkey.3ds");
 
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     uniView = glGetUniformLocation(shader.getProgram(), "view");

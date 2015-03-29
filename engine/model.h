@@ -20,10 +20,12 @@ public:
     Model& operator=(const Model&) &  = delete;
     Model& operator=(Model&&) & = delete;
 
+    void setShader(GLuint shaderProgram) { shader = shaderProgram; }
     bool loadModel(const std::string file);
     unsigned int getNumIndices() const;
 
 private:
+    GLuint shader;
     std::vector<std::unique_ptr<Mesh>> meshes;
 };
 

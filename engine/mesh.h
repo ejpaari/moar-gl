@@ -9,19 +9,26 @@ namespace moar {
 
 class Mesh {
 public:
-    Mesh(const std::vector<glm::vec3>& vertices, const std::vector<unsigned int>& indices);
+    Mesh();
     ~Mesh();
     Mesh(const Mesh&) = delete;
     Mesh(Mesh&&) = delete;
     Mesh& operator=(const Mesh&) &  = delete;
     Mesh& operator=(Mesh&&) & = delete;
 
+    void setShader(GLuint shaderProgram) { shader = shaderProgram; }
+    void setVertices(const std::vector<glm::vec3>& vertices);
+    void setIndices(const std::vector<unsigned int>& indices);
+    void setNormals(const std::vector<glm::vec3>& normals);
+
     unsigned int getNumIndices() const { return numIndices; }
 
 private:
-    GLuint vao;
-    GLuint vbo;
-    GLuint ebo;
+    GLuint shader;
+    GLuint VAO;
+    GLuint vertexBuffer;
+    GLuint indexBuffer;
+    GLuint normalBuffer;
     unsigned int numIndices;    
 };
 

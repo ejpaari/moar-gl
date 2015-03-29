@@ -19,8 +19,6 @@ private:
     moar::Shader shader;
     moar::Model model;
 
-    GLint posAttrib;
-
     GLint uniView;
     GLint uniProj;
 

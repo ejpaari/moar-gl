@@ -57,7 +57,11 @@ bool Model::loadModel(const std::string file) {
                 indices.push_back(assimpMesh->mFaces[j].mIndices[2]);
             }
 
-            meshes[i] = std::unique_ptr<Mesh>(new Mesh(vertices, indices));
+            meshes[i] = std::unique_ptr<Mesh>(new Mesh());
+            meshes[i]->setShader(shader);
+            meshes[i]->setVertices(vertices);
+            meshes[i]->setNormals(normals);
+            meshes[i]->setIndices(indices);
             // To do: add normals and texture coordinates to mesh
         }
         return true;
@@ -70,7 +74,6 @@ bool Model::loadModel(const std::string file) {
 
 unsigned int Model::getNumIndices() const {
     if (meshes.empty()) {
-        std::cerr << "Warning: Trying to render an empty model." << std::endl;
         return 0;
     }
     return meshes[0]->getNumIndices();

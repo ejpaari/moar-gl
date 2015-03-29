@@ -6,7 +6,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <string>
-#include <utility>
 #include <memory>
 
 namespace moar {
@@ -28,7 +27,8 @@ private:
     std::shared_ptr<Application> app;
     GLFWwindow* window;
     std::string settingsFile;
-    std::pair<bool, double> timeLimit;
+    bool useTimeLimit;
+    double timeLimit;
 };
 
 } // moar
