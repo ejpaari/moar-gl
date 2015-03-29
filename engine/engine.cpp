@@ -69,13 +69,19 @@ bool Engine::init() {
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
 
     std::cout << "Window resolution: " << screenWidth << " x " << screenHeight << std::endl;
+
+    glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+
     return true;
 }
 
 void Engine::execute() {
-    app->initialize();
+    app->start();
     while (app->isRunning()) {
-        app->run();
+        app->update();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        app->render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -13,8 +13,8 @@ public:
     ~Mesh();
     Mesh(const Mesh&) = delete;
     Mesh(Mesh&&) = delete;
-    Mesh& operator=(const Mesh&) &  = delete;
-    Mesh& operator=(Mesh&&) & = delete;
+    Mesh& operator=(const Mesh&) = delete;
+    Mesh& operator=(Mesh&&) = delete;
 
     void setShader(GLuint shaderProgram) { shader = shaderProgram; }
     void setVertices(const std::vector<glm::vec3>& vertices);
@@ -22,6 +22,8 @@ public:
     void setNormals(const std::vector<glm::vec3>& normals);
 
     unsigned int getNumIndices() const { return numIndices; }
+
+    void render() const;
 
 private:
     GLuint shader;

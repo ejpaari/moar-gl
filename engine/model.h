@@ -4,7 +4,6 @@
 #include "mesh.h"
 
 #include <GL/glew.h>
-#include <assimp/scene.h>
 #include <string>
 #include <vector>
 #include <memory>
@@ -17,12 +16,13 @@ public:
     ~Model();
     Model(const Model&) = delete;
     Model(Model&&) = delete;
-    Model& operator=(const Model&) &  = delete;
-    Model& operator=(Model&&) & = delete;
+    Model& operator=(const Model&) = delete;
+    Model& operator=(Model&&) = delete;
+
+    bool loadModel(const std::string file);
+    void render() const;
 
     void setShader(GLuint shaderProgram) { shader = shaderProgram; }
-    bool loadModel(const std::string file);
-    unsigned int getNumIndices() const;
 
 private:
     GLuint shader;

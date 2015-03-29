@@ -42,8 +42,10 @@ void Mesh::setNormals(const std::vector<glm::vec3>& normals) {
     glVertexAttribPointer(normalAttrib , 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-
-
-
+void Mesh::render() const {
+    glBindVertexArray(VAO);
+    glUseProgram(shader);
+    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
+}
 
 } // moar

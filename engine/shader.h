@@ -12,10 +12,10 @@ class Shader
 public:
     explicit Shader();
     ~Shader();
-    Shader(const Shader&) = delete;
-    Shader(Shader&&) = delete;
-    Shader& operator=(const Shader&) &  = delete;
-    Shader& operator=(Shader&&) & = delete;
+    Shader(const Shader& rhs) = delete;
+    Shader(Shader&& rhs) = delete;
+    Shader& operator=(Shader rhs) = delete;
+    Shader& operator=(Shader&& rhs) = delete;
 
     bool attachShader(GLenum shaderType, const char *filename);
     void linkProgram() { glLinkProgram(program); }

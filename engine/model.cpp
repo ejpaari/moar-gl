@@ -1,6 +1,7 @@
 #include "model.h"
 
 #include <assimp/Importer.hpp>
+#include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <iostream>
 
@@ -60,8 +61,8 @@ bool Model::loadModel(const std::string file) {
             meshes[i] = std::unique_ptr<Mesh>(new Mesh());
             meshes[i]->setShader(shader);
             meshes[i]->setVertices(vertices);
-            meshes[i]->setNormals(normals);
             meshes[i]->setIndices(indices);
+            meshes[i]->setNormals(normals);
             // To do: add normals and texture coordinates to mesh
         }
         return true;
@@ -72,11 +73,10 @@ bool Model::loadModel(const std::string file) {
     }
 }
 
-unsigned int Model::getNumIndices() const {
-    if (meshes.empty()) {
-        return 0;
+void Model::render() const {
+    for (unsigned int i = 0; i < meshes.size(); ++i) {
+        meshes[i]->render();
     }
-    return meshes[0]->getNumIndices();
 }
 
 } // moar

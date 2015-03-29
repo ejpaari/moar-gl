@@ -24,7 +24,9 @@ SOURCES += \
     ../engine/application.cpp \
     ../engine/shader.cpp \
     ../engine/model.cpp \
-    ../engine/mesh.cpp
+    ../engine/mesh.cpp \
+    ../engine/object.cpp \
+    ../engine/renderobject.cpp
 
 HEADERS += \
     myapp.h \
@@ -32,7 +34,9 @@ HEADERS += \
     ../engine/application.h \
     ../engine/shader.h \
     ../engine/model.h \
-    ../engine/mesh.h
+    ../engine/mesh.h \
+    ../engine/object.h \
+    ../engine/renderobject.h
 
 # GLEW
 unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW
