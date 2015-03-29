@@ -1,10 +1,11 @@
 # moar-gl
-apt-get install libglew-dev libsoil-dev libglm-dev assimp-utils
 
-git clone --recursive https://github.com/ejpaari/moar-gl
+GLEW 7.0
 
-cmake / make GLFW
+SOIL 2007-07-26
 
-cmkae / make Assimp
+GLM
 
-Boost (http://www.boost.org/) version 1.57.0 (but other versions will probably do just fine)
+Boost 1.57.0
+
+GLFW & Assimp as submodules
