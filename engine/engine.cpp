@@ -2,19 +2,23 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
-namespace moar {
+namespace moar
+{
 
 Engine::Engine(const std::string& settingsFile) :
     settingsFile(settingsFile),
     useTimeLimit(false),
-    timeLimit(0.0) {
+    timeLimit(0.0)
+{
 }
 
-Engine::~Engine() {
+Engine::~Engine()
+{
     glfwTerminate();
 }
 
-bool Engine::init() {
+bool Engine::init()
+{
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return false;
@@ -76,11 +80,13 @@ bool Engine::init() {
     return true;
 }
 
-void Engine::execute() {
+void Engine::execute()
+{
     app->start();
     while (app->isRunning()) {
-        app->update();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        app->input(window);
+        app->update();
         app->render();
 
         glfwSwapBuffers(window);

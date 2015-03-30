@@ -2,20 +2,24 @@
 
 #include <cstdio>
 
-namespace moar {
+namespace moar
+{
 
-Shader::Shader() {
+Shader::Shader()
+{
     program = glCreateProgram();
 }
 
-Shader::~Shader() {
+Shader::~Shader()
+{
     glDeleteProgram(program);
     for (GLuint shader : shaders) {
         glDeleteShader(shader);
     }
 }
 
-bool Shader::attachShader(GLenum shaderType, const char *filename) {
+bool Shader::attachShader(GLenum shaderType, const char *filename)
+{
     GLuint shader = glCreateShader(shaderType);
     if (!shader || !compileShader(shader, filename)) {
         glDeleteShader(shader);
@@ -27,7 +31,8 @@ bool Shader::attachShader(GLenum shaderType, const char *filename) {
     return true;
 }
 
-bool Shader::compileShader(GLuint shader, const char* filename) {
+bool Shader::compileShader(GLuint shader, const char* filename)
+{
     FILE* fp = fopen(filename, "r");
     if (!fp) {
         return false;

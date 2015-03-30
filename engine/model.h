@@ -8,9 +8,11 @@
 #include <vector>
 #include <memory>
 
-namespace moar {
+namespace moar
+{
 
-class Model {
+class Model
+{
 public:
     explicit Model();
     ~Model();

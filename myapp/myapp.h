@@ -4,7 +4,8 @@
 #include "../engine/application.h"
 
 
-class MyApp : public moar::Application {
+class MyApp : public moar::Application
+{
 public:
     MyApp();
     virtual ~MyApp() final;

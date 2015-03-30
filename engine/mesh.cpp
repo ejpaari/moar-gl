@@ -1,6 +1,7 @@
 #include "mesh.h"
 
-namespace moar {
+namespace moar
+{
 
 Mesh::Mesh() :
     numIndices(0) {
@@ -8,14 +9,17 @@ Mesh::Mesh() :
     glBindVertexArray(VAO);
 }
 
-Mesh::~Mesh() {
+Mesh::~Mesh()
+{
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteBuffers(1, &indexBuffer);
     glDeleteBuffers(1, &normalBuffer);
+    glDeleteBuffers(1, &texBuffer);
     glDeleteVertexArrays(1, &VAO);
 }
 
-void Mesh::setVertices(const std::vector<glm::vec3>& vertices) {
+void Mesh::setVertices(const std::vector<glm::vec3>& vertices)
+{
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
@@ -25,14 +29,16 @@ void Mesh::setVertices(const std::vector<glm::vec3>& vertices) {
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-void Mesh::setIndices(const std::vector<unsigned int>& indices) {
+void Mesh::setIndices(const std::vector<unsigned int>& indices)
+{
     numIndices = indices.size();
     glGenBuffers(1, &indexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndices, &indices[0], GL_STATIC_DRAW);
 }
 
-void Mesh::setNormals(const std::vector<glm::vec3>& normals) {
+void Mesh::setNormals(const std::vector<glm::vec3>& normals)
+{
     glGenBuffers(1, &normalBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(), &normals[0], GL_STATIC_DRAW);
@@ -42,7 +48,19 @@ void Mesh::setNormals(const std::vector<glm::vec3>& normals) {
     glVertexAttribPointer(normalAttrib , 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-void Mesh::render() const {
+void Mesh::setTextureCoordinates(const std::vector<glm::vec2>& coords)
+{
+    glGenBuffers(1, &texBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * coords.size(), &coords[0], GL_STATIC_DRAW);
+
+    GLint texAttrib = glGetAttribLocation(shader, "tex");
+    glEnableVertexAttribArray(texAttrib);
+    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+}
+
+void Mesh::render() const
+{
     glBindVertexArray(VAO);
     glUseProgram(shader);
     glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);

@@ -3,20 +3,26 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <glm/glm.hpp>
 #include <iostream>
 
-namespace moar {
+namespace moar
+{
 
-Model::Model() {
-
+Model::Model()
+{
 }
 
-Model::~Model() {
+Model::~Model()
+{
 }
 
-bool Model::loadModel(const std::string file) {
+bool Model::loadModel(const std::string file)
+{
     Assimp::Importer importer;
-    const aiScene* assimpScene = importer.ReadFile(file, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+    unsigned int flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices  |
+            aiProcess_GenSmoothNormals | aiProcess_GenUVCoords;
+    const aiScene* assimpScene = importer.ReadFile(file, flags);
 
     if (assimpScene) {
         meshes.resize(assimpScene->mNumMeshes);
@@ -28,6 +34,7 @@ bool Model::loadModel(const std::string file) {
             const aiMesh* assimpMesh = assimpScene->mMeshes[i];
             std::vector<glm::vec3> vertices;
             std::vector<glm::vec3> normals;
+            std::vector<glm::vec2> texCoords;
             std::vector<unsigned int> indices;
 
             for (unsigned int j = 0; j < assimpMesh->mNumVertices; ++j) {
@@ -42,10 +49,13 @@ bool Model::loadModel(const std::string file) {
                 n.y = assimpMesh->mNormals[j].y;
                 n.z = assimpMesh->mNormals[j].z;
                 normals.push_back(n);
-                // To do: texture coordinates
-//                if (assimpMesh->HasTextureCoords(j)) {
-//                    assimpMesh->mTextureCoords[j]);
-//                }
+
+                glm::vec2 t;
+                if (assimpMesh->HasTextureCoords(0)) {
+                    t.x = assimpMesh->mTextureCoords[0][j].x;
+                    t.y = assimpMesh->mTextureCoords[0][j].y;
+                }
+                texCoords.push_back(t);
             }
 
             for (unsigned int j = 0; j < assimpMesh->mNumFaces; ++j) {
@@ -63,7 +73,7 @@ bool Model::loadModel(const std::string file) {
             meshes[i]->setVertices(vertices);
             meshes[i]->setIndices(indices);
             meshes[i]->setNormals(normals);
-            // To do: add normals and texture coordinates to mesh
+            meshes[i]->setTextureCoordinates(texCoords);
         }
         return true;
     } else {
@@ -73,7 +83,8 @@ bool Model::loadModel(const std::string file) {
     }
 }
 
-void Model::render() const {
+void Model::render() const
+{
     for (unsigned int i = 0; i < meshes.size(); ++i) {
         meshes[i]->render();
     }

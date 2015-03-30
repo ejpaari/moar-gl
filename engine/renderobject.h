@@ -6,12 +6,16 @@
 
 #include <string>
 
-namespace moar {
+namespace moar
+{
 
 class RenderObject : public Object
 {
 public:
-    RenderObject();
+    static const glm::mat4* projection;
+    static const glm::mat4* view;
+
+    explicit RenderObject();
     ~RenderObject();
     RenderObject(const RenderObject&) = delete;
     RenderObject(RenderObject&&) = delete;
@@ -22,6 +26,7 @@ public:
     void render();
 
 private:
+
     Model model;
     GLuint shader;
     GLuint textures[1];

@@ -26,7 +26,8 @@ SOURCES += \
     ../engine/model.cpp \
     ../engine/mesh.cpp \
     ../engine/object.cpp \
-    ../engine/renderobject.cpp
+    ../engine/renderobject.cpp \
+    ../engine/camera.cpp
 
 HEADERS += \
     myapp.h \
@@ -36,7 +37,8 @@ HEADERS += \
     ../engine/model.h \
     ../engine/mesh.h \
     ../engine/object.h \
-    ../engine/renderobject.h
+    ../engine/renderobject.h \
+    ../engine/camera.h
 
 # GLEW
 unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW

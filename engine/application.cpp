@@ -2,22 +2,37 @@
 
 #include <iostream>
 
-namespace moar {
+namespace moar
+{
 
 Application::Application() :
-    running(true) {
+    running(true)
+{
+    RenderObject::view = camera.getViewMatrixPointer();
+    RenderObject::projection = camera.getProjectionMatrixPointer();
+    camera.setPosition(glm::vec3(0.0f, 0.0f, -5.0f));
 }
 
-Application::~Application() {
+Application::~Application()
+{
 }
 
-void Application::render() {
+void Application::input(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera.move(glm::vec3(0.0f, 0.0f, 0.01f));
+    }
+}
+
+void Application::render()
+{
     for (unsigned int i = 0; i < renderObjects.size(); ++i) {
         renderObjects[i]->render();
     }
 }
 
-bool Application::createRenderObject(const std::string& shaderName, const std::string& modelName) {
+bool Application::createRenderObject(const std::string& shaderName, const std::string& modelName)
+{
     GLuint shaderProgram;
     auto found = shaders.find(shaderName);
     if (found == shaders.end()) {

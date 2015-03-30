@@ -2,14 +2,16 @@
 #define MESH_H
 
 #include <GL/glew.h>
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
 #include <vector>
 
-namespace moar {
+namespace moar
+{
 
-class Mesh {
+class Mesh
+{
 public:
-    Mesh();
+    explicit Mesh();
     ~Mesh();
     Mesh(const Mesh&) = delete;
     Mesh(Mesh&&) = delete;
@@ -20,6 +22,7 @@ public:
     void setVertices(const std::vector<glm::vec3>& vertices);
     void setIndices(const std::vector<unsigned int>& indices);
     void setNormals(const std::vector<glm::vec3>& normals);
+    void setTextureCoordinates(const std::vector<glm::vec2>& coords);
 
     unsigned int getNumIndices() const { return numIndices; }
 
@@ -31,6 +34,7 @@ private:
     GLuint vertexBuffer;
     GLuint indexBuffer;
     GLuint normalBuffer;
+    GLuint texBuffer;
     unsigned int numIndices;    
 };
 

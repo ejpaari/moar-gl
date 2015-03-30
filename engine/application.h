@@ -1,18 +1,22 @@
 #ifndef APPLICATION
 #define APPLICATION
 
-#include "../engine/renderobject.h"
-#include "../engine/shader.h"
+#include "renderobject.h"
+#include "shader.h"
+#include "camera.h"
 
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <vector>
 #include <map>
 #include <memory>
 
-namespace moar {
+namespace moar
+{
 
-class Application {
+class Application
+{
 public:
     explicit Application();
     virtual ~Application();
@@ -21,8 +25,9 @@ public:
     Application& operator=(const Application&) = delete;
     Application& operator=(Application&&) = delete;
 
-    void virtual start() = 0;
-    void virtual update() = 0;
+    virtual void start() = 0;
+    virtual void input(GLFWwindow* window);
+    virtual void update() = 0;
     void render();
     void quit() { running = false; }
 
@@ -31,6 +36,7 @@ public:
     bool isRunning() const { return running; }
 
 private:
+    Camera camera;
     bool running;
 
     std::vector<std::shared_ptr<RenderObject>> renderObjects;

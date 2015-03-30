@@ -7,10 +7,13 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <memory>
+#include <functional>
 
-namespace moar {
+namespace moar
+{
 
-class Engine {
+class Engine
+{
 public:
     explicit Engine(const std::string& settingsFile);
     ~Engine();
@@ -22,6 +25,7 @@ public:
     bool init();
     void setApplication(std::shared_ptr<Application> application) { app = application; }
     void execute();
+    void input(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
     std::shared_ptr<Application> app;

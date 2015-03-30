@@ -3,7 +3,8 @@
 
 #include <memory>
 
-int main(/*int argc, char* argv[]*/) {
+int main(/*int argc, char* argv[]*/)
+{
     moar::Engine engine("../moar-gl/myapp/settings.ini");
     if (!engine.init()) {
         return -1;
