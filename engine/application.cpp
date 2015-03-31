@@ -31,7 +31,7 @@ void Application::render()
     }
 }
 
-bool Application::createRenderObject(const std::string& shaderName, const std::string& modelName)
+RenderObject* Application::createRenderObject(const std::string& shaderName, const std::string& modelName)
 {
     GLuint shaderProgram;
     auto found = shaders.find(shaderName);
@@ -48,13 +48,13 @@ bool Application::createRenderObject(const std::string& shaderName, const std::s
         isGood = shader->attachShader(GL_VERTEX_SHADER, vertexShaderFile.c_str());
         if (!isGood) {
             std::cerr << "Failed to attach vertex shader: " << shaderName << std::endl;
-            return false;
+            return nullptr;
         }
 
         isGood = shader->attachShader(GL_FRAGMENT_SHADER, fragmentShaderFile.c_str());
         if (!isGood) {
             std::cerr << "Failed to attach fragment shader: " << shaderName << std::endl;
-            return false;
+            return nullptr;
         }
 
         shader->linkProgram();
@@ -67,7 +67,7 @@ bool Application::createRenderObject(const std::string& shaderName, const std::s
     std::shared_ptr<RenderObject> renderObj(new RenderObject());
     renderObj->init(shaderProgram, modelName);
     renderObjects.push_back(renderObj);
-    return true;
+    return renderObj.get();
 }
 
 } // moar

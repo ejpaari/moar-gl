@@ -86,7 +86,7 @@ void Engine::execute()
     while (app->isRunning()) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         app->input(window);
-        app->update();
+        app->update(glfwGetTime());
         app->render();
 
         glfwSwapBuffers(window);

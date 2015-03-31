@@ -27,11 +27,11 @@ public:
 
     virtual void start() = 0;
     virtual void input(GLFWwindow* window);
-    virtual void update() = 0;
+    virtual void update(double time) = 0;
     void render();
     void quit() { running = false; }
 
-    bool createRenderObject(const std::string& shaderName, const std::string& modelName);
+    RenderObject* createRenderObject(const std::string& shaderName, const std::string& modelName);
 
     bool isRunning() const { return running; }
 

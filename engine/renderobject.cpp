@@ -59,6 +59,7 @@ bool RenderObject::init(GLuint shaderProgram, const std::string& modelName)
 
 void RenderObject::render()
 {
+    glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(getModelMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, glm::value_ptr(*view));
     glUniformMatrix4fv(glGetUniformLocation(shader, "proj"), 1, GL_FALSE, glm::value_ptr(*projection));
     model.render();
