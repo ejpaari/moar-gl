@@ -14,8 +14,10 @@ public:
     void virtual update(double time) final;
 
 private:
-    moar::RenderObject* monkey;
-    moar::RenderObject* torus;
+    moar::RenderObject* monkey1;
+    moar::RenderObject* monkey2;
+    moar::RenderObject* torus1;
+    moar::RenderObject* torus2;
 };
 
 #endif // MYAPP_H

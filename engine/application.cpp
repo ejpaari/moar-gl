@@ -6,11 +6,12 @@ namespace moar
 {
 
 Application::Application() :
-    running(true)
+    running(true),
+    movementSpeed(0.01f)
 {
     RenderObject::view = camera.getViewMatrixPointer();
     RenderObject::projection = camera.getProjectionMatrixPointer();
-    camera.setPosition(glm::vec3(0.0f, 0.0f, -5.0f));
+    camera.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 Application::~Application()
@@ -19,9 +20,30 @@ Application::~Application()
 
 void Application::input(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera.move(glm::vec3(0.0f, 0.0f, 0.01f));
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+        quit();
     }
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        camera.move(camera.getForward() * movementSpeed);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        camera.move(-camera.getForward() * movementSpeed);
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        camera.move(camera.getLeft() * movementSpeed);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        camera.move(-camera.getLeft() * movementSpeed);
+    }
+
+    double x = 0.0;
+    double y = 0.0;
+    glfwGetCursorPos(window, &x, &y);
+    mouse.setPosition(x, y);
+
+    camera.rotate(glm::vec3(0.0f, 1.0f, 0.0f), -mouse.getDeltaX());
+    camera.rotate(glm::vec3(1.0f, 0.0f, 0.0f), mouse.getDeltaY());
 }
 
 void Application::render()

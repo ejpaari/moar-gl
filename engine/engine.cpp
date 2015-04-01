@@ -92,7 +92,7 @@ void Engine::execute()
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
+        if (glfwWindowShouldClose(window)) {
             app->quit();
         }
         if (useTimeLimit && glfwGetTime() >= timeLimit) {

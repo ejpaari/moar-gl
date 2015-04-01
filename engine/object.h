@@ -9,6 +9,10 @@ namespace moar
 class Object
 {
 public:
+    static const glm::vec3 FORWARD;
+    static const glm::vec3 UP;
+    static const glm::vec3 LEFT;
+
     explicit Object();
     virtual ~Object();
     Object(const Object&) = delete;
@@ -24,8 +28,12 @@ public:
     virtual void rotate(const glm::vec3& axis, float amount) { rotation += axis * amount; }
 
     glm::mat4x4 getModelMatrix() const;
+    glm::vec3 getForward() const;
+    glm::vec3 getUp() const;
+    glm::vec3 getLeft() const;
 
 protected:
+
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;

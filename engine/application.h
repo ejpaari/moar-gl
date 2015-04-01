@@ -4,6 +4,7 @@
 #include "renderobject.h"
 #include "shader.h"
 #include "camera.h"
+#include "mouse.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -37,7 +38,9 @@ public:
 
 private:
     Camera camera;
+    Mouse mouse;
     bool running;
+    float movementSpeed;
 
     std::vector<std::shared_ptr<RenderObject>> renderObjects;
     std::map<std::string, std::unique_ptr<Shader>> shaders;

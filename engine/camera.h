@@ -21,12 +21,14 @@ public:
 
     virtual void setPosition(const glm::vec3& pos);
     virtual void move(const glm::vec3& translation);
-
+    virtual void rotate(const glm::vec3& axis, float amount);
 
     const glm::mat4* getViewMatrixPointer() const { return viewMatrix.get(); }
     const glm::mat4* getProjectionMatrixPointer() const { return projectionMatrix.get(); }
 
 private:
+    void updateViewMatrix();
+
     float FOV;
     float ratio;
     float nearClipPlane;

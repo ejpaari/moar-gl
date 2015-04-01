@@ -2,6 +2,8 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
+
 namespace moar
 {
 
@@ -23,14 +25,24 @@ Camera::~Camera()
 
 void Camera::setPosition(const glm::vec3& pos)
 {
-    position = pos;
-    *viewMatrix = glm::mat4(glm::lookAt(position, forward, up));
+    Object::setPosition(pos);
+    updateViewMatrix();
 }
 
 void Camera::move(const glm::vec3& translation)
 {
-    position += translation;
-    *viewMatrix = glm::mat4(glm::lookAt(position, forward, up));
+    Object::move(translation);
+    updateViewMatrix();
+}
+
+void Camera::rotate(const glm::vec3& axis, float amount) {
+    Object::rotate(axis, amount);
+    updateViewMatrix();
+}
+
+void Camera::updateViewMatrix()
+{
+    *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));
 }
 
 } // moar
