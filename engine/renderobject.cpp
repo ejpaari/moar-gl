@@ -28,25 +28,6 @@ bool RenderObject::init(GLuint shaderProgram, Model* renderModel)
     glUseProgram(shader);
 
     model = renderModel;
-    for (auto i = model->getMeshes()->begin(); i != model->getMeshes()->end(); ++i) {
-        // Todo: Explicitly bind locations! This is not very smart
-        glBindVertexArray((*i)->getVAO());
-
-        glBindBuffer(GL_ARRAY_BUFFER, (*i)->getVertexBuffer());
-        GLint posAttrib = glGetAttribLocation(shader, "position");        
-        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(posAttrib);
-
-        glBindBuffer(GL_ARRAY_BUFFER, (*i)->getNormalBuffer());
-        GLint normalAttrib = glGetAttribLocation(shader, "normal");        
-        glVertexAttribPointer(normalAttrib , 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(normalAttrib);
-
-        glBindBuffer(GL_ARRAY_BUFFER, (*i)->getTexBuffer());
-        GLint texAttrib = glGetAttribLocation(shader, "tex");        
-        glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(texAttrib);
-    }
 
     // Todo: Texture
     glGenTextures(1, textures);

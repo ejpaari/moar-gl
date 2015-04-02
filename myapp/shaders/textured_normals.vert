@@ -1,8 +1,8 @@
 #version 450 core
 
-in vec3 position;
-in vec3 normal;
-in vec2 tex;
+layout (location = 1) in vec3 position;
+layout (location = 2) in vec2 tex;
+layout (location = 3) in vec3 normal;
 
 out vec3 Color;
 out vec2 TexCoord;
