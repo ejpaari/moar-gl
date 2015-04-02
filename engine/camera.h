@@ -20,6 +20,7 @@ public:
     Camera& operator=(Camera&&) = delete;
 
     virtual void setPosition(const glm::vec3& pos);
+
     virtual void move(const glm::vec3& translation);
     virtual void rotate(const glm::vec3& axis, float amount);
 

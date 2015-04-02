@@ -1,49 +1,43 @@
 #include "application.h"
 
+#include <boost/math/constants/constants.hpp>
 #include <iostream>
 
 namespace moar
 {
 
 Application::Application() :
-    running(true),
-    movementSpeed(0.01f)
+    running(true)
 {
     RenderObject::view = camera.getViewMatrixPointer();
     RenderObject::projection = camera.getProjectionMatrixPointer();
-    camera.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 Application::~Application()
 {
 }
 
-void Application::input(GLFWwindow* window)
+void Application::handleInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
         quit();
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera.move(camera.getForward() * movementSpeed);
+        camera.move(camera.getForward() * input.getMovementSpeed());
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera.move(-camera.getForward() * movementSpeed);
+        camera.move(-camera.getForward() * input.getMovementSpeed());
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera.move(camera.getLeft() * movementSpeed);
+        camera.move(camera.getLeft() * input.getMovementSpeed());
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera.move(-camera.getLeft() * movementSpeed);
+        camera.move(-camera.getLeft() * input.getMovementSpeed());
     }
 
-    double x = 0.0;
-    double y = 0.0;
-    glfwGetCursorPos(window, &x, &y);
-    mouse.setPosition(x, y);
-
-    camera.rotate(glm::vec3(0.0f, 1.0f, 0.0f), -mouse.getDeltaX());
-    camera.rotate(glm::vec3(1.0f, 0.0f, 0.0f), mouse.getDeltaY());
+    camera.rotate(glm::vec3(0.0f, 1.0f, 0.0f), -input.getCursorDeltaX() * boost::math::constants::degree<double>());
+    camera.rotate(glm::vec3(1.0f, 0.0f, 0.0f), input.getCursorDeltaY() * boost::math::constants::degree<double>());
 }
 
 void Application::render()

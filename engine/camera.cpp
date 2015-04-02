@@ -2,7 +2,6 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
 
 namespace moar
 {
@@ -15,12 +14,10 @@ Camera::Camera() :
     viewMatrix(new glm::mat4(glm::lookAt(position, forward, up))),
     projectionMatrix(new glm::mat4(glm::perspective(FOV, ratio, nearClipPlane, farClipPlane)))
 {
-    position = glm::vec3(0.0f, 0.0f, -5.0f);
 }
 
 Camera::~Camera()
 {
-
 }
 
 void Camera::setPosition(const glm::vec3& pos)

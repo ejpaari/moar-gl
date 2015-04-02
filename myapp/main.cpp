@@ -5,12 +5,12 @@
 
 int main(/*int argc, char* argv[]*/)
 {
-    moar::Engine engine("../moar-gl/myapp/settings.ini");
-    if (!engine.init()) {
-        return -1;
-    }
+    moar::Engine engine;
     std::shared_ptr<MyApp> app(new MyApp());
     engine.setApplication(app);
+    if (!engine.init("../moar-gl/myapp/settings.ini")) {
+        return -1;
+    }
     engine.execute();
     return 0;
 }

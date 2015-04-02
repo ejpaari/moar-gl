@@ -4,7 +4,7 @@
 #include "renderobject.h"
 #include "shader.h"
 #include "camera.h"
-#include "mouse.h"
+#include "input.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -27,7 +27,7 @@ public:
     Application& operator=(Application&&) = delete;
 
     virtual void start() = 0;
-    virtual void input(GLFWwindow* window);
+    virtual void handleInput(GLFWwindow* window);
     virtual void update(double time) = 0;
     void render();
     void quit() { running = false; }
@@ -36,11 +36,12 @@ public:
 
     bool isRunning() const { return running; }
 
+    Input* getInput() { return &input; }
+
 private:
     Camera camera;
-    Mouse mouse;
+    Input input;
     bool running;
-    float movementSpeed;
 
     std::vector<std::shared_ptr<RenderObject>> renderObjects;
     std::map<std::string, std::unique_ptr<Shader>> shaders;

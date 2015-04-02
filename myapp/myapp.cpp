@@ -24,6 +24,6 @@ void MyApp::start()
     torus2->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
 }
 
-void MyApp::update(double time)
+void MyApp::update(double)
 {
 }
