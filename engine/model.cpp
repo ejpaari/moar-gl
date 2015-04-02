@@ -68,13 +68,13 @@ bool Model::loadModel(const std::string file)
                 indices.push_back(assimpMesh->mFaces[j].mIndices[2]);
             }
 
-            meshes[i] = std::unique_ptr<Mesh>(new Mesh());
-            meshes[i]->setShader(shader);
+            meshes[i] = std::unique_ptr<Mesh>(new Mesh());            
             meshes[i]->setVertices(vertices);
             meshes[i]->setIndices(indices);
             meshes[i]->setNormals(normals);
             meshes[i]->setTextureCoordinates(texCoords);
         }
+        std::cout << "Loaded model: " << file << std::endl;
         return true;
     } else {
         std::cerr << "Failed to read model: " << file << std::endl;
@@ -84,7 +84,7 @@ bool Model::loadModel(const std::string file)
 }
 
 void Model::render() const
-{
+{    
     for (unsigned int i = 0; i < meshes.size(); ++i) {
         meshes[i]->render();
     }

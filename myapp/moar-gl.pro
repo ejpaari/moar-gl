@@ -14,8 +14,10 @@ TEMPLATE = app
 
 DISTFILES += \
     settings.ini \
-    shaders/test.frag \
-    shaders/test.vert
+    shaders/normals.frag \
+    shaders/normals.vert \
+    shaders/textured_normals.frag \
+    shaders/textured_normals.vert
 
 SOURCES += \
     main.cpp \
@@ -28,7 +30,8 @@ SOURCES += \
     ../engine/object.cpp \
     ../engine/renderobject.cpp \
     ../engine/camera.cpp \
-    ../engine/input.cpp
+    ../engine/input.cpp \
+    ../engine/resourcemanager.cpp
 
 HEADERS += \
     myapp.h \
@@ -40,7 +43,8 @@ HEADERS += \
     ../engine/object.h \
     ../engine/renderobject.h \
     ../engine/camera.h \
-    ../engine/input.h
+    ../engine/input.h \
+    ../engine/resourcemanager.h
 
 # GLEW
 unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW

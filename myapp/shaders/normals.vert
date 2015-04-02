@@ -13,7 +13,7 @@ uniform mat4 proj;
 
 void main()
 {
-    Color = vec3(proj * view * model * vec4(normal, 0.0)) * normal;
+    Color = normal;
     TexCoord = tex;
     gl_Position = proj * view * model * vec4(position, 1.0);
 }

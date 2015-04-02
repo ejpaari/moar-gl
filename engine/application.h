@@ -2,7 +2,6 @@
 #define APPLICATION
 
 #include "renderobject.h"
-#include "shader.h"
 #include "camera.h"
 #include "input.h"
 
@@ -16,6 +15,8 @@
 namespace moar
 {
 
+class Engine;
+
 class Application
 {
 public:
@@ -25,6 +26,8 @@ public:
     Application(Application&&) = delete;
     Application& operator=(const Application&) = delete;
     Application& operator=(Application&&) = delete;
+
+    void setEngine(Engine* engine) { this->engine = engine; }
 
     virtual void start() = 0;
     virtual void handleInput(GLFWwindow* window);
@@ -36,15 +39,16 @@ public:
 
     bool isRunning() const { return running; }
 
+    Engine* getEngine() { return engine; }
     Input* getInput() { return &input; }
 
 private:
+    Engine* engine;
     Camera camera;
     Input input;
     bool running;
 
     std::vector<std::shared_ptr<RenderObject>> renderObjects;
-    std::map<std::string, std::unique_ptr<Shader>> shaders;
 };
 
 } // moar

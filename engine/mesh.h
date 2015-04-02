@@ -18,18 +18,21 @@ public:
     Mesh& operator=(const Mesh&) = delete;
     Mesh& operator=(Mesh&&) = delete;
 
-    void setShader(GLuint shaderProgram) { shader = shaderProgram; }
+    // Todo: template function
     void setVertices(const std::vector<glm::vec3>& vertices);
     void setIndices(const std::vector<unsigned int>& indices);
     void setNormals(const std::vector<glm::vec3>& normals);
     void setTextureCoordinates(const std::vector<glm::vec2>& coords);
 
+    GLuint getVAO() const { return VAO; }
+    GLuint getVertexBuffer() const { return vertexBuffer; }
+    GLuint getNormalBuffer() const { return normalBuffer; }
+    GLuint getTexBuffer() const { return texBuffer; }
     unsigned int getNumIndices() const { return numIndices; }
 
     void render() const;
 
 private:
-    GLuint shader;
     GLuint VAO;
     GLuint vertexBuffer;
     GLuint indexBuffer;

@@ -22,12 +22,12 @@ public:
     RenderObject& operator=(const RenderObject&) = delete;
     RenderObject& operator=(RenderObject&&) = delete;
 
-    bool init(GLuint shaderProgram, const std::string& modelName);
+    bool init(GLuint shaderProgram, Model* renderModel);
     void render();
 
 private:
 
-    Model model;
+    Model* model;
     GLuint shader;
     GLuint textures[1];
 

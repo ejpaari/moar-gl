@@ -2,6 +2,7 @@
 #define ENGINE
 
 #include "application.h"
+#include "resourcemanager.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -21,15 +22,17 @@ public:
     Engine& operator=(const Engine&) = delete;
     Engine& operator=(Engine&&) = delete;
 
+    void setApplication(std::shared_ptr<Application> application);
     bool init(const std::string& settingsFile);
-    void setApplication(std::shared_ptr<Application> application) { app = application; }
     void execute();
-    void input(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+    ResourceManager* getResourceManager() { return &manager; }
 
 private:
     void printInfo(int screenWidth, int screenHeight);
 
     std::shared_ptr<Application> app;
+    ResourceManager manager;
     GLFWwindow* window;
     bool useTimeLimit;
     double timeLimit;

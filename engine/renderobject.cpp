@@ -19,21 +19,33 @@ RenderObject::RenderObject()
 
 RenderObject::~RenderObject()
 {
+    glDeleteTextures(1, &textures[0]);
 }
 
-bool RenderObject::init(GLuint shaderProgram, const std::string& modelName)
+bool RenderObject::init(GLuint shaderProgram, Model* renderModel)
 {
     shader = shaderProgram;
     glUseProgram(shader);
 
-    // Model
-    std::string path = "../moar-gl/models/";
-    path += modelName;
-    model.setShader(shader);
-    bool isGood = model.loadModel(path);
-    if (!isGood) {
-        std::cerr << "Failed to load model: " << modelName << std::endl;
-        return false;
+    model = renderModel;
+    for (auto i = model->getMeshes()->begin(); i != model->getMeshes()->end(); ++i) {
+        // Todo: Explicitly bind locations! This is not very smart
+        glBindVertexArray((*i)->getVAO());
+
+        glBindBuffer(GL_ARRAY_BUFFER, (*i)->getVertexBuffer());
+        GLint posAttrib = glGetAttribLocation(shader, "position");        
+        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(posAttrib);
+
+        glBindBuffer(GL_ARRAY_BUFFER, (*i)->getNormalBuffer());
+        GLint normalAttrib = glGetAttribLocation(shader, "normal");        
+        glVertexAttribPointer(normalAttrib , 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(normalAttrib);
+
+        glBindBuffer(GL_ARRAY_BUFFER, (*i)->getTexBuffer());
+        GLint texAttrib = glGetAttribLocation(shader, "tex");        
+        glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(texAttrib);
     }
 
     // Todo: Texture
@@ -59,10 +71,11 @@ bool RenderObject::init(GLuint shaderProgram, const std::string& modelName)
 
 void RenderObject::render()
 {
+    glUseProgram(shader);
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(getModelMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, glm::value_ptr(*view));
     glUniformMatrix4fv(glGetUniformLocation(shader, "proj"), 1, GL_FALSE, glm::value_ptr(*projection));
-    model.render();
+    model->render();
 }
 
 } // moar

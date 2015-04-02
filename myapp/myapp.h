@@ -16,8 +16,10 @@ public:
 private:
     moar::RenderObject* monkey1;
     moar::RenderObject* monkey2;
+    moar::RenderObject* monkey3;
     moar::RenderObject* torus1;
     moar::RenderObject* torus2;
+    moar::RenderObject* torus3;
 };
 
 #endif // MYAPP_H

@@ -24,10 +24,9 @@ public:
     bool loadModel(const std::string file);
     void render() const;
 
-    void setShader(GLuint shaderProgram) { shader = shaderProgram; }
+    std::vector<std::unique_ptr<Mesh>>* getMeshes() { return &meshes; }
 
 private:
-    GLuint shader;
     std::vector<std::unique_ptr<Mesh>> meshes;
 };
 

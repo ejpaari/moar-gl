@@ -23,10 +23,6 @@ void Mesh::setVertices(const std::vector<glm::vec3>& vertices)
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-    GLint posAttrib = glGetAttribLocation(shader, "position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 void Mesh::setIndices(const std::vector<unsigned int>& indices)
@@ -42,10 +38,6 @@ void Mesh::setNormals(const std::vector<glm::vec3>& normals)
     glGenBuffers(1, &normalBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(), &normals[0], GL_STATIC_DRAW);
-
-    GLint normalAttrib = glGetAttribLocation(shader, "normal");
-    glEnableVertexAttribArray(normalAttrib);
-    glVertexAttribPointer(normalAttrib , 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 void Mesh::setTextureCoordinates(const std::vector<glm::vec2>& coords)
@@ -53,16 +45,11 @@ void Mesh::setTextureCoordinates(const std::vector<glm::vec2>& coords)
     glGenBuffers(1, &texBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, texBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * coords.size(), &coords[0], GL_STATIC_DRAW);
-
-    GLint texAttrib = glGetAttribLocation(shader, "tex");
-    glEnableVertexAttribArray(texAttrib);
-    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 void Mesh::render() const
 {
     glBindVertexArray(VAO);
-    glUseProgram(shader);
     glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
 }
 

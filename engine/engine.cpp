@@ -8,12 +8,18 @@ namespace moar
 Engine::Engine() :
     useTimeLimit(false),
     timeLimit(0.0)
-{
+{    
 }
 
 Engine::~Engine()
 {
     glfwTerminate();
+}
+
+void Engine::setApplication(std::shared_ptr<Application> application)
+{
+     app = application;
+     app->setEngine(this);
 }
 
 bool Engine::init(const std::string& settingsFile)
@@ -62,6 +68,8 @@ bool Engine::init(const std::string& settingsFile)
 
     useTimeLimit = pt.get<bool>("Engine.useTimeLimit");
     timeLimit = pt.get<double>("Engine.timeLimit");
+    manager.setShaderPath(pt.get<std::string>("Engine.shaderPath"));
+    manager.setModelPath(pt.get<std::string>("Engine.modelPath"));
 
     glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
