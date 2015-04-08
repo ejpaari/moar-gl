@@ -19,33 +19,14 @@ RenderObject::RenderObject()
 
 RenderObject::~RenderObject()
 {
-    glDeleteTextures(1, &textures[0]);
 }
 
-bool RenderObject::init(GLuint shaderProgram, Model* renderModel)
+bool RenderObject::init(GLuint shaderProgram, Model* renderModel, GLuint textureName)
 {
-    shader = shaderProgram;
     glUseProgram(shader);
-
+    shader = shaderProgram;    
     model = renderModel;
-
-    // Todo: Texture
-    glGenTextures(1, textures);
-
-    int width, height;
-    unsigned char* image;
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    image = SOIL_load_image("../moar-gl/textures/checker.png", &width, &height, 0, SOIL_LOAD_RGB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-    SOIL_free_image_data(image);
-    glUniform1i(glGetUniformLocation(shader, "myTexture"), 0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    texture = textureName;
 
     return true;
 }
@@ -56,6 +37,9 @@ void RenderObject::render()
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, glm::value_ptr(getModelMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, glm::value_ptr(*view));
     glUniformMatrix4fv(glGetUniformLocation(shader, "proj"), 1, GL_FALSE, glm::value_ptr(*projection));
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(glGetUniformLocation(shader, "myTexture"), 0);
     model->render();
 }
 

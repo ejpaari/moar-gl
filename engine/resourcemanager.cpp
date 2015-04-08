@@ -68,4 +68,22 @@ Model* ResourceManager::getModel(const std::string& modelName)
     }
 }
 
+GLuint ResourceManager::getTexture(const std::string& textureName)
+{
+    auto found = textures.find(textureName);
+    if (found == textures.end()) {
+        std::string textureFile = texturePath + textureName;
+        std::unique_ptr<Texture> texture(new Texture());
+        bool isGood = texture->load(textureFile);
+        if (!isGood) {
+            std::cerr << "Failed to load texture: " << textureFile << std::endl;
+            return 0;
+        }
+        auto iter = textures.insert(std::pair<std::string, std::unique_ptr<Texture>>(textureName, std::move(texture)));
+        return iter.first->second->getName();
+    } else {
+        return found->second->getName();
+    }
+}
+
 } // moar

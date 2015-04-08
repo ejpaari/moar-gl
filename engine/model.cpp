@@ -1,4 +1,5 @@
 #include "model.h"
+#include "resourcemanager.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -27,7 +28,8 @@ bool Model::loadModel(const std::string file)
     if (assimpScene) {
         meshes.resize(assimpScene->mNumMeshes);
         if (assimpScene->mNumMeshes == 0) {
-            std::cerr << "Warning: No mesh found in the model " << file << std::endl;
+            std::cerr << "No mesh found in the model " << file << std::endl;
+            return false;
         }
 
         for (unsigned int i = 0; i < meshes.size(); ++i) {
@@ -67,6 +69,8 @@ bool Model::loadModel(const std::string file)
                 indices.push_back(assimpMesh->mFaces[j].mIndices[1]);
                 indices.push_back(assimpMesh->mFaces[j].mIndices[2]);
             }
+
+            // Todo: load mesh materials.
 
             meshes[i] = std::unique_ptr<Mesh>(new Mesh());            
             meshes[i]->setVertices(vertices);

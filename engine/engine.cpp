@@ -70,6 +70,7 @@ bool Engine::init(const std::string& settingsFile)
     timeLimit = pt.get<double>("Engine.timeLimit");
     manager.setShaderPath(pt.get<std::string>("Engine.shaderPath"));
     manager.setModelPath(pt.get<std::string>("Engine.modelPath"));
+    manager.setTexturePath(pt.get<std::string>("Engine.texturePath"));
 
     glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);

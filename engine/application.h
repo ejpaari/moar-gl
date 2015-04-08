@@ -9,7 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <vector>
-#include <map>
 #include <memory>
 
 namespace moar
@@ -35,7 +34,7 @@ public:
     void render();
     void quit() { running = false; }
 
-    RenderObject* createRenderObject(const std::string& shaderName, const std::string& modelName);
+    RenderObject* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName = "");
 
     bool isRunning() const { return running; }
 

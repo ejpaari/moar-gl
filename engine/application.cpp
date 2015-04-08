@@ -50,13 +50,17 @@ void Application::render()
     }
 }
 
-RenderObject* Application::createRenderObject(const std::string& shaderName, const std::string& modelName)
+RenderObject* Application::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)
 {
     GLuint shader = engine->getResourceManager()->getShader(shaderName);
     Model* model = engine->getResourceManager()->getModel(modelName);
+    GLuint texture = 0;
+    if (!textureName.empty()) {
+        texture = engine->getResourceManager()->getTexture(textureName);
+    }
 
     std::shared_ptr<RenderObject> renderObj(new RenderObject());
-    renderObj->init(shader, model);
+    renderObj->init(shader, model, texture);
     renderObjects.push_back(renderObj);
     return renderObj.get();
 }

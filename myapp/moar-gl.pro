@@ -31,7 +31,8 @@ SOURCES += \
     ../engine/renderobject.cpp \
     ../engine/camera.cpp \
     ../engine/input.cpp \
-    ../engine/resourcemanager.cpp
+    ../engine/resourcemanager.cpp \
+    ../engine/texture.cpp
 
 HEADERS += \
     myapp.h \
@@ -44,7 +45,8 @@ HEADERS += \
     ../engine/renderobject.h \
     ../engine/camera.h \
     ../engine/input.h \
-    ../engine/resourcemanager.h
+    ../engine/resourcemanager.h \
+    ../engine/texture.h
 
 # GLEW
 unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW

@@ -11,6 +11,8 @@
 namespace moar
 {
 
+class ResourceManager;
+
 class Model
 {
 public:
@@ -23,8 +25,6 @@ public:
 
     bool loadModel(const std::string file);
     void render() const;
-
-    std::vector<std::unique_ptr<Mesh>>* getMeshes() { return &meshes; }
 
 private:
     std::vector<std::unique_ptr<Mesh>> meshes;
