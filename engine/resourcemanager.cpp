@@ -12,7 +12,6 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-
 }
 
 GLuint ResourceManager::getShader(const std::string& shaderName)

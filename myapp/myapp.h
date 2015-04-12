@@ -2,7 +2,7 @@
 #define MYAPP_H
 
 #include "../engine/application.h"
-#include "../engine/renderobject.h"
+#include "../engine/object.h"
 
 class MyApp : public moar::Application
 {
@@ -14,10 +14,10 @@ public:
     void virtual update(double time) final;
 
 private:
-    moar::RenderObject* monkey1;
-    moar::RenderObject* torus1;
-    moar::RenderObject* torus2;
-    moar::RenderObject* ico;
+    moar::Object* monkey1;
+    moar::Object* torus1;
+    moar::Object* torus2;
+    moar::Object* ico;
 };
 
 #endif // MYAPP_H

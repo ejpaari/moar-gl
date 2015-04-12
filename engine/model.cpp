@@ -70,7 +70,7 @@ bool Model::loadModel(const std::string file)
                 indices.push_back(assimpMesh->mFaces[j].mIndices[2]);
             }
 
-            // Todo: load mesh materials.
+            // Todo: maybe load mesh materials?
 
             meshes[i] = std::unique_ptr<Mesh>(new Mesh());            
             meshes[i]->setVertices(vertices);

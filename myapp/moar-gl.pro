@@ -28,11 +28,13 @@ SOURCES += \
     ../engine/model.cpp \
     ../engine/mesh.cpp \
     ../engine/object.cpp \
-    ../engine/renderobject.cpp \
     ../engine/camera.cpp \
     ../engine/input.cpp \
     ../engine/resourcemanager.cpp \
-    ../engine/texture.cpp
+    ../engine/texture.cpp \
+    ../engine/component.cpp \
+    ../engine/renderer.cpp \
+    ../engine/material.cpp
 
 HEADERS += \
     myapp.h \
@@ -42,11 +44,13 @@ HEADERS += \
     ../engine/model.h \
     ../engine/mesh.h \
     ../engine/object.h \
-    ../engine/renderobject.h \
     ../engine/camera.h \
     ../engine/input.h \
     ../engine/resourcemanager.h \
-    ../engine/texture.h
+    ../engine/texture.h \
+    ../engine/component.h \
+    ../engine/renderer.h \
+    ../engine/material.h
 
 # GLEW
 unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW

@@ -1,6 +1,5 @@
 #include "application.h"
 #include "engine.h"
-#include "model.h"
 
 #include <boost/math/constants/constants.hpp>
 #include <iostream>
@@ -12,8 +11,9 @@ Application::Application() :
     engine(nullptr),
     running(true)
 {
-    RenderObject::view = camera.getViewMatrixPointer();
-    RenderObject::projection = camera.getProjectionMatrixPointer();
+    // Todo: when using multiple cameras, this should be moved
+    Renderer::view = camera.getViewMatrixPointer();
+    Renderer::projection = camera.getProjectionMatrixPointer();
 }
 
 Application::~Application()
@@ -46,21 +46,29 @@ void Application::handleInput(GLFWwindow* window)
 void Application::render()
 {
     for (unsigned int i = 0; i < renderObjects.size(); ++i) {
-        renderObjects[i]->render();
+        renderObjects[i]->execute();
     }
 }
 
-RenderObject* Application::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)
+Object* Application::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)
 {
+    // Todo: Maybe this should be moved for the custom application
     GLuint shader = engine->getResourceManager()->getShader(shaderName);
-    Model* model = engine->getResourceManager()->getModel(modelName);
     GLuint texture = 0;
     if (!textureName.empty()) {
         texture = engine->getResourceManager()->getTexture(textureName);
     }
+    Material* material = new Material();
+    material->setShader(shader);
+    material->setTexture(texture);
 
-    std::shared_ptr<RenderObject> renderObj(new RenderObject());
-    renderObj->init(shader, model, texture);
+    Renderer* renderer = new Renderer();
+    Model* model = engine->getResourceManager()->getModel(modelName);
+    renderer->setModel(model);
+
+    std::shared_ptr<Object> renderObj(new Object());
+    renderObj->setComponent(material);
+    renderObj->setComponent(renderer);
     renderObjects.push_back(renderObj);
     return renderObj.get();
 }

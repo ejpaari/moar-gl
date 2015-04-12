@@ -27,6 +27,8 @@ public:
     const glm::mat4* getViewMatrixPointer() const { return viewMatrix.get(); }
     const glm::mat4* getProjectionMatrixPointer() const { return projectionMatrix.get(); }
 
+    // Todo: frustum culling
+
 private:
     void updateViewMatrix();
 

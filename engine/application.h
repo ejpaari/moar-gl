@@ -1,9 +1,11 @@
 #ifndef APPLICATION
 #define APPLICATION
 
-#include "renderobject.h"
-#include "camera.h"
 #include "input.h"
+#include "object.h"
+#include "renderer.h"
+#include "material.h"
+#include "camera.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -34,7 +36,7 @@ public:
     void render();
     void quit() { running = false; }
 
-    RenderObject* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName = "");
+    Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName = "");
 
     bool isRunning() const { return running; }
 
@@ -47,7 +49,7 @@ private:
     Input input;
     bool running;
 
-    std::vector<std::shared_ptr<RenderObject>> renderObjects;
+    std::vector<std::shared_ptr<Object>> renderObjects;
 };
 
 } // moar
