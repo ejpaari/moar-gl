@@ -5,9 +5,10 @@ in vec2 TexCoord;
 
 out vec4 outColor;
 
-uniform sampler2D myTexture;
+uniform sampler2D DiffuseTex;
+uniform sampler2D NormalTex;
 
 void main()
 {
-    outColor = (vec4(Color, 1.0) * 0.4 * texture(myTexture, TexCoord)) + (0.6 * texture(myTexture, TexCoord));
+    outColor = (0.4 * texture(NormalTex, TexCoord) + 0.6 * texture(DiffuseTex, TexCoord));
 }

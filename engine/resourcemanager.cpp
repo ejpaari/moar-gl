@@ -38,7 +38,7 @@ GLuint ResourceManager::getShader(const std::string& shaderName)
         shader->linkProgram();
         std::cout << "Created shader: " << shaderName << std::endl;
         GLuint shaderProgram = shader->getProgram();
-        shaders.insert(std::pair<std::string, std::unique_ptr<Shader>>(shaderName, std::move(shader)));        
+        shaders.insert(std::make_pair(shaderName, std::move(shader)));
         return shaderProgram;
     } else {
         return found->second->getProgram();
@@ -56,7 +56,7 @@ Model* ResourceManager::getModel(const std::string& modelName)
             std::cerr << "Failed to load model: " << modelFile << std::endl;
             return nullptr;
         }
-        auto iter = models.insert(std::pair<std::string, std::unique_ptr<Model>>(modelName, std::move(model)));
+        auto iter = models.insert(std::make_pair(modelName, std::move(model)));
         if (iter.second) {
             return iter.first->second.get();
         } else {

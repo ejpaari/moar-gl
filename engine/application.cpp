@@ -60,7 +60,7 @@ Object* Application::createRenderObject(const std::string& shaderName, const std
     }
     Material* material = new Material();
     material->setShader(shader);
-    material->setTexture(texture);
+    material->setTexture(texture, Material::TextureType::DIFFUSE);
 
     Renderer* renderer = new Renderer();
     Model* model = engine->getResourceManager()->getModel(modelName);

@@ -3,6 +3,7 @@
 
 #include "../engine/application.h"
 #include "../engine/object.h"
+#include "../engine/engine.h"
 
 class MyApp : public moar::Application
 {
