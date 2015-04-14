@@ -41,7 +41,8 @@ public:
     void setShader(GLuint shader) { this->shader = shader; }
     void setTexture(GLuint texture, TextureType type);
 
-    std::string getType() final { return "Material"; }
+    virtual std::string getName() final { return "Material"; }
+    virtual Component::Type getType() final { return Component::Type::MATERIAL; }
 
 private:
     const TextureInfo* getTextureInfo(TextureType type);

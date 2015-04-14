@@ -17,7 +17,7 @@ void MyApp::start()
     torus1 = createRenderObject("textured_normals", "torus.3ds", "brick.png");
 
     torus1->setPosition(glm::vec3(3.0f, 0.0f, 3.0f));
-    moar::Material* mat = dynamic_cast<moar::Material*>(torus1->getComponent("Material"));
+    moar::Material* mat = torus1->getComponent<moar::Material>("Material");
     mat->setTexture(getEngine()->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
 
     monkey1 = createRenderObject("textured_normals", "monkey.3ds", "checker.png");

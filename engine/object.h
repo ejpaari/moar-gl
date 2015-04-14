@@ -44,7 +44,8 @@ public:
 
     bool setComponent(Component* comp);
 
-    Component* getComponent(const std::string& name) const;
+    template<typename T>
+    T* getComponent(const std::string& name);
 
 protected:
     glm::vec3 position;
@@ -58,6 +59,29 @@ protected:
     std::unique_ptr<Component> renderer;
     std::vector<std::unique_ptr<Component>> components;
 };
+
+template<typename T>
+T* Object::getComponent(const std::string& name)
+{
+    if (name == "Transformation") {
+        return nullptr;
+    }
+    if (name == "Material") {
+        return dynamic_cast<T*>(material.get());
+    }
+    if (name == "Renderer") {
+        return dynamic_cast<T*>(renderer.get());
+    }
+    if (name == "Camera") {
+        return nullptr;
+    }
+    for (unsigned int i = 0; i < components.size(); ++i) {
+        if (components[i]->getName() == name) {
+            return dynamic_cast<T*>(components[i].get());
+        }
+    }
+    return nullptr;
+}
 
 } // moar
 

@@ -26,7 +26,8 @@ public:
 
     void setModel(Model* model) { this->model = model; }
 
-    std::string getType() final { return "Renderer"; }
+    virtual std::string getName() final { return "Renderer"; }
+    virtual Component::Type getType() final { return Component::Type::RENDERER; }
 
 private:
     Model* model;

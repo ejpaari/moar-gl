@@ -11,8 +11,13 @@ class Object;
 class Component
 {
 public:
-
-    // Todo: add type enum in addition to name
+    enum Type {
+        TRANSFORMATION,
+        RENDERER,
+        MATERIAL,
+        CAMERA,
+        CUSTOM
+    };
 
     Component();
     virtual ~Component();
@@ -26,7 +31,8 @@ public:
     void setParent(Object* parentObject) { parent = parentObject; }
 
     Object* getParent() const { return parent; }
-    virtual std::string getType() { return ""; }
+    virtual std::string getName() = 0;
+    virtual Component::Type getType() = 0;
 
 protected:
     Object* parent;

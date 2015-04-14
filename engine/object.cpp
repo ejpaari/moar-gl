@@ -77,39 +77,33 @@ glm::vec3 Object::getLeft() const
 
 bool Object::setComponent(Component* comp)
 {
-    // Todo: type enum + switch
     comp->setParent(this);
-    if (comp->getType() == "Material") {
-        material.reset(comp);
-        return true;
-    } else if (comp->getType() == "Renderer") {
+
+    switch (comp->getType()) {
+    case Component::TRANSFORMATION:
+        return false;
+        break;
+    case Component::RENDERER:
         renderer.reset(comp);
-        return true;
-    } else {
+        break;
+    case Component::MATERIAL:
+        material.reset(comp);
+        break;
+    case Component::CAMERA:
+        return false;
+        break;
+    case Component::CUSTOM:
         for (unsigned int i = 0; i < components.size(); ++i) {
-            if (components[i]->getType() == comp->getType()) {
+            if (components[i]->getName() == comp->getName()) {
                 components[i].reset(comp);
-                return true;
             }
         }
+        break;
+    default:
+        return false;
+        break;
     }
-    return false;
-}
-
-Component* Object::getComponent(const std::string& name) const
-{
-    // Todo: use type enum and switch case
-    if (name == "Material") {
-        return material.get();
-    } else if (name == "Renderer") {
-        return renderer.get();
-    }
-    for (unsigned int i = 0; i < components.size(); ++i) {
-        if (components[i]->getType() == name) {
-            return components[i].get();
-        }
-    }
-    return nullptr;
+    return true;
 }
 
 } // moar
