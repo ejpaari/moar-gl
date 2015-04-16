@@ -5,12 +5,10 @@ namespace moar
 
 Component::Component()
 {
-
 }
 
 Component::~Component()
 {
-
 }
 
 } // moar

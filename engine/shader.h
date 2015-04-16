@@ -18,7 +18,7 @@ public:
     Shader& operator=(Shader&& rhs) = delete;
 
     bool attachShader(GLenum shaderType, const char *filename);
-    void linkProgram() { glLinkProgram(program); }
+    bool linkProgram();
     void useProgram() { glUseProgram(program); }
 
     GLuint getProgram() { return program; }

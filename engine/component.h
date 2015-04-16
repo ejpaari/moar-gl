@@ -12,7 +12,6 @@ class Component
 {
 public:
     enum Type {
-        TRANSFORMATION,
         RENDERER,
         MATERIAL,
         CAMERA,

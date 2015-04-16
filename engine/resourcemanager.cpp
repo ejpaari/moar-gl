@@ -35,7 +35,9 @@ GLuint ResourceManager::getShader(const std::string& shaderName)
             return 0;
         }
 
-        shader->linkProgram();
+        if (!shader->linkProgram()) {
+            return 0;
+        }
         std::cout << "Created shader: " << shaderName << std::endl;
         GLuint shaderProgram = shader->getProgram();
         shaders.insert(std::make_pair(shaderName, std::move(shader)));

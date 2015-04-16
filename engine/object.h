@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+#include <typeinfo>
+#include <iostream>
 
 namespace moar
 {
@@ -33,7 +35,6 @@ public:
     virtual void setRotation(const glm::vec3& rotation) { this->rotation = rotation; }
     virtual void setScale(const glm::vec3& scale) { this->scale = scale; }
 
-    // Todo: transformation component
     glm::mat4x4 getModelMatrix() const;
     glm::vec3 getPosition() { return position; }
     glm::vec3 getRotation() { return rotation; }
@@ -45,7 +46,7 @@ public:
     bool setComponent(Component* comp);
 
     template<typename T>
-    T* getComponent(const std::string& name);
+    T* getComponent();
 
 protected:
     glm::vec3 position;
@@ -61,22 +62,16 @@ protected:
 };
 
 template<typename T>
-T* Object::getComponent(const std::string& name)
+T* Object::getComponent()
 {
-    if (name == "Transformation") {
-        return nullptr;
-    }
-    if (name == "Material") {
+    if (typeid(*material.get()) == typeid(T)) {
         return dynamic_cast<T*>(material.get());
     }
-    if (name == "Renderer") {
+    if (typeid(*renderer.get()) == typeid(T)) {
         return dynamic_cast<T*>(renderer.get());
     }
-    if (name == "Camera") {
-        return nullptr;
-    }
     for (unsigned int i = 0; i < components.size(); ++i) {
-        if (components[i]->getName() == name) {
+        if (typeid(*components[i].get()) == typeid(T)) {
             return dynamic_cast<T*>(components[i].get());
         }
     }

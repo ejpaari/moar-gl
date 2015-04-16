@@ -80,17 +80,11 @@ bool Object::setComponent(Component* comp)
     comp->setParent(this);
 
     switch (comp->getType()) {
-    case Component::TRANSFORMATION:
-        return false;
-        break;
     case Component::RENDERER:
         renderer.reset(comp);
         break;
     case Component::MATERIAL:
         material.reset(comp);
-        break;
-    case Component::CAMERA:
-        return false;
         break;
     case Component::CUSTOM:
         for (unsigned int i = 0; i < components.size(); ++i) {
@@ -101,7 +95,6 @@ bool Object::setComponent(Component* comp)
         break;
     default:
         return false;
-        break;
     }
     return true;
 }

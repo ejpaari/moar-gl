@@ -1,6 +1,9 @@
 #include "shader.h"
 
 #include <cstdio>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
 
 namespace moar
 {
@@ -13,9 +16,6 @@ Shader::Shader()
 Shader::~Shader()
 {
     glDeleteProgram(program);
-    for (GLuint shader : shaders) {
-        glDeleteShader(shader);
-    }
 }
 
 bool Shader::attachShader(GLenum shaderType, const char *filename)
@@ -65,6 +65,31 @@ bool Shader::compileShader(GLuint shader, const char* filename)
     }
 
     return true;
+}
+
+bool Shader::linkProgram()
+{
+    glLinkProgram(program);
+
+    GLint isLinked = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+    if (isLinked == GL_FALSE)
+    {
+        GLint maxLength = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+        std::vector<GLchar> infoLog(maxLength);
+        glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+        std::copy(infoLog.begin(), infoLog.end(), std::ostream_iterator<GLchar>(std::cerr, ""));
+
+        glDeleteProgram(program);;
+    }
+
+    for (GLuint shader : shaders) {
+        glDetachShader(program, shader);
+        glDeleteShader(shader);
+    }
+
+    return isLinked;
 }
 
 } // moar
