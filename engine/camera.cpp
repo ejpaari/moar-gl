@@ -2,9 +2,12 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
+#include <boost/math/constants/constants.hpp>
 
 namespace moar
 {
+
+const float Camera::ROTATION_LIMIT = 85.0f * boost::math::constants::degree<double>();
 
 Camera::Camera() :
     FOV(45.0f),
@@ -34,6 +37,12 @@ void Camera::move(const glm::vec3& translation)
 
 void Camera::rotate(const glm::vec3& axis, float amount) {
     Object::rotate(axis, amount);
+    if (rotation.x > ROTATION_LIMIT) {
+        rotation.x = ROTATION_LIMIT;
+    }
+    if (rotation.x < -ROTATION_LIMIT) {
+        rotation.x = -ROTATION_LIMIT;
+    }
     updateViewMatrix();
 }
 

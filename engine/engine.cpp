@@ -65,6 +65,7 @@ bool Engine::init(const std::string& settingsFile)
     float movementSpeed = pt.get<double>("Input.movementSpeed");
     app->getInput()->setSensitivity(sensitivity);
     app->getInput()->setMovementSpeed(movementSpeed);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     useTimeLimit = pt.get<bool>("Engine.useTimeLimit");
     timeLimit = pt.get<double>("Engine.timeLimit");

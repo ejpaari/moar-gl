@@ -53,6 +53,7 @@ void Application::render()
 Object* Application::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)
 {
     // Todo: Maybe this should be moved for the custom application
+    // Todo: Multithreaded loading?
     GLuint shader = engine->getResourceManager()->getShader(shaderName);
     GLuint texture = 0;
     if (!textureName.empty()) {

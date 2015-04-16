@@ -12,6 +12,8 @@ namespace moar
 class Camera : public Object
 {
 public:
+    static const float ROTATION_LIMIT;
+
     // Todo: this should be inherited from component
     explicit Camera();
     virtual ~Camera();
