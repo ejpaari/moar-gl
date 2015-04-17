@@ -42,7 +42,7 @@ bool Engine::init(const std::string& settingsFile)
 
     int screenWidth = pt.get<int>("Window.width");
     int screenHeight = pt.get<int>("Window.height");
-    window = glfwCreateWindow(screenWidth, screenHeight, "moar-gl", NULL, NULL);
+    window = glfwCreateWindow(screenWidth, screenHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to create window" << std::endl;
         glfwTerminate();
