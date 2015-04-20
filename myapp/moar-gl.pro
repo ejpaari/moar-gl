@@ -1,3 +1,4 @@
+
 #-------------------------------------------------
 #
 # Project created by QtCreator 2015-03-18T17:27:39
@@ -34,7 +35,8 @@ SOURCES += \
     ../engine/texture.cpp \
     ../engine/component.cpp \
     ../engine/renderer.cpp \
-    ../engine/material.cpp
+    ../engine/material.cpp \
+    ../engine/gui.cpp
 
 HEADERS += \
     myapp.h \
@@ -50,13 +52,8 @@ HEADERS += \
     ../engine/texture.h \
     ../engine/component.h \
     ../engine/renderer.h \
-    ../engine/material.h
-
-# GLEW
-unix:!macx: LIBS += -L /usr/lib/x86_64-linux-gnu/ -lGLEW
-
-INCLUDEPATH += /usr/include/GL
-DEPENDPATH += /usr/include/GL
+    ../engine/material.h \
+    ../engine/gui.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL
@@ -66,14 +63,26 @@ DEPENDPATH += $$PWD/../glfw/include/
 
 unix:!macx: PRE_TARGETDEPS += $$PWD/../glfw/src/libglfw3.a
 
-# SOIL
-unix:!macx: LIBS += -L$$PWD/../../../../../usr/lib/ -lSOIL
+# GLEW
+unix:!macx: LIBS += -L/usr/lib/x86_64-linux-gnu/ -lGLEW
 
-INCLUDEPATH += $$PWD/../../../../../usr/include/SOIL
-DEPENDPATH += $$PWD/../../../../../usr/include/SOIL
+INCLUDEPATH += /usr/include/GL
+DEPENDPATH += /usr/include/GL
+
+# SOIL
+unix:!macx: LIBS += -L/usr/lib/ -lSOIL
+
+INCLUDEPATH += /usr/include/SOIL
+DEPENDPATH += /usr/include/SOIL
 
 # Assimp
 unix:!macx: LIBS += -L$$PWD/../assimp/lib/ -lassimp
 
 INCLUDEPATH += $$PWD/../assimp/include
 DEPENDPATH += $$PWD/../assimp/include
+
+# AntTweakBar
+unix:!macx: LIBS += -L/usr/lib/ -lAntTweakBar
+
+INCLUDEPATH += /usr/include/AntTweakBar
+DEPENDPATH += /usr/include/AntTweakBar

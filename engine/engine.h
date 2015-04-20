@@ -3,6 +3,7 @@
 
 #include "application.h"
 #include "resourcemanager.h"
+#include "gui.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -29,10 +30,11 @@ public:
     ResourceManager* getResourceManager() { return &manager; }
 
 private:
-    void printInfo(int screenWidth, int screenHeight);
+    void printInfo(int windowWidth, int windowHeight);
 
     std::shared_ptr<Application> app;
     ResourceManager manager;
+    GUI gui;
     GLFWwindow* window;
     bool useTimeLimit;
     double timeLimit;

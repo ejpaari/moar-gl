@@ -31,18 +31,16 @@ bool Engine::init(const std::string& settingsFile)
 
     boost::property_tree::ptree pt;
     boost::property_tree::ini_parser::read_ini(settingsFile, pt);
-    int openglMajor = pt.get<int>("OpenGL.major");
-    int openglMinor = pt.get<int>("OpenGL.minor");
 
-    glfwWindowHint(GLFW_SAMPLES, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openglMajor);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openglMinor);
+    glfwWindowHint(GLFW_SAMPLES, pt.get<int>("OpenGL.multisampling"));
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, pt.get<int>("OpenGL.major"));
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-    int screenWidth = pt.get<int>("Window.width");
-    int screenHeight = pt.get<int>("Window.height");
-    window = glfwCreateWindow(screenWidth, screenHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
+    int windowWidth = pt.get<int>("Window.width");
+    int windowHeight = pt.get<int>("Window.height");
+    window = glfwCreateWindow(windowWidth, windowHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to create window" << std::endl;
         glfwTerminate();
@@ -65,7 +63,11 @@ bool Engine::init(const std::string& settingsFile)
     float movementSpeed = pt.get<double>("Input.movementSpeed");
     app->getInput()->setSensitivity(sensitivity);
     app->getInput()->setMovementSpeed(movementSpeed);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (!gui.init(windowWidth, windowHeight)) {
+        std::cerr << "Failed to initialize AntTweakBar" << std::endl;
+        return false;
+    }
 
     useTimeLimit = pt.get<bool>("Engine.useTimeLimit");
     timeLimit = pt.get<double>("Engine.timeLimit");
@@ -76,7 +78,7 @@ bool Engine::init(const std::string& settingsFile)
     glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 
-    printInfo(screenWidth, screenHeight);
+    printInfo(windowWidth, windowHeight);
 
     return true;
 }
@@ -91,9 +93,11 @@ void Engine::execute()
         app->getInput()->setCursorPosition(x, y);
 
         app->handleInput(window);
+        gui.handleInput(window, static_cast<int>(x), static_cast<int>(y));
         app->update(glfwGetTime());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         app->render();
+        gui.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -103,11 +107,12 @@ void Engine::execute()
         }
         if (useTimeLimit && glfwGetTime() >= timeLimit) {
             app->quit();
+            gui.uninit();
         }
     }
 }
 
-void Engine::printInfo(int screenWidth, int screenHeight)
+void Engine::printInfo(int windowWidth, int windowHeight)
 {
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
     std::cout << "GFX: " << glGetString(GL_RENDERER) << std::endl;
@@ -122,7 +127,7 @@ void Engine::printInfo(int screenWidth, int screenHeight)
     glfwGetMonitorPhysicalSize(primaryMonitor, &monitorWidth, &monitorHeight);
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
 
-    std::cout << "Window resolution: " << screenWidth << " x " << screenHeight << std::endl;
+    std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl;
 }
 
 } // moar
