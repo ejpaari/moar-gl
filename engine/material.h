@@ -38,11 +38,11 @@ public:
 
     virtual void execute() final;
 
-    void setShader(GLuint shader) { this->shader = shader; }
+    void setShader(GLuint shader);
     void setTexture(GLuint texture, TextureType type);
 
-    virtual std::string getName() final { return "Material"; }
-    virtual Component::Type getType() final { return Component::Type::MATERIAL; }
+    virtual std::string getName() final;
+    virtual Component::Type getType() final;
 
 private:
     const TextureInfo* getTextureInfo(TextureType type);

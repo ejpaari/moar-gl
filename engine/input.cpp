@@ -25,6 +25,16 @@ void Input::setCursorPosition(double x, double y)
     this->y = y;
 }
 
+void Input::setSensitivity(double sensitivity)
+{
+    this->sensitivity = sensitivity;
+}
+
+void Input::setMovementSpeed(float speed)
+{
+    movementSpeed = speed;
+}
+
 double Input::getCursorDeltaX() const
 {
     return sensitivity * deltaX;
@@ -33,6 +43,16 @@ double Input::getCursorDeltaX() const
 double Input::getCursorDeltaY() const
 {
     return sensitivity * deltaY;
+}
+
+double Input::getSensitivity() const
+{
+    return sensitivity;
+}
+
+float Input::getMovementSpeed() const
+{
+    return movementSpeed;
 }
 
 } // moar

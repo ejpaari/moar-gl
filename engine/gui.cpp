@@ -37,4 +37,14 @@ void GUI::handleInput(GLFWwindow* window, int x, int y)
     }
 }
 
+void GUI::render()
+{
+    TwDraw();
+}
+
+void GUI::uninit()
+{
+    TwTerminate();
+}
+
 } // moar

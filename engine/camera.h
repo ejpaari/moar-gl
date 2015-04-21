@@ -27,8 +27,8 @@ public:
     virtual void move(const glm::vec3& translation);
     virtual void rotate(const glm::vec3& axis, float amount);
 
-    const glm::mat4* getViewMatrixPointer() const { return viewMatrix.get(); }
-    const glm::mat4* getProjectionMatrixPointer() const { return projectionMatrix.get(); }
+    const glm::mat4* getViewMatrixPointer() const;
+    const glm::mat4* getProjectionMatrixPointer() const;
 
     // Todo: frustum culling
 

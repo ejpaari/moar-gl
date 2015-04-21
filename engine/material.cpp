@@ -31,6 +31,11 @@ void Material::execute()
     }
 }
 
+void Material::setShader(GLuint shader)
+{
+    this->shader = shader;
+}
+
 void Material::setTexture(GLuint texture, TextureType type)
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
@@ -41,6 +46,16 @@ void Material::setTexture(GLuint texture, TextureType type)
     }
 
     textures.push_back(std::make_tuple(texture, getTextureInfo(type)));
+}
+
+std::string Material::getName()
+{
+    return "Material";
+}
+
+Component::Type Material::getType()
+{
+    return Component::Type::MATERIAL;
 }
 
 const Material::TextureInfo* Material::getTextureInfo(TextureType type)

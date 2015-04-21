@@ -1,4 +1,6 @@
 #include "engine.h"
+#include "renderer.h"
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
@@ -8,7 +10,10 @@ namespace moar
 Engine::Engine() :
     useTimeLimit(false),
     timeLimit(0.0)
-{    
+{
+    // Todo: Multiple cameras.
+    Renderer::view = camera.getViewMatrixPointer();
+    Renderer::projection = camera.getProjectionMatrixPointer();
 }
 
 Engine::~Engine()
@@ -61,8 +66,8 @@ bool Engine::init(const std::string& settingsFile)
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     double sensitivity = pt.get<double>("Input.sensitivity");
     float movementSpeed = pt.get<double>("Input.movementSpeed");
-    app->getInput()->setSensitivity(sensitivity);
-    app->getInput()->setMovementSpeed(movementSpeed);
+    input.setSensitivity(sensitivity);
+    input.setMovementSpeed(movementSpeed);
 
     if (!gui.init(windowWidth, windowHeight)) {
         std::cerr << "Failed to initialize AntTweakBar" << std::endl;
@@ -90,13 +95,13 @@ void Engine::execute()
     double y = 0.0;
     while (app->isRunning()) {
         glfwGetCursorPos(window, &x, &y);
-        app->getInput()->setCursorPosition(x, y);
+        input.setCursorPosition(x, y);
 
         app->handleInput(window);
         gui.handleInput(window, static_cast<int>(x), static_cast<int>(y));
         app->update(glfwGetTime());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        app->render();
+        render();
         gui.render();
 
         glfwSwapBuffers(window);
@@ -110,6 +115,27 @@ void Engine::execute()
             gui.uninit();
         }
     }
+}
+
+ResourceManager* Engine::getResourceManager()
+{
+    return &manager;
+}
+
+Camera* Engine::getCamera()
+{
+    return &camera;
+}
+
+Input* Engine::getInput()
+{
+    return &input;
+}
+
+void Engine::addRenderObject(Object* object)
+{
+    std::shared_ptr<Object> obj(object);
+    renderObjects.push_back(obj);
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)
@@ -128,6 +154,13 @@ void Engine::printInfo(int windowWidth, int windowHeight)
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
 
     std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl;
+}
+
+void Engine::render()
+{
+    for (unsigned int i = 0; i < renderObjects.size(); ++i) {
+        renderObjects[i]->execute();
+    }
 }
 
 } // moar

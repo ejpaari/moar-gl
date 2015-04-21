@@ -27,11 +27,11 @@ public:
     void setTextureCoordinates(const std::vector<glm::vec2>& coords);
     void setNormals(const std::vector<glm::vec3>& normals);
 
-    GLuint getVAO() const { return VAO; }
-    GLuint getVertexBuffer() const { return vertexBuffer; }
-    GLuint getNormalBuffer() const { return normalBuffer; }
-    GLuint getTexBuffer() const { return texBuffer; }
-    unsigned int getNumIndices() const { return numIndices; }
+    GLuint getVAO() const;
+    GLuint getVertexBuffer() const;
+    GLuint getNormalBuffer() const;
+    GLuint getTexBuffer() const;
+    unsigned int getNumIndices() const;
 
     void render() const;
     // Todo: AOS vs. SOA for better cache

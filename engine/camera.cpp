@@ -46,6 +46,16 @@ void Camera::rotate(const glm::vec3& axis, float amount) {
     updateViewMatrix();
 }
 
+const glm::mat4* Camera::getViewMatrixPointer() const
+{
+    return viewMatrix.get();
+}
+
+const glm::mat4* Camera::getProjectionMatrixPointer() const
+{
+    return projectionMatrix.get();
+}
+
 void Camera::updateViewMatrix()
 {
     *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));

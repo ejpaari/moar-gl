@@ -15,13 +15,13 @@ public:
     Input& operator=(Input&&) = delete;
 
     void setCursorPosition(double x, double y);
-    void setSensitivity(double sensitivity) { this->sensitivity = sensitivity; }
-    void setMovementSpeed(float speed) { movementSpeed = speed; }
+    void setSensitivity(double sensitivity);
+    void setMovementSpeed(float speed);
 
     double getCursorDeltaX() const;
     double getCursorDeltaY() const;
-    double getSensitivity() const { return sensitivity; }
-    float getMovementSpeed() const { return movementSpeed; }
+    double getSensitivity() const;
+    float getMovementSpeed() const;
 
 private:
     double x;

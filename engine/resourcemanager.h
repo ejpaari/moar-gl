@@ -23,9 +23,9 @@ public:
     ResourceManager& operator=(const ResourceManager&) = delete;
     ResourceManager& operator=(ResourceManager&&) = delete;
 
-    void setShaderPath(const std::string& path) { shaderPath = path; }
-    void setModelPath(const std::string& path) { modelPath = path; }
-    void setTexturePath(const std::string& path) { texturePath = path; }
+    void setShaderPath(const std::string& path);
+    void setModelPath(const std::string& path);
+    void setTexturePath(const std::string& path);
 
     GLuint getShader(const std::string& shaderName);
     Model* getModel(const std::string& modelName);

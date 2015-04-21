@@ -19,7 +19,7 @@ public:
 
     bool load(const std::string& file);
 
-    GLuint getName() const { return name; }
+    GLuint getName() const;
 
 private:
     GLuint name;

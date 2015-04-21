@@ -4,6 +4,9 @@
 #include "application.h"
 #include "resourcemanager.h"
 #include "gui.h"
+#include "input.h"
+#include "camera.h"
+#include "object.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -27,15 +30,25 @@ public:
     bool init(const std::string& settingsFile);
     void execute();
 
-    ResourceManager* getResourceManager() { return &manager; }
+    ResourceManager* getResourceManager();
+    Camera* getCamera();
+    Input* getInput();
+    void addRenderObject(Object* object);
 
 private:
     void printInfo(int windowWidth, int windowHeight);
+    void render();
 
     std::shared_ptr<Application> app;
+
+    GLFWwindow* window;
+
     ResourceManager manager;
     GUI gui;
-    GLFWwindow* window;
+    Input input;
+    Camera camera;
+    std::vector<std::shared_ptr<Object>> renderObjects;
+
     bool useTimeLimit;
     double timeLimit;
 };

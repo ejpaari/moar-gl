@@ -42,6 +42,46 @@ void Object::execute()
     }
 }
 
+void Object::move(const glm::vec3& translation)
+{
+    position += translation;
+}
+
+void Object::rotate(const glm::vec3& axis, float amount)
+{
+    rotation += axis * amount;
+}
+
+void Object::setPosition(const glm::vec3& position)
+{
+    this->position = position;
+}
+
+void Object::setRotation(const glm::vec3& rotation)
+{
+    this->rotation = rotation;
+}
+
+void Object::setScale(const glm::vec3& scale)
+{
+    this->scale = scale;
+}
+
+glm::vec3 Object::getPosition()
+{
+    return position;
+}
+
+glm::vec3 Object::getRotation()
+{
+    return rotation;
+}
+
+glm::vec3 Object::getScale()
+{
+    return scale;
+}
+
 glm::mat4x4 Object::getModelMatrix() const
 {
     glm::mat4x4 modelMatrix =

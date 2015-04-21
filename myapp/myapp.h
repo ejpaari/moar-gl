@@ -2,7 +2,6 @@
 #define MYAPP_H
 
 #include "../engine/application.h"
-#include "../engine/object.h"
 #include "../engine/engine.h"
 
 class MyApp : public moar::Application
@@ -11,10 +10,16 @@ public:
     MyApp();
     virtual ~MyApp() final;
 
-    void virtual start() final;
-    void virtual update(double time) final;
+    virtual void start() final;
+    virtual void handleInput(GLFWwindow* window) final;
+    virtual void update(double time) final;
 
 private:
+    moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
+
+    moar::Engine* engine;
+    moar::Camera* camera;
+    moar::Input* input;
     moar::Object* monkey1;
     moar::Object* torus1;
     moar::Object* torus2;

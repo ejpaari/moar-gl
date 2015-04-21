@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
 namespace moar
 {
@@ -21,10 +22,14 @@ public:
 
     bool init(int width, int height);
     void handleInput(GLFWwindow* window, int x, int y);
-    void render() { TwDraw(); }
-    void uninit() { TwTerminate(); }
+    void render();
+    void uninit();
+
+    TwBar* createBar(const std::string& name);
+    TwBar* getBar(const std::string& name);
 
 private:
+    // Todo: Support multiple bars.
     TwBar* bar;
     double speed;
     bool wire;

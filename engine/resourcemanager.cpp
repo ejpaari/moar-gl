@@ -14,6 +14,21 @@ ResourceManager::~ResourceManager()
 {
 }
 
+void ResourceManager::setShaderPath(const std::string& path)
+{
+    shaderPath = path;
+}
+
+void ResourceManager::setModelPath(const std::string& path)
+{
+    modelPath = path;
+}
+
+void ResourceManager::setTexturePath(const std::string& path)
+{
+    texturePath = path;
+}
+
 GLuint ResourceManager::getShader(const std::string& shaderName)
 {
     auto found = shaders.find(shaderName);

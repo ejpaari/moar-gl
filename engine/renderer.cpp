@@ -31,5 +31,20 @@ void Renderer::execute()
     model->render();
 }
 
+void Renderer::setModel(Model* model)
+{
+    this->model = model;
+}
+
+std::string Renderer::getName()
+{
+    return "Renderer";
+}
+
+Component::Type Renderer::getType()
+{
+    return Component::Type::RENDERER;
+}
+
 } // moar
 

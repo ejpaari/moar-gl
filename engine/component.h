@@ -27,9 +27,9 @@ public:
 
     virtual void execute() = 0;
 
-    void setParent(Object* parentObject) { parent = parentObject; }
+    void setParent(Object* parentObject);
 
-    Object* getParent() const { return parent; }
+    Object* getParent() const;
     virtual std::string getName() = 0;
     virtual Component::Type getType() = 0;
 

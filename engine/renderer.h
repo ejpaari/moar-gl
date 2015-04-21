@@ -24,10 +24,10 @@ public:
 
     virtual void execute() final;
 
-    void setModel(Model* model) { this->model = model; }
+    void setModel(Model* model);
 
-    virtual std::string getName() final { return "Renderer"; }
-    virtual Component::Type getType() final { return Component::Type::RENDERER; }
+    virtual std::string getName() final;
+    virtual Component::Type getType() final;
 
 private:
     Model* model;

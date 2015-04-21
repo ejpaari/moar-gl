@@ -19,9 +19,9 @@ public:
 
     bool attachShader(GLenum shaderType, const char *filename);
     bool linkProgram();
-    void useProgram() { glUseProgram(program); }
+    void useProgram();
 
-    GLuint getProgram() { return program; }
+    GLuint getProgram();
 
 private:
     bool compileShader(GLuint shader, const char* filename);

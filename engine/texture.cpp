@@ -44,4 +44,9 @@ bool Texture::load(const std::string& file)
     return true;
 }
 
+GLuint Texture::getName() const
+{
+    return name;
+}
+
 } // moar
