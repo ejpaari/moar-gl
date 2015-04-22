@@ -2,7 +2,6 @@
 #include "../engine/renderer.h"
 #include "../engine/material.h"
 
-#include <glm/glm.hpp>
 #include <boost/math/constants/constants.hpp>
 
 MyApp::MyApp()
@@ -33,6 +32,8 @@ void MyApp::start()
     torus2->setPosition(glm::vec3(-1.0f, 0.0f, 3.0f));
     ico = createRenderObject("textured_normals", "icosphere.3ds", "marble.jpg");
     ico->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+
+    initGUI();
 }
 
 void MyApp::handleInput(GLFWwindow *window)
@@ -85,4 +86,14 @@ moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std
     renderObj->setComponent(renderer);
     engine->addRenderObject(renderObj);
     return renderObj;
+}
+
+void MyApp::initGUI()
+{
+    bar = TwNewBar("TweakBar");
+    TwAddVarRW(bar, "speed", TW_TYPE_DOUBLE, &speed, "");
+    TwAddVarRW(bar, "wire", TW_TYPE_BOOL32, &wire, "");
+    TwAddVarRO(bar, "time", TW_TYPE_DOUBLE, &time, "");
+    TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, "");
+    TwAddVarRW(bar, "cubeColor", TW_TYPE_COLOR32, &cubeColor, "");
 }

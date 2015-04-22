@@ -4,6 +4,7 @@
 #include "component.h"
 #include "model.h"
 
+#include <glm/glm.hpp>
 #include <string>
 
 namespace moar

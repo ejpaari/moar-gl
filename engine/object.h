@@ -7,7 +7,6 @@
 #include <memory>
 #include <vector>
 #include <typeinfo>
-#include <iostream>
 
 namespace moar
 {

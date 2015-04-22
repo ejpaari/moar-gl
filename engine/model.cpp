@@ -1,5 +1,4 @@
 #include "model.h"
-#include "resourcemanager.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

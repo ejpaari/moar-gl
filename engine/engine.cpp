@@ -69,7 +69,7 @@ bool Engine::init(const std::string& settingsFile)
     input.setSensitivity(sensitivity);
     input.setMovementSpeed(movementSpeed);
 
-    if (!gui.init(windowWidth, windowHeight)) {
+    if (!gui.init(window)) {
         std::cerr << "Failed to initialize AntTweakBar" << std::endl;
         return false;
     }
@@ -98,7 +98,6 @@ void Engine::execute()
         input.setCursorPosition(x, y);
 
         app->handleInput(window);
-        gui.handleInput(window, static_cast<int>(x), static_cast<int>(y));
         app->update(glfwGetTime());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         render();

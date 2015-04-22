@@ -3,7 +3,6 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include <iostream>
 
 namespace moar
 {

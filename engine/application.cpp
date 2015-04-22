@@ -1,8 +1,6 @@
 #include "application.h"
 #include "engine.h"
 
-#include <iostream>
-
 namespace moar
 {
 
