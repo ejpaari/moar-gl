@@ -64,6 +64,7 @@ bool Engine::init(const std::string& settingsFile)
     }
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     double sensitivity = pt.get<double>("Input.sensitivity");
     float movementSpeed = pt.get<double>("Input.movementSpeed");
     input.setSensitivity(sensitivity);
@@ -98,7 +99,8 @@ void Engine::execute()
         input.setCursorPosition(x, y);
 
         app->handleInput(window);
-        app->update(glfwGetTime());
+        app->update(glfwGetTime(), glfwGetTime() - time);
+        time = glfwGetTime();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         render();
         gui.render();

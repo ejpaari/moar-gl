@@ -51,6 +51,7 @@ private:
 
     bool useTimeLimit;
     double timeLimit;
+    double time;
 };
 
 } // moar

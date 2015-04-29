@@ -19,7 +19,7 @@ public:
 
     virtual void start() final;
     virtual void handleInput(GLFWwindow* window) final;
-    virtual void update(double time) final;
+    virtual void update(double time, double deltaTime) final;
 
 private:
     moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
@@ -34,11 +34,11 @@ private:
     moar::Object* ico;
 
     TwBar* bar;
-    double speed;
-    bool wire;
-    double time;
-    glm::vec3 bgColor;
-    unsigned int cubeColor;
+    glm::vec3 rotationAxis;
+    float rotationSpeed;
+    int fps;
+    int fpsCounter;
+    double timeCounter;
 };
 
 #endif // MYAPP_H

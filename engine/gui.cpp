@@ -1,6 +1,7 @@
 #include "gui.h"
 
 #include <AntTweakBar.h>
+#include <iostream>
 
 namespace
 {
@@ -13,6 +14,16 @@ void mouseButtonCallback(GLFWwindow* /*window*/, int button, int action, int /*m
 void cursorPosCallback(GLFWwindow* /*window*/, double x, double y)
 {
     TwEventMousePosGLFW(static_cast<int>(x), static_cast<int>(y));
+}
+
+void keyCallback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
+{
+    TwEventKeyGLFW(key, action);
+}
+
+void charCallback(GLFWwindow* /*window*/, unsigned int codepoint)
+{
+    TwEventCharGLFW(codepoint, GLFW_PRESS);
 }
 
 } // Anonymous
@@ -40,6 +51,8 @@ bool GUI::init(GLFWwindow* window)
     TwWindowSize(width, height);
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
     glfwSetCursorPosCallback(window, cursorPosCallback);
+    glfwSetKeyCallback(window, keyCallback);
+    glfwSetCharCallback(window, charCallback);
 
     return true;
 }

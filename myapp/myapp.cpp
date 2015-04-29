@@ -4,7 +4,12 @@
 
 #include <boost/math/constants/constants.hpp>
 
-MyApp::MyApp()
+MyApp::MyApp() :
+    rotationAxis(0.0f, 1.0f, 0.0f),
+    rotationSpeed(0.0001f),
+    fps(0),
+    fpsCounter(0),
+    timeCounter(0.0)
 {
 }
 
@@ -38,7 +43,14 @@ void MyApp::start()
 
 void MyApp::handleInput(GLFWwindow *window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        return;
+    } else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)  {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         quit();
     }
 
@@ -59,11 +71,20 @@ void MyApp::handleInput(GLFWwindow *window)
     camera->rotate(glm::vec3(1.0f, 0.0f, 0.0f), input->getCursorDeltaY() * boost::math::constants::degree<double>());
 }
 
-void MyApp::update(double)
+void MyApp::update(double, double deltaTime)
 {
-    torus1->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.0001f);
-    torus2->rotate(glm::vec3(0.0f, 1.0f, 0.0f), -0.001f);
-    monkey1->rotate(glm::vec3(0.0f, 1.0f, 0.0f), -0.001f);
+    timeCounter += deltaTime;
+    if (timeCounter < 1.0) {
+        ++fpsCounter;
+    } else {
+        fps = fpsCounter;
+        timeCounter = 0.0;
+        fpsCounter = 0;
+    }
+
+    torus1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+    torus2->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
 }
 
 moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)
@@ -91,9 +112,7 @@ moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std
 void MyApp::initGUI()
 {
     bar = TwNewBar("TweakBar");
-    TwAddVarRW(bar, "speed", TW_TYPE_DOUBLE, &speed, "");
-    TwAddVarRW(bar, "wire", TW_TYPE_BOOL32, &wire, "");
-    TwAddVarRO(bar, "time", TW_TYPE_DOUBLE, &time, "");
-    TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, "");
-    TwAddVarRW(bar, "cubeColor", TW_TYPE_COLOR32, &cubeColor, "");
+    TwAddVarRW(bar, "axis", TW_TYPE_DIR3F, &rotationAxis, "");
+    TwAddVarRW(bar, "speed", TW_TYPE_FLOAT, &rotationSpeed, "");
+    TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
 }
