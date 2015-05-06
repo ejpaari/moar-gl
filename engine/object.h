@@ -25,7 +25,10 @@ public:
     Object& operator=(const Object&) = delete;
     Object& operator=(Object&&) = delete;
 
-    void execute();
+    void executeCustomComponents();
+    void prepareMaterial();
+    void prepareLight();
+    void render();
 
     virtual void move(const glm::vec3& translation);
     virtual void rotate(const glm::vec3& axis, float amount);
@@ -42,7 +45,8 @@ public:
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
 
-    bool setComponent(Component* comp);
+    void addComponent(Component* comp);
+    bool hasComponent(const std::string& name) const;
 
     template<typename T>
     T* getComponent();
@@ -53,25 +57,21 @@ protected:
     glm::vec3 scale;
     glm::vec3 forward;
     glm::vec3 up;
-    glm::vec3 left;
+    glm::vec3 left;    
 
-    std::unique_ptr<Component> material;
-    std::unique_ptr<Component> renderer;
-    std::vector<std::unique_ptr<Component>> components;
+    Component* material;
+    Component* renderer;
+    Component* light;
+    std::vector<Component*> customComponents;
+    std::vector<std::unique_ptr<Component>> allComponents;
 };
 
 template<typename T>
 T* Object::getComponent()
 {
-    if (typeid(*material.get()) == typeid(T)) {
-        return dynamic_cast<T*>(material.get());
-    }
-    if (typeid(*renderer.get()) == typeid(T)) {
-        return dynamic_cast<T*>(renderer.get());
-    }
-    for (unsigned int i = 0; i < components.size(); ++i) {
-        if (typeid(*components[i].get()) == typeid(T)) {
-            return dynamic_cast<T*>(components[i].get());
+    for (unsigned int i = 0; i < allComponents.size(); ++i) {
+        if (typeid(*allComponents[i].get()) == typeid(T)) {
+            return dynamic_cast<T*>(allComponents[i].get());
         }
     }
     return nullptr;

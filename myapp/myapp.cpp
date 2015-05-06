@@ -1,12 +1,13 @@
 #include "myapp.h"
 #include "../engine/renderer.h"
 #include "../engine/material.h"
+#include "../engine/light.h"
 
 #include <boost/math/constants/constants.hpp>
 
 MyApp::MyApp() :
     rotationAxis(0.0f, 1.0f, 0.0f),
-    rotationSpeed(0.0001f),
+    rotationSpeed(0.5f),
     fps(0),
     fpsCounter(0),
     timeCounter(0.0)
@@ -19,17 +20,16 @@ MyApp::~MyApp()
 
 void MyApp::start()
 {
-    engine = getEngine();
     camera = engine->getCamera();
     input = engine->getInput();
 
-    torus1 = createRenderObject("textured_normals", "torus.3ds", "brick.png");
+    monkey0 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
 
-    torus1->setPosition(glm::vec3(3.0f, 0.0f, 3.0f));
-    moar::Material* mat = torus1->getComponent<moar::Material>();
-    mat->setTexture(getEngine()->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
+    monkey0->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    moar::Material* mat = monkey0->getComponent<moar::Material>();
+    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
 
-    torus1->getComponent<moar::Material>();
+    monkey0->getComponent<moar::Material>();
 
     monkey1 = createRenderObject("textured_normals", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -37,6 +37,14 @@ void MyApp::start()
     torus2->setPosition(glm::vec3(-1.0f, 0.0f, 3.0f));
     ico = createRenderObject("textured_normals", "icosphere.3ds", "marble.jpg");
     ico->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+
+    moar::Light* lightComponent = new moar::Light();
+    lightComponent->setPower(5.0f);
+    lightComponent->setColor(glm::vec3(0.1f, 1.0f, 0.1f));
+    moar::Object* light = new moar::Object();
+    light->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+    light->addComponent(lightComponent);
+    engine->addObject(light);
 
     initGUI();
 }
@@ -82,7 +90,7 @@ void MyApp::update(double, double deltaTime)
         fpsCounter = 0;
     }
 
-    torus1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+    monkey0->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
     torus2->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
     monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
 }
@@ -103,9 +111,9 @@ moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std
     renderer->setModel(model);
 
     moar::Object* renderObj = new moar::Object();
-    renderObj->setComponent(material);
-    renderObj->setComponent(renderer);
-    engine->addRenderObject(renderObj);
+    renderObj->addComponent(material);
+    renderObj->addComponent(renderer);
+    engine->addObject(renderObj);
     return renderObj;
 }
 

@@ -18,7 +18,9 @@ DISTFILES += \
     shaders/normals.frag \
     shaders/normals.vert \
     shaders/textured_normals.frag \
-    shaders/textured_normals.vert
+    shaders/textured_normals.vert \
+    shaders/diffuse.frag \
+    shaders/diffuse.vert
 
 SOURCES += \
     main.cpp \
@@ -36,7 +38,8 @@ SOURCES += \
     ../engine/component.cpp \
     ../engine/renderer.cpp \
     ../engine/material.cpp \
-    ../engine/gui.cpp
+    ../engine/gui.cpp \
+    ../engine/light.cpp
 
 HEADERS += \
     myapp.h \
@@ -53,7 +56,8 @@ HEADERS += \
     ../engine/component.h \
     ../engine/renderer.h \
     ../engine/material.h \
-    ../engine/gui.h
+    ../engine/gui.h \
+    ../engine/light.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL

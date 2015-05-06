@@ -32,7 +32,6 @@ public:
 
 private:
     Model* model;
-    GLint currentShader;
 };
 
 } // moar

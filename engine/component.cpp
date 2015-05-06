@@ -3,6 +3,8 @@
 namespace moar
 {
 
+GLint Component::currentShader = 0;
+
 Component::Component()
 {
 }

@@ -21,8 +21,7 @@ Renderer::~Renderer()
 }
 
 void Renderer::execute()
-{
-    glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
+{    
     glUniformMatrix4fv(glGetUniformLocation(currentShader, "model"), 1, GL_FALSE, glm::value_ptr(parent->getModelMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(currentShader, "view"), 1, GL_FALSE, glm::value_ptr(*view));
     glUniformMatrix4fv(glGetUniformLocation(currentShader, "proj"), 1, GL_FALSE, glm::value_ptr(*projection));

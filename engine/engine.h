@@ -33,11 +33,13 @@ public:
     ResourceManager* getResourceManager();
     Camera* getCamera();
     Input* getInput();
-    void addRenderObject(Object* object);
+    void addObject(Object* object);
 
 private:
-    void printInfo(int windowWidth, int windowHeight);
+    void executeCustomComponents();
     void render();
+
+    void printInfo(int windowWidth, int windowHeight);
 
     std::shared_ptr<Application> app;
 
@@ -47,7 +49,9 @@ private:
     GUI gui;
     Input input;
     Camera camera;
-    std::vector<std::shared_ptr<Object>> renderObjects;
+    std::vector<Object*> renderObjects;
+    std::vector<Object*> lights;
+    std::vector<std::shared_ptr<Object>> allObjects;
 
     bool useTimeLimit;
     double timeLimit;

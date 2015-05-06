@@ -29,9 +29,4 @@ bool Application::isRunning() const
     return running;
 }
 
-Engine* Application::getEngine()
-{
-    return engine;
-}
-
 } // moar

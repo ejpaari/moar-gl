@@ -102,6 +102,7 @@ void Engine::execute()
         app->update(glfwGetTime(), glfwGetTime() - time);
         time = glfwGetTime();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        executeCustomComponents();
         render();
         gui.render();
 
@@ -133,10 +134,35 @@ Input* Engine::getInput()
     return &input;
 }
 
-void Engine::addRenderObject(Object* object)
+void Engine::addObject(Object* object)
 {
-    std::shared_ptr<Object> obj(object);
-    renderObjects.push_back(obj);
+    std::shared_ptr<Object> obj(object);    
+    allObjects.push_back(obj);
+
+    if (object->hasComponent("Renderer")) {
+        renderObjects.push_back(object);
+    }
+    if (object->hasComponent("Light")) {
+        lights.push_back(object);
+    }
+}
+
+void Engine::executeCustomComponents()
+{
+    for (unsigned int i = 0; i < allObjects.size(); ++i) {
+        allObjects[i]->executeCustomComponents();
+    }
+}
+
+void Engine::render()
+{
+    for (auto renderObj : renderObjects) {
+        renderObj->prepareMaterial();
+        for (auto light : lights) {
+            light->prepareLight();
+            renderObj->render();
+        }
+    }
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)
@@ -155,13 +181,6 @@ void Engine::printInfo(int windowWidth, int windowHeight)
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
 
     std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl;
-}
-
-void Engine::render()
-{
-    for (unsigned int i = 0; i < renderObjects.size(); ++i) {
-        renderObjects[i]->execute();
-    }
 }
 
 } // moar

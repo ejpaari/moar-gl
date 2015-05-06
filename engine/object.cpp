@@ -3,6 +3,8 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <utility>
+#include <assert.h>
 
 namespace moar
 {
@@ -27,18 +29,29 @@ Object::~Object()
 {
 }
 
-void Object::execute()
+void Object::executeCustomComponents()
 {
-    if (material != nullptr) {
-        material->execute();
+    for (unsigned int i = 0; i < customComponents.size(); ++i) {
+        customComponents[i]->execute();
     }
-    if (renderer != nullptr) {
-        renderer->execute();
-    }
+}
 
-    for (unsigned int i = 0; i < components.size(); ++i) {
-        components[i]->execute();
-    }
+void Object::prepareMaterial()
+{
+    assert(material != nullptr);
+    material->execute();
+}
+
+void Object::prepareLight()
+{
+    assert(light != nullptr);
+    light->execute();
+}
+
+void Object::render()
+{
+    assert(renderer != nullptr);
+    renderer->execute();
 }
 
 void Object::move(const glm::vec3& translation)
@@ -114,28 +127,53 @@ glm::vec3 Object::getLeft() const
     return glm::vec3(v.x, v.y, v.z);
 }
 
-bool Object::setComponent(Component* comp)
+void Object::addComponent(Component *comp)
 {
     comp->setParent(this);
+    std::unique_ptr<Component> component(comp);
+    bool componentExists = false;
+    for (unsigned int i = 0; i < allComponents.size(); ++i) {
+        if (allComponents[i]->getName() == comp->getName()) {
+            allComponents[i].reset(comp);
+            componentExists = true;
+        }
+    }
+
+    if (!componentExists) {
+        allComponents.push_back(std::move(component));
+    }
 
     switch (comp->getType()) {
     case Component::RENDERER:
-        renderer.reset(comp);
+        renderer = comp;
         break;
     case Component::MATERIAL:
-        material.reset(comp);
+        material = comp;
+        break;
+    case Component::LIGHT:
+        light = comp;
         break;
     case Component::CUSTOM:
-        for (unsigned int i = 0; i < components.size(); ++i) {
-            if (components[i]->getName() == comp->getName()) {
-                components[i].reset(comp);
+        for (auto custom : customComponents) {
+            if (custom->getName() == comp->getName()) {
+                custom = comp;
+                return;
             }
         }
         break;
     default:
-        return false;
+        return;
     }
-    return true;
+}
+
+bool Object::hasComponent(const std::string& name) const
+{
+    for (unsigned int i = 0; i < allComponents.size(); ++i) {
+        if (allComponents[i]->getName() == name) {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // moar

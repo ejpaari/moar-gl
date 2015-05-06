@@ -25,11 +25,10 @@ private:
     moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
     void initGUI();
 
-    moar::Engine* engine;
     moar::Camera* camera;
     moar::Input* input;
     moar::Object* monkey1;
-    moar::Object* torus1;
+    moar::Object* monkey0;
     moar::Object* torus2;
     moar::Object* ico;
 

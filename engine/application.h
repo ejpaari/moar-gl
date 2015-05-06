@@ -28,10 +28,9 @@ public:
     bool isRunning() const;
 
 protected:
-    Engine* getEngine();
-
-private:
     Engine* engine;
+
+private:    
     bool running;    
 };
 
