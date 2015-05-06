@@ -19,8 +19,13 @@ DISTFILES += \
     shaders/normals.vert \
     shaders/textured_normals.frag \
     shaders/textured_normals.vert \
-    shaders/diffuse.frag \
-    shaders/diffuse.vert
+    shaders/diffuse.vert \
+    ../shaders/diffuse.frag \
+    ../shaders/normals.frag \
+    ../shaders/textured_normals.frag \
+    ../shaders/diffuse.vert \
+    ../shaders/normals.vert \
+    ../shaders/textured_normals.vert
 
 SOURCES += \
     main.cpp \
