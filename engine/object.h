@@ -4,6 +4,7 @@
 #include "component.h"
 
 #include <glm/glm.hpp>
+#include <GL/glew.h>
 #include <memory>
 #include <vector>
 #include <typeinfo>
@@ -18,6 +19,9 @@ public:
     static const glm::vec3 UP;
     static const glm::vec3 LEFT;
 
+    static const glm::mat4* projection;
+    static const glm::mat4* view;
+
     explicit Object();
     virtual ~Object();
     Object(const Object&) = delete;
@@ -26,7 +30,7 @@ public:
     Object& operator=(Object&&) = delete;
 
     void executeCustomComponents();
-    void prepareMaterial();
+    void prepareRender();
     void prepareLight();
     void render();
 
@@ -64,6 +68,8 @@ protected:
     Component* light;
     std::vector<Component*> customComponents;
     std::vector<std::unique_ptr<Component>> allComponents;
+
+    static GLint currentShader;
 };
 
 template<typename T>

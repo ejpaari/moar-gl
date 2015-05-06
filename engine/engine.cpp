@@ -12,8 +12,8 @@ Engine::Engine() :
     timeLimit(0.0)
 {
     // Todo: Multiple cameras.
-    Renderer::view = camera.getViewMatrixPointer();
-    Renderer::projection = camera.getProjectionMatrixPointer();
+    Object::view = camera.getViewMatrixPointer();
+    Object::projection = camera.getProjectionMatrixPointer();
 }
 
 Engine::~Engine()
@@ -157,7 +157,7 @@ void Engine::executeCustomComponents()
 void Engine::render()
 {
     for (auto renderObj : renderObjects) {
-        renderObj->prepareMaterial();
+        renderObj->prepareRender();
         for (auto light : lights) {
             light->prepareLight();
             renderObj->render();

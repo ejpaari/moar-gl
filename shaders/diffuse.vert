@@ -19,7 +19,7 @@ void main()
     normal_Cam = vec3(view * model * vec4(normal, 0.0));
     vertexPos_World = vec3(model * vec4(position, 1.0));
 
-    vec3 vertexPos_Cam = vec3(view * model * vec4(position, 1.0));
+    vec3 vertexPos_Cam = vec3(view * vec4(vertexPos_World, 1.0));
     lightDir_Cam = vec3(view * vec4(lightPos, 1.0)) - vertexPos_Cam;
 
     texCoord = tex;

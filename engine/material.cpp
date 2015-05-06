@@ -29,7 +29,6 @@ void Material::execute()
         glUniform1i(glGetUniformLocation(shader, std::get<1>(textures[i])->name),
                     std::get<1>(textures[i])->value);
     }
-    currentShader = shader;
 }
 
 void Material::setShader(GLuint shader)

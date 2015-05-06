@@ -22,15 +22,14 @@ public:
     virtual void update(double time, double deltaTime) final;
 
 private:
-    moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
     void initGUI();
+    moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
+    moar::Object* createLight(glm::vec3 color, float power);
 
     moar::Camera* camera;
     moar::Input* input;
     moar::Object* monkey1;
-    moar::Object* monkey0;
-    moar::Object* torus2;
-    moar::Object* ico;
+    moar::Object* monkey2;
 
     TwBar* bar;
     glm::vec3 rotationAxis;

@@ -1,7 +1,6 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
-#include <GL/glew.h>
 #include <string>
 
 namespace moar
@@ -37,7 +36,6 @@ public:
 
 protected:
     Object* parent;
-    static GLint currentShader;
 };
 
 } // moar

@@ -3,6 +3,7 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <utility>
 #include <assert.h>
 
@@ -12,6 +13,11 @@ namespace moar
 const glm::vec3 Object::FORWARD = glm::vec3(0.0f, 0.0f, 1.0f);
 const glm::vec3 Object::UP = glm::vec3(0.0f, 1.0f, 0.0f);
 const glm::vec3 Object::LEFT = glm::vec3(1.0f, 0.0f, 0.0f);
+
+const glm::mat4* Object::projection = nullptr;
+const glm::mat4* Object::view = nullptr;
+
+GLint Object::currentShader = 0;
 
 Object::Object() :
     position(0.0f, 0.0f, 0.0f),
@@ -36,10 +42,15 @@ void Object::executeCustomComponents()
     }
 }
 
-void Object::prepareMaterial()
+void Object::prepareRender()
 {
     assert(material != nullptr);
     material->execute();
+    assert(renderer != nullptr);
+    glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
+    glUniformMatrix4fv(glGetUniformLocation(currentShader, "model"), 1, GL_FALSE, glm::value_ptr(getModelMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(currentShader, "view"), 1, GL_FALSE, glm::value_ptr(*view));
+    glUniformMatrix4fv(glGetUniformLocation(currentShader, "proj"), 1, GL_FALSE, glm::value_ptr(*projection));
 }
 
 void Object::prepareLight()

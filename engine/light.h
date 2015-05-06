@@ -4,6 +4,7 @@
 #include "component.h"
 
 #include <glm/glm.hpp>
+#include <GL/glew.h>
 
 namespace moar
 {
@@ -27,6 +28,8 @@ public:
     virtual Component::Type getType() final;
 
 private:
+    static GLint shader;
+
     glm::vec3 color;
     float power;
 };

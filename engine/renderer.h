@@ -13,9 +13,6 @@ namespace moar
 class Renderer : public Component
 {
 public:
-    static const glm::mat4* projection;
-    static const glm::mat4* view;
-
     explicit Renderer();
     virtual ~Renderer();
     Renderer(const Renderer&) = delete;

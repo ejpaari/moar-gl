@@ -23,28 +23,18 @@ void MyApp::start()
     camera = engine->getCamera();
     input = engine->getInput();
 
-    monkey0 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
-
-    monkey0->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    moar::Material* mat = monkey0->getComponent<moar::Material>();
-    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
-
-    monkey0->getComponent<moar::Material>();
-
-    monkey1 = createRenderObject("textured_normals", "monkey.3ds", "checker.png");
+    monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
-    torus2 = createRenderObject("normals", "torus.3ds", "");
-    torus2->setPosition(glm::vec3(-1.0f, 0.0f, 3.0f));
-    ico = createRenderObject("textured_normals", "icosphere.3ds", "marble.jpg");
-    ico->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
 
-    moar::Light* lightComponent = new moar::Light();
-    lightComponent->setPower(5.0f);
-    lightComponent->setColor(glm::vec3(0.1f, 1.0f, 0.1f));
-    moar::Object* light = new moar::Object();
-    light->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
-    light->addComponent(lightComponent);
-    engine->addObject(light);
+    monkey2 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
+    monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+//    moar::Material* mat = monkey2->getComponent<moar::Material>();
+//    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
+
+    moar::Object* light1 = createLight(glm::vec3(0.0f, 1.0f, 0.0f), 10.0f);
+    light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
+    moar::Object* light2 = createLight(glm::vec3(0.0f, 0.0f, 1.0f), 15.0f);
+    light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
 
     initGUI();
 }
@@ -74,6 +64,10 @@ void MyApp::handleInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera->move(-camera->getLeft() * input->getMovementSpeed());
     }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+        camera->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+        camera->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+    }
 
     camera->rotate(glm::vec3(0.0f, 1.0f, 0.0f), -input->getCursorDeltaX() * boost::math::constants::degree<double>());
     camera->rotate(glm::vec3(1.0f, 0.0f, 0.0f), input->getCursorDeltaY() * boost::math::constants::degree<double>());
@@ -90,9 +84,16 @@ void MyApp::update(double, double deltaTime)
         fpsCounter = 0;
     }
 
-    monkey0->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
-    torus2->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
     monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+    monkey2->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+}
+
+void MyApp::initGUI()
+{
+    bar = TwNewBar("TweakBar");
+    TwAddVarRW(bar, "axis", TW_TYPE_DIR3F, &rotationAxis, "");
+    TwAddVarRW(bar, "speed", TW_TYPE_FLOAT, &rotationSpeed, "");
+    TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
 }
 
 moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)
@@ -117,10 +118,13 @@ moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std
     return renderObj;
 }
 
-void MyApp::initGUI()
+moar::Object* MyApp::createLight(glm::vec3 color, float power)
 {
-    bar = TwNewBar("TweakBar");
-    TwAddVarRW(bar, "axis", TW_TYPE_DIR3F, &rotationAxis, "");
-    TwAddVarRW(bar, "speed", TW_TYPE_FLOAT, &rotationSpeed, "");
-    TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
+    moar::Light* lightComponent = new moar::Light();
+    lightComponent->setPower(power);
+    lightComponent->setColor(color);
+    moar::Object* light = new moar::Object();
+    light->addComponent(lightComponent);
+    engine->addObject(light);
+    return light;
 }
