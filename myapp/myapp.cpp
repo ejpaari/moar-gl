@@ -4,6 +4,7 @@
 #include "../engine/light.h"
 
 #include <boost/math/constants/constants.hpp>
+#include <cmath>
 
 MyApp::MyApp() :
     rotationAxis(0.0f, 1.0f, 0.0f),
@@ -31,10 +32,12 @@ void MyApp::start()
 //    moar::Material* mat = monkey2->getComponent<moar::Material>();
 //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
 
-    moar::Object* light1 = createLight(glm::vec3(0.0f, 1.0f, 0.0f), 10.0f);
+    light1 = createLight(glm::vec3(0.0f, 1.0f, 0.0f), 10.0f);
     light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
-    moar::Object* light2 = createLight(glm::vec3(0.0f, 0.0f, 1.0f), 15.0f);
+    light2 = createLight(glm::vec3(1.0f, 0.0f, 0.0f), 15.0f);
     light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
+    light3 = createLight(glm::vec3(0.0f, 0.0f, 1.0f), 15.0f);
+    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     initGUI();
 }
@@ -73,7 +76,7 @@ void MyApp::handleInput(GLFWwindow *window)
     camera->rotate(glm::vec3(1.0f, 0.0f, 0.0f), input->getCursorDeltaY() * boost::math::constants::degree<double>());
 }
 
-void MyApp::update(double, double deltaTime)
+void MyApp::update(double time, double deltaTime)
 {
     timeCounter += deltaTime;
     if (timeCounter < 1.0) {
@@ -86,6 +89,9 @@ void MyApp::update(double, double deltaTime)
 
     monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
     monkey2->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+
+    light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
+    light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
 }
 
 void MyApp::initGUI()

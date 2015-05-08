@@ -31,6 +31,10 @@ private:
     moar::Object* monkey1;
     moar::Object* monkey2;
 
+    moar::Object* light1;
+    moar::Object* light2;
+    moar::Object* light3;
+
     TwBar* bar;
     glm::vec3 rotationAxis;
     float rotationSpeed;
