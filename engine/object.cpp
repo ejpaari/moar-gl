@@ -27,7 +27,8 @@ Object::Object() :
     up(UP),
     left(LEFT),
     material(nullptr),
-    renderer(nullptr)
+    renderer(nullptr),
+    light(nullptr)
 {
 }
 

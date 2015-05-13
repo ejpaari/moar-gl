@@ -8,7 +8,8 @@
 namespace moar
 {
 
-Renderer::Renderer()
+Renderer::Renderer() :
+    model(nullptr)
 {
 }
 

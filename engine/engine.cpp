@@ -8,8 +8,10 @@ namespace moar
 {
 
 Engine::Engine() :
+    window(nullptr),
     useTimeLimit(false),
-    timeLimit(0.0)
+    timeLimit(0.0),
+    time(0.0)
 {
     // Todo: Multiple cameras.
     Object::view = camera.getViewMatrixPointer();
@@ -99,7 +101,8 @@ void Engine::execute()
         input.setCursorPosition(x, y);
 
         app->handleInput(window);
-        app->update(glfwGetTime(), glfwGetTime() - time);
+        // Todo: This actually causes delay
+        app->update(glfwGetTime(), glfwGetTime() - time);        
         time = glfwGetTime();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         executeCustomComponents();

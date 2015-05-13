@@ -3,7 +3,8 @@
 namespace moar
 {
 
-Component::Component()
+Component::Component() :
+    parent(nullptr)
 {
 }
 

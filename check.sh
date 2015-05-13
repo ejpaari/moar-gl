@@ -10,7 +10,7 @@ echo "valgrind complete"
 
 echo "Running cppcheck..."
 CPPCHECK_FILE=cppcheck.txt
-cppcheck engine/ $CPPCHECK_DIR 2> $CPPCHECK_FILE
+cppcheck --enable=all engine/ $CPPCHECK_DIR 2> $CPPCHECK_FILE
 echo "cppcheck complete"
 
 echo ""

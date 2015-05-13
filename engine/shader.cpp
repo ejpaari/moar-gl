@@ -92,11 +92,6 @@ bool Shader::linkProgram()
     return isLinked;
 }
 
-void Shader::useProgram()
-{
-    glUseProgram(program);
-}
-
 GLuint Shader::getProgram()
 {
     return program;

@@ -23,7 +23,7 @@ public:
     Model& operator=(const Model&) = delete;
     Model& operator=(Model&&) = delete;
 
-    bool loadModel(const std::string file);
+    bool loadModel(const std::string& file);
     void render() const;
 
 private:

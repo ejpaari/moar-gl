@@ -17,7 +17,7 @@ Model::~Model()
 {
 }
 
-bool Model::loadModel(const std::string file)
+bool Model::loadModel(const std::string& file)
 {
     Assimp::Importer importer;
     unsigned int flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices  |
