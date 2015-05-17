@@ -1,4 +1,5 @@
 #include "shader.h"
+#include "constants.h"
 
 #include <cstdio>
 #include <algorithm>
@@ -8,9 +9,10 @@
 namespace moar
 {
 
-Shader::Shader()
+Shader::Shader() :
+    lightBlockIndex(0)
 {
-    program = glCreateProgram();
+    program = glCreateProgram();    
 }
 
 Shader::~Shader()
@@ -88,6 +90,9 @@ bool Shader::linkProgram()
         glDetachShader(program, shader);
         glDeleteShader(shader);
     }
+
+    lightBlockIndex = glGetUniformBlockIndex(program, lightBlockName);
+    glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
 
     return isLinked;
 }

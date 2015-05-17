@@ -9,8 +9,12 @@ out vec4 outColor;
 
 uniform sampler2D DiffuseTex;
 uniform vec3 lightPos;
-uniform vec3 lightColor;
+//uniform vec3 lightColor;
 uniform float lightPower;
+
+layout (std140) uniform LightBlock {
+    vec3 lightColor;
+};
 
 void main()
 {    

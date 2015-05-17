@@ -160,14 +160,14 @@ void Engine::executeCustomComponents()
 void Engine::render()
 {
     glDepthFunc(GL_LEQUAL);
+    glBlendFunc(GL_ONE, GL_ONE);
     for (auto renderObj : renderObjects) {
         renderObj->prepareRender();
         for (unsigned int i = 0; i < lights.size(); ++i) {            
             if (i == 0) {
                 glDisable(GL_BLEND);
             } else if (i == 1) {
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_ONE, GL_ONE);
+                glEnable(GL_BLEND);                
             }
             lights[i]->prepareLight();
             renderObj->render();

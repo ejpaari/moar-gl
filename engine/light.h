@@ -29,6 +29,8 @@ public:
 
 private:
     static GLint shader;
+    static GLuint lightBlockBuffer;
+    static bool lightBlockBufferCreated;
 
     glm::vec3 color;
     float power;

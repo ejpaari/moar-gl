@@ -7,12 +7,20 @@
 #include <cmath>
 
 MyApp::MyApp() :
+    camera(nullptr),
+    input(nullptr),
+    bar(nullptr),
     rotationAxis(0.0f, 1.0f, 0.0f),
     rotationSpeed(0.5f),
     fps(0),
     fpsCounter(0),
     timeCounter(0.0)
-{
+{    
+    monkey1 = nullptr;
+    monkey2 = nullptr;
+    light1 = nullptr;
+    light2 = nullptr;
+    light3 = nullptr;
 }
 
 MyApp::~MyApp()
