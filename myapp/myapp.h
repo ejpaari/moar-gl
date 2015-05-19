@@ -24,7 +24,7 @@ public:
 private:
     void initGUI();
     moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
-    moar::Object* createLight(glm::vec3 color, float power);
+    moar::Object* createLight(const glm::vec4& color);
 
     moar::Camera* camera;
     moar::Input* input;

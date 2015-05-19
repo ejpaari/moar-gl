@@ -9,17 +9,14 @@ namespace moar
 {
 
 GLint Light::shader = 0;
-GLuint Light::lightBlockBuffer = 0;
-bool Light::lightBlockBufferCreated = false;
 
 Light::Light() :
-    color(1.0f, 1.0f, 1.0f),
-    power(10.0f)
+    color(1.0f, 1.0f, 1.0f, 10.0f)
 {
-    if (!lightBlockBufferCreated) {
-        glGenBuffers(1, &lightBlockBuffer);
-        lightBlockBufferCreated = true;
-    }
+    glGenBuffers(1, &lightBlockBuffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
+    GLsizeiptr bufferSize = sizeof(color) + sizeof(parent->getPosition());
+    glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
 }
 
 Light::~Light()
@@ -29,26 +26,17 @@ Light::~Light()
 
 void Light::execute()
 {
-    // Todo: Should every light have its own buffer?
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(color), glm::value_ptr(color), GL_DYNAMIC_DRAW);
+    GLintptr offset = 0;
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(color), glm::value_ptr(color));
+    offset += sizeof(color);
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(parent->getPosition()), glm::value_ptr(parent->getPosition()));
     glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
-
-    // Todo: Add all light properties to uniform buffer.
-    glGetIntegerv(GL_CURRENT_PROGRAM, &shader);
-    glUniform3f(glGetUniformLocation(shader, "lightPos"), parent->getPosition().x, parent->getPosition().y, parent->getPosition().z);
-    //glUniform3f(glGetUniformLocation(shader, "lightColor"), color.x, color.y, color.z);
-    glUniform1f(glGetUniformLocation(shader, "lightPower"), power);
 }
 
-void Light::setColor(const glm::vec3& color)
+void Light::setColor(const glm::vec4& color)
 {
     this->color = color;
-}
-
-void Light::setPower(float power)
-{
-    this->power = power;
 }
 
 std::string Light::getName()

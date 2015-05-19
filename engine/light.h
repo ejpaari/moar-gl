@@ -21,19 +21,15 @@ public:
 
     virtual void execute() final;
 
-    void setColor(const glm::vec3& color);
-    void setPower(float power);
+    void setColor(const glm::vec4& color);
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
 
 private:
     static GLint shader;
-    static GLuint lightBlockBuffer;
-    static bool lightBlockBufferCreated;
-
-    glm::vec3 color;
-    float power;
+    GLuint lightBlockBuffer;
+    glm::vec4 color;
 };
 
 } // moar

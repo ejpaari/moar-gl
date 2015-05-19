@@ -13,7 +13,10 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
-uniform vec3 lightPos;
+layout (std140) uniform LightBlock {
+    vec4 lightColor;
+    vec3 lightPos;
+};
 
 void main()
 {

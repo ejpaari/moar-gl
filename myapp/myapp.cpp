@@ -40,11 +40,11 @@ void MyApp::start()
 //    moar::Material* mat = monkey2->getComponent<moar::Material>();
 //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
 
-    light1 = createLight(glm::vec3(0.0f, 1.0f, 0.0f), 10.0f);
+    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 10.0f));
     light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
-    light2 = createLight(glm::vec3(1.0f, 0.0f, 0.0f), 15.0f);
+    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 15.0f));
     light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
-    light3 = createLight(glm::vec3(0.0f, 0.0f, 1.0f), 15.0f);
+    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 15.0f));
     light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     initGUI();
@@ -132,10 +132,9 @@ moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std
     return renderObj;
 }
 
-moar::Object* MyApp::createLight(glm::vec3 color, float power)
+moar::Object* MyApp::createLight(const glm::vec4& color)
 {
     moar::Light* lightComponent = new moar::Light();
-    lightComponent->setPower(power);
     lightComponent->setColor(color);
     moar::Object* light = new moar::Object();
     light->addComponent(lightComponent);

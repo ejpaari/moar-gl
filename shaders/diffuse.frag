@@ -8,12 +8,13 @@ in vec2 texCoord;
 out vec4 outColor;
 
 uniform sampler2D DiffuseTex;
-uniform vec3 lightPos;
+//uniform vec3 lightPos;
 //uniform vec3 lightColor;
-uniform float lightPower;
+//uniform float lightPower;
 
 layout (std140) uniform LightBlock {
-    vec3 lightColor;
+    vec4 lightColor;
+    vec3 lightPos;
 };
 
 void main()
@@ -23,5 +24,5 @@ void main()
     float diff = clamp(dot(n,l), 0, 1);
 
     float lightDistance = length(lightPos - vertexPos_World);
-    outColor = vec4(lightColor * lightPower * diff / (lightDistance * lightDistance), 1.0) * texture(DiffuseTex, texCoord);
+    outColor = vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * texture(DiffuseTex, texCoord);
 }

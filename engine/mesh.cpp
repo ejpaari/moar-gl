@@ -45,31 +45,6 @@ void Mesh::setNormals(const std::vector<glm::vec3>& normals)
     setBufferData<glm::vec3>(normalBuffer, normals, INDEX_NORMAL, 3);
 }
 
-GLuint Mesh::getVAO() const
-{
-    return VAO;
-}
-
-GLuint Mesh::getVertexBuffer() const
-{
-    return vertexBuffer;
-}
-
-GLuint Mesh::getNormalBuffer() const
-{
-    return normalBuffer;
-}
-
-GLuint Mesh::getTexBuffer() const
-{
-    return texBuffer;
-}
-
-unsigned int Mesh::getNumIndices() const
-{
-    return numIndices;
-}
-
 void Mesh::render() const
 {
     glBindVertexArray(VAO);
