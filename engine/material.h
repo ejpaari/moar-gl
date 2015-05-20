@@ -43,6 +43,7 @@ public:
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
+    GLuint getShader() const;
 
 private:
     const TextureInfo* getTextureInfo(TextureType type);

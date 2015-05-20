@@ -28,6 +28,7 @@ void Light::execute()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
     GLintptr offset = 0;
+    // Todo: Don't update if object has not changed.
     glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(color), glm::value_ptr(color));
     offset += sizeof(color);
     glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(parent->getPosition()), glm::value_ptr(parent->getPosition()));

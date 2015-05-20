@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "renderer.h"
+#include "material.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -101,10 +102,8 @@ void Engine::execute()
         input.setCursorPosition(x, y);
 
         app->handleInput(window);
-        // Todo: This actually causes delay
         app->update(glfwGetTime(), glfwGetTime() - time);        
         time = glfwGetTime();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         executeCustomComponents();
         render();
         gui.render();
@@ -139,11 +138,12 @@ Input* Engine::getInput()
 
 void Engine::addObject(Object* object)
 {
-    std::shared_ptr<Object> obj(object);    
+    std::shared_ptr<Object> obj(object);
     allObjects.push_back(obj);
 
     if (object->hasComponent("Renderer")) {
-        renderObjects.push_back(object);
+        GLuint shaderProgram = object->getComponent<Material>()->getShader();
+        renderObjects[shaderProgram].push_back(object);
     }
     if (object->hasComponent("Light")) {
         lights.push_back(object);
@@ -159,18 +159,21 @@ void Engine::executeCustomComponents()
 
 void Engine::render()
 {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
-    for (auto renderObj : renderObjects) {
-        renderObj->prepareRender();
-        for (unsigned int i = 0; i < lights.size(); ++i) {            
-            if (i == 0) {
-                glDisable(GL_BLEND);
-            } else if (i == 1) {
-                glEnable(GL_BLEND);                
+    for (auto renderObjs : renderObjects) {
+        glUseProgram(renderObjs.first);
+        for (auto renderObj : renderObjs.second) {
+            renderObj->prepareRender();
+            glDisable(GL_BLEND);
+            for (unsigned int i = 0; i < lights.size(); ++i) {
+                if (i == 1) {
+                    glEnable(GL_BLEND);
+                }
+                lights[i]->prepareLight();
+                renderObj->render();
             }
-            lights[i]->prepareLight();
-            renderObj->render();
         }
     }
 }

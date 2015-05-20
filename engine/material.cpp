@@ -22,7 +22,6 @@ Material::~Material()
 
 void Material::execute()
 {
-    glUseProgram(shader);
     for (unsigned int i = 0; i < textures.size(); ++i) {
         glActiveTexture(std::get<1>(textures[i])->unit);
         glBindTexture(GL_TEXTURE_2D, std::get<0>(textures[i]));
@@ -68,6 +67,11 @@ const Material::TextureInfo* Material::getTextureInfo(TextureType type)
 
     std::cerr << "Warning: Could not map texture information." << std::endl;
     return nullptr;
+}
+
+GLuint Material::getShader() const
+{
+    return shader;
 }
 
 } // moar

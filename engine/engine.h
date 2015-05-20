@@ -11,6 +11,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <string>
+#include <vector>
+#include <map>
 #include <memory>
 
 namespace moar
@@ -49,7 +51,7 @@ private:
     GUI gui;
     Input input;
     Camera camera;
-    std::vector<Object*> renderObjects;
+    std::map<GLuint, std::vector<Object*>> renderObjects;
     std::vector<Object*> lights;
     std::vector<std::shared_ptr<Object>> allObjects;
 
