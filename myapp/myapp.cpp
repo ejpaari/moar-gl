@@ -35,7 +35,7 @@ void MyApp::start()
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
 
-    monkey2 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
+    monkey2 = createRenderObject("normals", "monkey.3ds", "checker.png");
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
 //    moar::Material* mat = monkey2->getComponent<moar::Material>();
 //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL);
@@ -96,7 +96,6 @@ void MyApp::update(double time, double deltaTime)
     }
 
     monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
-    monkey2->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
 
     light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
     light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));

@@ -1,4 +1,5 @@
 #include "object.h"
+#include "constants.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>
@@ -49,9 +50,13 @@ void Object::prepareRender()
     material->execute();
     assert(renderer != nullptr);
     glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
-    glUniformMatrix4fv(glGetUniformLocation(currentShader, "model"), 1, GL_FALSE, glm::value_ptr(getModelMatrix()));
-    glUniformMatrix4fv(glGetUniformLocation(currentShader, "view"), 1, GL_FALSE, glm::value_ptr(*view));
-    glUniformMatrix4fv(glGetUniformLocation(currentShader, "proj"), 1, GL_FALSE, glm::value_ptr(*projection));
+    glm::mat4x4 model = getModelMatrix();
+    // Todo: uniform block.
+    glUniformMatrix4fv(M_LOCATION, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(V_LOCATION, 1, GL_FALSE, glm::value_ptr(*view));
+    glUniformMatrix4fv(MV_LOCATION, 1, GL_FALSE, glm::value_ptr((*view) * model));
+    glUniformMatrix4fv(P_LOCATION, 1, GL_FALSE, glm::value_ptr(*projection));
+    glUniformMatrix4fv(MVP_LOCATION, 1, GL_FALSE, glm::value_ptr((*projection) * (*view) * model));
 }
 
 void Object::prepareLight()

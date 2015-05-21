@@ -27,7 +27,6 @@ public:
     virtual Component::Type getType() final;
 
 private:
-    static GLint shader;
     GLuint lightBlockBuffer;
     glm::vec4 color;
 };

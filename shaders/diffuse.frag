@@ -8,9 +8,6 @@ in vec2 texCoord;
 out vec4 outColor;
 
 uniform sampler2D DiffuseTex;
-//uniform vec3 lightPos;
-//uniform vec3 lightColor;
-//uniform float lightPower;
 
 layout (std140) uniform LightBlock {
     vec4 lightColor;

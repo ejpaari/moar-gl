@@ -4,11 +4,10 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 
 namespace moar
 {
-
-GLint Light::shader = 0;
 
 Light::Light() :
     color(1.0f, 1.0f, 1.0f, 10.0f)
@@ -28,7 +27,6 @@ void Light::execute()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
     GLintptr offset = 0;
-    // Todo: Don't update if object has not changed.
     glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(color), glm::value_ptr(color));
     offset += sizeof(color);
     glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(parent->getPosition()), glm::value_ptr(parent->getPosition()));

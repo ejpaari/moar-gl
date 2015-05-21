@@ -91,7 +91,7 @@ bool Shader::linkProgram()
         glDeleteShader(shader);
     }
 
-    lightBlockIndex = glGetUniformBlockIndex(program, lightBlockName);
+    lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
     glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
 
     return isLinked;

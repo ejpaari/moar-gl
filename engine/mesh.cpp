@@ -1,11 +1,8 @@
 #include "mesh.h"
+#include "constants.h"
 
 namespace moar
 {
-
-const GLuint Mesh::INDEX_VERTEX = 1;
-const GLuint Mesh::INDEX_TEX = 2;
-const GLuint Mesh::INDEX_NORMAL= 3;
 
 Mesh::Mesh() :
     numIndices(0) {
@@ -32,17 +29,17 @@ void Mesh::setIndices(const std::vector<unsigned int>& indices)
 
 void Mesh::setVertices(const std::vector<glm::vec3>& vertices)
 {
-    setBufferData<glm::vec3>(vertexBuffer, vertices, INDEX_VERTEX, 3);
+    setBufferData<glm::vec3>(vertexBuffer, vertices, VERTEX_LOCATION, 3);
 }
 
 void Mesh::setTextureCoordinates(const std::vector<glm::vec2>& coords)
 {
-    setBufferData<glm::vec2>(texBuffer, coords, INDEX_TEX, 2);
+    setBufferData<glm::vec2>(texBuffer, coords, TEX_LOCATION, 2);
 }
 
 void Mesh::setNormals(const std::vector<glm::vec3>& normals)
 {
-    setBufferData<glm::vec3>(normalBuffer, normals, INDEX_NORMAL, 3);
+    setBufferData<glm::vec3>(normalBuffer, normals, NORMAL_LOCATION, 3);
 }
 
 void Mesh::render() const
