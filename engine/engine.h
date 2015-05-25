@@ -50,7 +50,7 @@ private:
     ResourceManager manager;
     GUI gui;
     Input input;
-    Camera camera;
+    std::shared_ptr<Camera> camera;
     std::map<GLuint, std::vector<Object*>> renderObjects;
     std::vector<Object*> lights;
     std::vector<std::shared_ptr<Object>> allObjects;

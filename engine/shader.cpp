@@ -9,8 +9,7 @@
 namespace moar
 {
 
-Shader::Shader() :
-    lightBlockIndex(0)
+Shader::Shader()
 {
     program = glCreateProgram();    
 }
@@ -91,8 +90,10 @@ bool Shader::linkProgram()
         glDeleteShader(shader);
     }
 
-    lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
+    GLuint lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
     glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
+    GLuint transformationBlockIndex = glGetUniformBlockIndex(program, TRANSFORMATION_BLOCK_NAME);
+    glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);
 
     return isLinked;
 }

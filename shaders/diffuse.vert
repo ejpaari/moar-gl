@@ -9,11 +9,12 @@ out vec3 vertexPos_World;
 out vec3 lightDir_Cam;
 out vec2 texCoord;
 
-layout (location = 10) uniform mat4 M;
-layout (location = 11) uniform mat4 V;
-layout (location = 12) uniform mat4 MV;
-layout (location = 13) uniform mat4 P;
-layout (location = 14) uniform mat4 MVP;
+layout (std140) uniform TransformationBlock {
+    mat4 M;
+    mat4 V;
+    mat4 MV;
+    mat4 MVP;
+};
 
 layout (std140) uniform LightBlock {
     vec4 lightColor;

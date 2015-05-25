@@ -25,8 +25,7 @@ public:
 private:
     bool compileShader(GLuint shader, const char* filename);
 
-    GLuint program;
-    GLuint lightBlockIndex;
+    GLuint program;    
     std::vector<GLuint> shaders;
 };
 

@@ -13,10 +13,7 @@ Engine::Engine() :
     useTimeLimit(false),
     timeLimit(0.0),
     time(0.0)
-{
-    // Todo: Multiple cameras.
-    Object::view = camera.getViewMatrixPointer();
-    Object::projection = camera.getProjectionMatrixPointer();
+{    
 }
 
 Engine::~Engine()
@@ -89,6 +86,11 @@ bool Engine::init(const std::string& settingsFile)
 
     printInfo(windowWidth, windowHeight);
 
+    // Todo: Multiple cameras.
+    camera.reset(new Camera());
+    Object::view = camera->getViewMatrixPointer();
+    Object::projection = camera->getProjectionMatrixPointer();
+
     return true;
 }
 
@@ -128,7 +130,7 @@ ResourceManager* Engine::getResourceManager()
 
 Camera* Engine::getCamera()
 {
-    return &camera;
+    return camera.get();
 }
 
 Input* Engine::getInput()

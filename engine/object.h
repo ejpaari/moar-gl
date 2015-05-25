@@ -70,6 +70,8 @@ protected:
     std::vector<std::unique_ptr<Component>> allComponents;
 
     static GLint currentShader;
+
+    GLuint transformationBlockBuffer;
 };
 
 template<typename T>

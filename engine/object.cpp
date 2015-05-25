@@ -31,6 +31,10 @@ Object::Object() :
     renderer(nullptr),
     light(nullptr)
 {
+    glGenBuffers(1, &transformationBlockBuffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+    GLsizeiptr bufferSize = 4 * sizeof(*projection);
+    glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
 }
 
 Object::~Object()
@@ -51,12 +55,13 @@ void Object::prepareRender()
     assert(renderer != nullptr);
     glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
     glm::mat4x4 model = getModelMatrix();
-    // Todo: uniform block.
-    glUniformMatrix4fv(M_LOCATION, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(V_LOCATION, 1, GL_FALSE, glm::value_ptr(*view));
-    glUniformMatrix4fv(MV_LOCATION, 1, GL_FALSE, glm::value_ptr((*view) * model));
-    glUniformMatrix4fv(P_LOCATION, 1, GL_FALSE, glm::value_ptr(*projection));
-    glUniformMatrix4fv(MVP_LOCATION, 1, GL_FALSE, glm::value_ptr((*projection) * (*view) * model));
+    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+    GLintptr matrixSize = sizeof(model);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(model));
+    glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
+    glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * model));
+    glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * model));
+    glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
 }
 
 void Object::prepareLight()
