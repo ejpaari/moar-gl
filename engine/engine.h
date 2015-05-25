@@ -55,6 +55,9 @@ private:
     std::vector<Object*> lights;
     std::vector<std::shared_ptr<Object>> allObjects;
 
+    GLuint ambientShader;
+    glm::vec3 ambientColor;
+
     bool useTimeLimit;
     double timeLimit;
     double time;

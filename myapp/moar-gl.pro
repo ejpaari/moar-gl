@@ -23,7 +23,9 @@ DISTFILES += \
     ../shaders/diffuse.frag \
     ../shaders/normals.frag \
     ../shaders/diffuse.vert \
-    ../shaders/normals.vert
+    ../shaders/normals.vert \
+    ../shaders/ambient.frag \
+    ../shaders/ambient.vert
 
 SOURCES += \
     main.cpp \

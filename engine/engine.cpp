@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "renderer.h"
 #include "material.h"
+#include "constants.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -10,6 +11,8 @@ namespace moar
 
 Engine::Engine() :
     window(nullptr),
+    ambientShader(0),
+    ambientColor(0.01f, 0.01f, 0.01f),
     useTimeLimit(false),
     timeLimit(0.0),
     time(0.0)
@@ -91,6 +94,8 @@ bool Engine::init(const std::string& settingsFile)
     Object::view = camera->getViewMatrixPointer();
     Object::projection = camera->getProjectionMatrixPointer();
 
+    ambientShader = manager.getShader("ambient");
+
     return true;
 }
 
@@ -162,17 +167,29 @@ void Engine::executeCustomComponents()
 void Engine::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Ambient.
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
+    glDisable(GL_BLEND);
+    glUseProgram(ambientShader);
+    glUniform3f(AMBIENT_LOCATION, ambientColor.x, ambientColor.y, ambientColor.z);
+    for (auto renderObjs : renderObjects) {
+        for (auto renderObj : renderObjs.second) {
+            renderObj->prepareRender();
+            renderObj->render();
+        }
+    }
+
+    // Lighting.
+    glEnable(GL_BLEND);
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
     for (auto renderObjs : renderObjects) {
         glUseProgram(renderObjs.first);
         for (auto renderObj : renderObjs.second) {
             renderObj->prepareRender();
-            glDisable(GL_BLEND);
             for (unsigned int i = 0; i < lights.size(); ++i) {
-                if (i == 1) {
-                    glEnable(GL_BLEND);
-                }
                 lights[i]->prepareLight();
                 renderObj->render();
             }
