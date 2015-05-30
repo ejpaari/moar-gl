@@ -8,6 +8,7 @@
 #include <GL/glew.h>
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include <memory>
 
 namespace moar
@@ -30,6 +31,7 @@ public:
     GLuint getShader(const std::string& shaderName);
     Model* getModel(const std::string& modelName);
     GLuint getTexture(const std::string& textureName);
+    GLuint getTexture(std::vector<std::string> textureNames);
 
 private:
     std::string shaderPath;
@@ -38,6 +40,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<Shader>> shaders;
     std::unordered_map<std::string, std::unique_ptr<Model>> models;
     std::unordered_map<std::string, std::unique_ptr<Texture>> textures;
+    std::unordered_map<std::string, std::unique_ptr<Texture>> cubeTextures;
 };
 
 } // moar

@@ -96,9 +96,31 @@ GLuint ResourceManager::getTexture(const std::string& textureName)
             return 0;
         }
         auto iter = textures.insert(std::pair<std::string, std::unique_ptr<Texture>>(textureName, std::move(texture)));
-        return iter.first->second->getName();
+        return iter.first->second->getID();
     } else {
-        return found->second->getName();
+        return found->second->getID();
+    }
+}
+
+GLuint ResourceManager::getTexture(std::vector<std::string> textureNames)
+{
+    std::string textureKey = "";
+    for (auto& name : textureNames) {
+        textureKey += name;
+        name = texturePath + name;
+    }
+    auto found = cubeTextures.find(textureKey);
+    if (found == cubeTextures.end()) {
+        std::unique_ptr<Texture> texture(new Texture());
+        bool isGood = texture->load(textureNames);
+        if (!isGood) {
+            std::cerr << "Failed to load one or more cube textures" << std::endl;
+            return 0;
+        }
+        auto iter = cubeTextures.insert(std::make_pair(textureKey, std::move(texture)));
+        return iter.first->second->getID();
+    } else {
+        return found->second->getID();
     }
 }
 

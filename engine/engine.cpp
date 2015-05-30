@@ -11,6 +11,8 @@ namespace moar
 
 Engine::Engine() :
     window(nullptr),
+    skybox(nullptr),
+    skyboxShader(0),
     ambientShader(0),
     ambientColor(0.01f, 0.01f, 0.01f),
     useTimeLimit(false),
@@ -94,6 +96,11 @@ bool Engine::init(const std::string& settingsFile)
     Object::view = camera->getViewMatrixPointer();
     Object::projection = camera->getProjectionMatrixPointer();
 
+    std::vector<std::string> skyboxTextures = {"sb_px.png", "sb_nx.png", "sb_py.png", "sb_ny.png", "sb_pz.png", "sb_nz.png"};
+    if (!createSkybox(skyboxTextures)) {
+        std::cerr << "Failed to create the skybox" << std::endl;
+    }
+
     ambientShader = manager.getShader("ambient");
 
     return true;
@@ -111,7 +118,7 @@ void Engine::execute()
         app->handleInput(window);
         app->update(glfwGetTime(), glfwGetTime() - time);        
         time = glfwGetTime();
-        executeCustomComponents();
+        executeCustomComponents();        
         render();
         gui.render();
 
@@ -195,6 +202,16 @@ void Engine::render()
             }
         }
     }
+
+    if (skybox) {
+        glDisable(GL_BLEND);
+        glCullFace(GL_FRONT);
+        glDepthFunc(GL_LEQUAL);
+        glUseProgram(skyboxShader);
+        skybox->setPosition(camera->getPosition());
+        skybox->prepareRender();
+        skybox->render();
+    }
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)
@@ -213,6 +230,27 @@ void Engine::printInfo(int windowWidth, int windowHeight)
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
 
     std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl;
+}
+
+bool Engine::createSkybox(const std::vector<std::string>& files)
+{
+    skyboxShader = manager.getShader("skybox");
+    GLuint texture = 0;
+    if (!files.empty()) {
+        texture = manager.getTexture(files);
+    }
+    Material* material = new Material();
+    material->setShader(skyboxShader);
+    material->setTexture(texture, Material::TextureType::DIFFUSE);
+
+    Renderer* renderer = new Renderer();
+    Model* model = getResourceManager()->getModel("cube.3ds");
+    renderer->setModel(model);
+
+    skybox.reset(new Object());
+    skybox->addComponent(material);
+    skybox->addComponent(renderer);
+    return true;
 }
 
 } // moar

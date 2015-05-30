@@ -22,6 +22,7 @@ Material::~Material()
 
 void Material::execute()
 {
+    // Todo: Specify texture locations so it does not have to be queried.
     for (unsigned int i = 0; i < textures.size(); ++i) {
         glActiveTexture(std::get<1>(textures[i])->unit);
         glBindTexture(GL_TEXTURE_2D, std::get<0>(textures[i]));

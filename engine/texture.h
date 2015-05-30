@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <string>
+#include <vector>
 
 namespace moar
 {
@@ -18,11 +19,12 @@ public:
     Texture& operator=(Texture&&) = delete;
 
     bool load(const std::string& file);
+    bool load(const std::vector<std::string>& files);
 
-    GLuint getName() const;
+    GLuint getID() const;
 
 private:
-    GLuint name;
+    GLuint id;
 };
 
 } // moar

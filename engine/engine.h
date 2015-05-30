@@ -40,20 +40,23 @@ public:
 private:
     void executeCustomComponents();
     void render();
-
     void printInfo(int windowWidth, int windowHeight);
+    bool createSkybox(const std::vector<std::string>& files);
 
     std::shared_ptr<Application> app;
 
     GLFWwindow* window;
-
     ResourceManager manager;
     GUI gui;
     Input input;
+
     std::shared_ptr<Camera> camera;
     std::map<GLuint, std::vector<Object*>> renderObjects;
     std::vector<Object*> lights;
     std::vector<std::shared_ptr<Object>> allObjects;
+
+    std::shared_ptr<Object> skybox;
+    GLuint skyboxShader;
 
     GLuint ambientShader;
     glm::vec3 ambientColor;
