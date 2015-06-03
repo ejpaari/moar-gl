@@ -5,6 +5,7 @@
 #include "resourcemanager.h"
 #include "gui.h"
 #include "input.h"
+#include "rendersettings.h"
 #include "camera.h"
 #include "object.h"
 
@@ -41,7 +42,7 @@ private:
     void executeCustomComponents();
     void render();
     void printInfo(int windowWidth, int windowHeight);
-    bool createSkybox(const std::vector<std::string>& files);
+    bool createSkybox();
 
     std::shared_ptr<Application> app;
 
@@ -49,6 +50,7 @@ private:
     ResourceManager manager;
     GUI gui;
     Input input;
+    RenderSettings renderSettings;
 
     std::shared_ptr<Camera> camera;
     std::map<GLuint, std::vector<Object*>> renderObjects;
@@ -56,13 +58,7 @@ private:
     std::vector<std::shared_ptr<Object>> allObjects;
 
     std::shared_ptr<Object> skybox;
-    GLuint skyboxShader;
 
-    GLuint ambientShader;
-    glm::vec3 ambientColor;
-
-    bool useTimeLimit;
-    double timeLimit;
     double time;
 };
 

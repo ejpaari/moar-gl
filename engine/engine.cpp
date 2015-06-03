@@ -11,12 +11,6 @@ namespace moar
 
 Engine::Engine() :
     window(nullptr),
-    skybox(nullptr),
-    skyboxShader(0),
-    ambientShader(0),
-    ambientColor(0.01f, 0.01f, 0.01f),
-    useTimeLimit(false),
-    timeLimit(0.0),
     time(0.0)
 {    
 }
@@ -68,6 +62,8 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
+    printInfo(windowWidth, windowHeight);
+
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     double sensitivity = pt.get<double>("Input.sensitivity");
@@ -80,28 +76,23 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    useTimeLimit = pt.get<bool>("Engine.useTimeLimit");
-    timeLimit = pt.get<double>("Engine.timeLimit");
     manager.setShaderPath(pt.get<std::string>("Engine.shaderPath"));
     manager.setModelPath(pt.get<std::string>("Engine.modelPath"));
     manager.setTexturePath(pt.get<std::string>("Engine.texturePath"));
-
-    glClearColor(0.0f, 0.0f, 0.3f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-
-    printInfo(windowWidth, windowHeight);
 
     // Todo: Multiple cameras.
     camera.reset(new Camera());
     Object::view = camera->getViewMatrixPointer();
     Object::projection = camera->getProjectionMatrixPointer();
 
-    std::vector<std::string> skyboxTextures = {"sb_px.png", "sb_nx.png", "sb_py.png", "sb_ny.png", "sb_pz.png", "sb_nz.png"};
-    if (!createSkybox(skyboxTextures)) {
-        std::cerr << "Failed to create the skybox" << std::endl;
+    if (!renderSettings.loadSettings(pt, manager)) {
+        std::cerr << "Failed to load render settings" << std::endl;
+        return false;
     }
 
-    ambientShader = manager.getShader("ambient");
+    if (!createSkybox()) {
+        std::cerr << "Failed to create the skybox" << std::endl;
+    }
 
     return true;
 }
@@ -116,7 +107,7 @@ void Engine::execute()
         input.setCursorPosition(x, y);
 
         app->handleInput(window);
-        app->update(glfwGetTime(), glfwGetTime() - time);        
+        app->update(glfwGetTime(), glfwGetTime() - time);
         time = glfwGetTime();
         executeCustomComponents();        
         render();
@@ -128,11 +119,9 @@ void Engine::execute()
         if (glfwWindowShouldClose(window)) {
             app->quit();
         }
-        if (useTimeLimit && glfwGetTime() >= timeLimit) {
-            app->quit();
-            gui.uninit();
-        }
     }
+
+    gui.uninit();
 }
 
 ResourceManager* Engine::getResourceManager()
@@ -174,13 +163,14 @@ void Engine::executeCustomComponents()
 void Engine::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 
     // Ambient.
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glDisable(GL_BLEND);
-    glUseProgram(ambientShader);
-    glUniform3f(AMBIENT_LOCATION, ambientColor.x, ambientColor.y, ambientColor.z);
+    glUseProgram(renderSettings.ambientShader);
+    glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
     for (auto renderObjs : renderObjects) {
         for (auto renderObj : renderObjs.second) {
             renderObj->prepareRender();
@@ -207,7 +197,7 @@ void Engine::render()
         glDisable(GL_BLEND);
         glCullFace(GL_FRONT);
         glDepthFunc(GL_LEQUAL);
-        glUseProgram(skyboxShader);
+        glUseProgram(renderSettings.skyboxShader);
         skybox->setPosition(camera->getPosition());
         skybox->prepareRender();
         skybox->render();
@@ -229,18 +219,13 @@ void Engine::printInfo(int windowWidth, int windowHeight)
     glfwGetMonitorPhysicalSize(primaryMonitor, &monitorWidth, &monitorHeight);
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
 
-    std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl;
+    std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl << std::endl;
 }
 
-bool Engine::createSkybox(const std::vector<std::string>& files)
+bool Engine::createSkybox()
 {
-    skyboxShader = manager.getShader("skybox");
-    GLuint texture = 0;
-    if (!files.empty()) {
-        texture = manager.getTexture(files);
-    }
-    Material* material = new Material();
-    material->setShader(skyboxShader);
+    GLuint texture = manager.getTexture(renderSettings.skyboxTextures);
+    Material* material = new Material();    
     material->setTexture(texture, Material::TextureType::DIFFUSE);
 
     Renderer* renderer = new Renderer();
