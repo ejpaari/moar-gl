@@ -24,6 +24,7 @@ public:
     RenderSettings& operator=(RenderSettings&&) = delete;
 
     bool loadSettings(const boost::property_tree::ptree& pt, ResourceManager& manager);
+    bool isLoaded() const;
 
     glm::vec4 clearColor;
 
@@ -32,6 +33,9 @@ public:
 
     GLuint ambientShader;
     glm::vec3 ambientColor;
+
+private:
+    bool loaded;
 };
 
 } // moar

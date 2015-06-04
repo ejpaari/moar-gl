@@ -66,7 +66,7 @@ const Material::TextureInfo* Material::getTextureInfo(TextureType type)
         }
     }
 
-    std::cerr << "Warning: Could not map texture information." << std::endl;
+    std::cerr << "WARNING: Could not map material texture information" << std::endl;
     return nullptr;
 }
 

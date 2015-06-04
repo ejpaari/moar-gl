@@ -40,13 +40,13 @@ GLuint ResourceManager::getShader(const std::string& shaderName)
         bool isGood;
         isGood = shader->attachShader(GL_VERTEX_SHADER, vertexShader.c_str());
         if (!isGood) {
-            std::cerr << "Failed to attach vertex shader: " << vertexShader << std::endl;
+            std::cerr << "WARNING: Failed to attach vertex shader: " << vertexShader << std::endl;
             return 0;
         }
 
         isGood = shader->attachShader(GL_FRAGMENT_SHADER, fragmentShader.c_str());
         if (!isGood) {
-            std::cerr << "Failed to attach fragment shader: " << fragmentShader << std::endl;
+            std::cerr << "WARNING: Failed to attach fragment shader: " << fragmentShader << std::endl;
             return 0;
         }
 
@@ -70,7 +70,7 @@ Model* ResourceManager::getModel(const std::string& modelName)
         std::unique_ptr<Model> model(new Model());
         bool isGood = model->loadModel(modelFile);
         if (!isGood) {
-            std::cerr << "Failed to load model: " << modelFile << std::endl;
+            std::cerr << "WARNING: Failed to load model; " << modelFile << std::endl;
             return nullptr;
         }
         auto iter = models.insert(std::make_pair(modelName, std::move(model)));
@@ -92,7 +92,7 @@ GLuint ResourceManager::getTexture(const std::string& textureName)
         std::unique_ptr<Texture> texture(new Texture());
         bool isGood = texture->load(textureFile);
         if (!isGood) {
-            std::cerr << "Failed to load texture: " << textureFile << std::endl;
+            std::cerr << "WARNING: Failed to load texture; " << textureFile << std::endl;
             return 0;
         }
         auto iter = textures.insert(std::pair<std::string, std::unique_ptr<Texture>>(textureName, std::move(texture)));
@@ -114,7 +114,7 @@ GLuint ResourceManager::getTexture(std::vector<std::string> textureNames)
         std::unique_ptr<Texture> texture(new Texture());
         bool isGood = texture->load(textureNames);
         if (!isGood) {
-            std::cerr << "Failed to load one or more cube textures" << std::endl;
+            std::cerr << "WARNING: Failed to load one or more cube textures" << std::endl;
             return 0;
         }
         auto iter = cubeTextures.insert(std::make_pair(textureKey, std::move(texture)));

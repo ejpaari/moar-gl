@@ -27,7 +27,7 @@ bool Model::loadModel(const std::string& file)
     if (assimpScene) {
         meshes.resize(assimpScene->mNumMeshes);
         if (assimpScene->mNumMeshes == 0) {
-            std::cerr << "No mesh found in the model " << file << std::endl;
+            std::cerr << "WARNING: No mesh found in the model; " << file << std::endl;
             return false;
         }
 
@@ -61,7 +61,7 @@ bool Model::loadModel(const std::string& file)
 
             for (unsigned int j = 0; j < assimpMesh->mNumFaces; ++j) {
                 if (assimpMesh->mFaces[j].mNumIndices != 3) {
-                    std::cerr << "Unable to parse model indices: " << file << std::endl;
+                    std::cerr << "WARNING: Unable to parse model indices; " << file << std::endl;
                     return false;
                 }
                 indices.push_back(assimpMesh->mFaces[j].mIndices[0]);
@@ -80,14 +80,14 @@ bool Model::loadModel(const std::string& file)
         std::cout << "Loaded model: " << file << std::endl;
         return true;
     } else {
-        std::cerr << "Failed to read model: " << file << std::endl;
-        std::cerr << "Error: " << importer.GetErrorString() << std::endl;
+        std::cerr << "WARNING: Failed to read model; " << file << std::endl;
+        std::cerr << importer.GetErrorString() << std::endl;
         return false;
     }
 }
 
 void Model::render() const
-{    
+{
     for (unsigned int i = 0; i < meshes.size(); ++i) {
         meshes[i]->render();
     }

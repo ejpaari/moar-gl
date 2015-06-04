@@ -5,6 +5,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/exceptions.hpp>
+#include <exception>
 
 namespace moar
 {
@@ -22,43 +24,69 @@ Engine::~Engine()
 
 void Engine::setApplication(std::shared_ptr<Application> application)
 {
-     app = application;
-     app->setEngine(this);
+    app = application;
+    app->setEngine(this);
 }
 
 bool Engine::init(const std::string& settingsFile)
 {
     if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
+        std::cerr << "ERROR: Failed to initialize GLFW" << std::endl;
         return false;
     }
 
     boost::property_tree::ptree pt;
-    boost::property_tree::ini_parser::read_ini(settingsFile, pt);
+    try {
+        boost::property_tree::ini_parser::read_ini(settingsFile, pt);
+    } catch (std::exception& e) {
+        std::cerr << "ERROR: Could not load setting file; " << settingsFile << std::endl;
+        std::cerr << e.what() << std::endl;
+        return false;
+    }
 
-    glfwWindowHint(GLFW_SAMPLES, pt.get<int>("OpenGL.multisampling"));
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, pt.get<int>("OpenGL.major"));
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    try {
+        glfwWindowHint(GLFW_SAMPLES, pt.get<int>("OpenGL.multisampling"));
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, pt.get<int>("OpenGL.major"));
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    } catch (boost::property_tree::ptree_error& e) {
+        std::cerr << "ERRROR: Could not load OpenGL version info from the .ini-file" << std::endl;
+        std::cerr << e.what() << std::endl;
+        return false;
+    }
 
-    int windowWidth = pt.get<int>("Window.width");
-    int windowHeight = pt.get<int>("Window.height");
-    window = glfwCreateWindow(windowWidth, windowHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
+    int windowWidth = 800;
+    int windowHeight = 600;
+    try {
+        windowWidth = pt.get<int>("Window.width");
+        windowHeight = pt.get<int>("Window.height");
+        window = glfwCreateWindow(windowWidth, windowHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
+    } catch (boost::property_tree::ptree_error& e) {
+        std::cerr << "WARNING: Could not load window info from the .ini-file" << std::endl;
+        std::cerr << e.what() << std::endl;
+    }
     if (window == NULL) {
-        std::cerr << "Failed to create window" << std::endl;
+        std::cerr << "ERROR: Failed to create window" << std::endl;
         glfwTerminate();
         return false;
     }
 
-    int windowPosX = pt.get<int>("Window.Xposition");
-    int windowPosY = pt.get<int>("Window.Yposition");
+    int windowPosX = 0;
+    int windowPosY = 0;
+    try {
+        windowPosX = pt.get<int>("Window.Xposition");
+        windowPosY = pt.get<int>("Window.Yposition");
+    } catch (boost::property_tree::ptree_error& e) {
+        std::cerr << "WARNING: Could not load window position from the .ini-file" << std::endl;
+        std::cerr << e.what() << std::endl;
+    }
     glfwMakeContextCurrent(window);
     glfwSetWindowPos(window, windowPosX, windowPosY);
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW" << std::endl;
+        std::cerr << "ERROR: Failed to initialize GLEW" << std::endl;
         return false;
     }
 
@@ -66,19 +94,31 @@ bool Engine::init(const std::string& settingsFile)
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    double sensitivity = pt.get<double>("Input.sensitivity");
-    float movementSpeed = pt.get<double>("Input.movementSpeed");
-    input.setSensitivity(sensitivity);
-    input.setMovementSpeed(movementSpeed);
+
+    try {
+        double sensitivity = pt.get<double>("Input.sensitivity");
+        float movementSpeed = pt.get<double>("Input.movementSpeed");
+        input.setSensitivity(sensitivity);
+        input.setMovementSpeed(movementSpeed);
+    } catch (boost::property_tree::ptree_error& e) {
+        std::cerr << "WARNING: Could not load input info from the .ini-file" << std::endl;
+        std::cerr << e.what() << std::endl;
+    }
 
     if (!gui.init(window)) {
-        std::cerr << "Failed to initialize AntTweakBar" << std::endl;
+        std::cerr << "ERROR: Failed to initialize AntTweakBar" << std::endl;
         return false;
     }
 
-    manager.setShaderPath(pt.get<std::string>("Engine.shaderPath"));
-    manager.setModelPath(pt.get<std::string>("Engine.modelPath"));
-    manager.setTexturePath(pt.get<std::string>("Engine.texturePath"));
+    try {
+        manager.setShaderPath(pt.get<std::string>("Engine.shaderPath"));
+        manager.setModelPath(pt.get<std::string>("Engine.modelPath"));
+        manager.setTexturePath(pt.get<std::string>("Engine.texturePath"));
+    } catch (boost::property_tree::ptree_error& e) {
+        std::cerr << "ERROR: Could not load resource path info from the .ini-file" << std::endl;
+        std::cerr << e.what() << std::endl;
+        return false;
+    }
 
     // Todo: Multiple cameras.
     camera.reset(new Camera());
@@ -86,12 +126,11 @@ bool Engine::init(const std::string& settingsFile)
     Object::projection = camera->getProjectionMatrixPointer();
 
     if (!renderSettings.loadSettings(pt, manager)) {
-        std::cerr << "Failed to load render settings" << std::endl;
-        return false;
+        std::cerr << "WARNING: Failed to load render settings" << std::endl;
     }
 
     if (!createSkybox()) {
-        std::cerr << "Failed to create the skybox" << std::endl;
+        std::cerr << "WARNING: Failed to create the skybox" << std::endl;
     }
 
     return true;
@@ -109,7 +148,7 @@ void Engine::execute()
         app->handleInput(window);
         app->update(glfwGetTime(), glfwGetTime() - time);
         time = glfwGetTime();
-        executeCustomComponents();        
+        executeCustomComponents();
         render();
         gui.render();
 
@@ -154,7 +193,7 @@ void Engine::addObject(Object* object)
 }
 
 void Engine::executeCustomComponents()
-{
+{    
     for (unsigned int i = 0; i < allObjects.size(); ++i) {
         allObjects[i]->executeCustomComponents();
     }
@@ -224,8 +263,11 @@ void Engine::printInfo(int windowWidth, int windowHeight)
 
 bool Engine::createSkybox()
 {
+    if (!renderSettings.isLoaded()) {
+        return false;
+    }
     GLuint texture = manager.getTexture(renderSettings.skyboxTextures);
-    Material* material = new Material();    
+    Material* material = new Material();
     material->setTexture(texture, Material::TextureType::DIFFUSE);
 
     Renderer* renderer = new Renderer();
