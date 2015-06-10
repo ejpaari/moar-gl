@@ -39,7 +39,7 @@ public:
     virtual void execute() final;
 
     void setShader(GLuint shader);
-    void setTexture(GLuint texture, TextureType type);
+    void setTexture(GLuint texture, TextureType type, GLenum target);
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
@@ -49,7 +49,7 @@ private:
     const TextureInfo* getTextureInfo(TextureType type);
 
     GLuint shader;
-    std::vector<std::tuple<GLuint, const TextureInfo*>> textures;
+    std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
 };
 
 } // moar

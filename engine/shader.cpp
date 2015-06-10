@@ -86,9 +86,14 @@ bool Shader::linkProgram()
     }
 
     GLuint lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
-    glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
+    if (lightBlockIndex != GL_INVALID_INDEX) {
+        glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
+    }
+
     GLuint transformationBlockIndex = glGetUniformBlockIndex(program, TRANSFORMATION_BLOCK_NAME);
-    glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);
+    if (transformationBlockIndex != GL_INVALID_INDEX) {
+        glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);
+    }
 
     for (GLuint shader : shaders) {
         glDetachShader(program, shader);

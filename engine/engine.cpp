@@ -29,7 +29,7 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
         std::cerr << "SHADER_COMPILER";
         break;
     case GL_DEBUG_SOURCE_THIRD_PARTY:
-        std::cerr << "THIRTD_PART";
+        std::cerr << "THIRD_PARTY";
         break;
     case GL_DEBUG_SOURCE_APPLICATION:
         std::cerr << "APPLICATION";
@@ -57,6 +57,15 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
     case GL_DEBUG_TYPE_PERFORMANCE:
         std::cerr << "PERFORMANCE";
         break;
+    case GL_DEBUG_TYPE_MARKER:
+        std::cerr << "MARKER";
+        break;
+    case GL_DEBUG_TYPE_PUSH_GROUP:
+        std::cerr << "PUSH_GROUP";
+        break;
+    case GL_DEBUG_TYPE_POP_GROUP:
+        std::cerr << "POP_GROUP";
+        break;
     case GL_DEBUG_TYPE_OTHER:
         std::cerr << "OTHER";
         break;
@@ -77,6 +86,9 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
         break;
     case GL_DEBUG_SEVERITY_HIGH:
         std::cerr << "HIGH";
+        break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+        std::cerr << "NOTIFICATION";
         break;
     default:
         std::cerr << "UNKNOWN";
@@ -177,11 +189,11 @@ bool Engine::init(const std::string& settingsFile)
     }
 
     if (DEBUG && glDebugMessageCallback) {
-        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT);        
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageCallback(debugCallbackFunction, nullptr);
         GLuint unusedIds = 0;
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, GL_TRUE);
+        glDebugMessageCallback(debugCallbackFunction, nullptr);
     }
 
     printInfo(windowWidth, windowHeight);
@@ -362,7 +374,8 @@ bool Engine::createSkybox()
     }
     GLuint texture = manager.getTexture(renderSettings.skyboxTextures);
     Material* material = new Material();
-    material->setTexture(texture, Material::TextureType::DIFFUSE);
+    material->setShader(renderSettings.skyboxShader);
+    material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);
 
     Renderer* renderer = new Renderer();
     Model* model = getResourceManager()->getModel("cube.3ds");

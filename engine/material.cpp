@@ -25,9 +25,8 @@ void Material::execute()
     // Todo: Specify texture locations so it does not have to be queried.
     for (unsigned int i = 0; i < textures.size(); ++i) {
         glActiveTexture(std::get<1>(textures[i])->unit);
-        glBindTexture(GL_TEXTURE_2D, std::get<0>(textures[i]));
-        glUniform1i(glGetUniformLocation(shader, std::get<1>(textures[i])->name),
-                    std::get<1>(textures[i])->value);
+        glBindTexture(std::get<2>(textures[i]), std::get<0>(textures[i]));
+        glUniform1i(glGetUniformLocation(shader, std::get<1>(textures[i])->name), std::get<1>(textures[i])->value);
     }
 }
 
@@ -36,16 +35,17 @@ void Material::setShader(GLuint shader)
     this->shader = shader;
 }
 
-void Material::setTexture(GLuint texture, TextureType type)
+void Material::setTexture(GLuint texture, TextureType type, GLenum target)
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
         if (std::get<1>(textures[i])->type == type) {
             std::get<0>(textures[i]) = texture;
+            std::get<2>(textures[i]) = target;
             return;
         }
     }
 
-    textures.push_back(std::make_tuple(texture, getTextureInfo(type)));
+    textures.push_back(std::make_tuple(texture, getTextureInfo(type), target));
 }
 
 std::string Material::getName()
