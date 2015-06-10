@@ -26,7 +26,7 @@ void charCallback(GLFWwindow* /*window*/, unsigned int codepoint)
     TwEventCharGLFW(codepoint, GLFW_PRESS);
 }
 
-} // Anonymous
+} // anonymous
 
 namespace moar
 {

@@ -8,6 +8,85 @@
 #include <boost/property_tree/exceptions.hpp>
 #include <exception>
 
+namespace
+{
+
+void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei /*length*/,
+                                    const GLchar* message, void* /*userParam*/)
+{
+    std::cerr << "OpenGL debug callback function" << std::endl;
+    std::cerr << "    Message: "<< message << std::endl;
+
+    std::cerr << "    Source: ";
+    switch (source) {
+    case GL_DEBUG_SOURCE_API:
+        std::cerr << "API";
+        break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+        std::cerr << "WINDOW_SYSTEM";
+        break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER:
+        std::cerr << "SHADER_COMPILER";
+        break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:
+        std::cerr << "THIRTD_PART";
+        break;
+    case GL_DEBUG_SOURCE_APPLICATION:
+        std::cerr << "APPLICATION";
+        break;
+    case GL_DEBUG_SOURCE_OTHER:
+        std::cerr << "OTHER";
+        break;
+    }
+    std::cerr << std::endl;
+
+    std::cerr << "    Type: ";
+    switch (type) {
+    case GL_DEBUG_TYPE_ERROR:
+        std::cerr << "TYPE_ERROR";
+        break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+        std::cerr << "DEPRECATED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+        std::cerr << "UNDEFINED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_PORTABILITY:
+        std::cerr << "PORTABILITY";
+        break;
+    case GL_DEBUG_TYPE_PERFORMANCE:
+        std::cerr << "PERFORMANCE";
+        break;
+    case GL_DEBUG_TYPE_OTHER:
+        std::cerr << "OTHER";
+        break;
+    default:
+        std::cerr << "UNKNOWN";
+        break;
+    }
+    std::cerr << std::endl;
+
+    std::cerr << "    ID: " << id << std::endl;
+    std::cerr << "    Severity: ";
+    switch (severity){
+    case GL_DEBUG_SEVERITY_LOW:
+        std::cerr << "LOW";
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        std::cerr << "MEDIUM";
+        break;
+    case GL_DEBUG_SEVERITY_HIGH:
+        std::cerr << "HIGH";
+        break;
+    default:
+        std::cerr << "UNKNOWN";
+        break;
+    }
+    std::cerr << std::endl << std::endl;
+}
+
+} // anonymous
+
 namespace moar
 {
 
@@ -38,18 +117,24 @@ bool Engine::init(const std::string& settingsFile)
     boost::property_tree::ptree pt;
     try {
         boost::property_tree::ini_parser::read_ini(settingsFile, pt);
+        if (pt.get<int>("OpenGL.debug")) {
+            DEBUG = true;
+        }
     } catch (std::exception& e) {
         std::cerr << "ERROR: Could not load setting file; " << settingsFile << std::endl;
         std::cerr << e.what() << std::endl;
         return false;
     }
 
-    try {
+    try {        
         glfwWindowHint(GLFW_SAMPLES, pt.get<int>("OpenGL.multisampling"));
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, pt.get<int>("OpenGL.major"));
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        if (DEBUG) {
+            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+        }
     } catch (boost::property_tree::ptree_error& e) {
         std::cerr << "ERRROR: Could not load OpenGL version info from the .ini-file" << std::endl;
         std::cerr << e.what() << std::endl;
@@ -85,9 +170,18 @@ bool Engine::init(const std::string& settingsFile)
     glfwSetWindowPos(window, windowPosX, windowPosY);
 
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "ERROR: Failed to initialize GLEW" << std::endl;
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        fprintf(stderr, "ERROR: %s\n", glewGetErrorString(err));
         return false;
+    }
+
+    if (DEBUG && glDebugMessageCallback) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(debugCallbackFunction, nullptr);
+        GLuint unusedIds = 0;
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
     }
 
     printInfo(windowWidth, windowHeight);

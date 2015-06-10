@@ -85,15 +85,15 @@ bool Shader::linkProgram()
         glDeleteProgram(program);;
     }
 
-    for (GLuint shader : shaders) {
-        glDetachShader(program, shader);
-        glDeleteShader(shader);
-    }
-
     GLuint lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
     glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
     GLuint transformationBlockIndex = glGetUniformBlockIndex(program, TRANSFORMATION_BLOCK_NAME);
     glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);
+
+    for (GLuint shader : shaders) {
+        glDetachShader(program, shader);
+        glDeleteShader(shader);
+    }
 
     return isLinked;
 }
