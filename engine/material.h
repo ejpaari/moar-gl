@@ -40,6 +40,7 @@ public:
 
     void setShader(GLuint shader);
     void setTexture(GLuint texture, TextureType type, GLenum target);
+    void setSpecularity(float specularity);
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
@@ -50,6 +51,7 @@ private:
 
     GLuint shader;
     std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
+    float specularity;
 };
 
 } // moar

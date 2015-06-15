@@ -15,6 +15,7 @@ static const GLuint VERTEX_LOCATION = 1;
 static const GLuint TEX_LOCATION = 2;
 static const GLuint NORMAL_LOCATION = 3;
 static const GLuint AMBIENT_LOCATION = 10;
+static const GLuint SPECULAR_LOCATION = 11;
 
 static bool DEBUG = false;
 } // moar

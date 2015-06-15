@@ -14,6 +14,8 @@ namespace
 void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei /*length*/,
                                     const GLchar* message, void* /*userParam*/)
 {
+//    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
+
     std::cerr << "OpenGL debug callback function" << std::endl;
     std::cerr << "    Message: "<< message << std::endl;
 

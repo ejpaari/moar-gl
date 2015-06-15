@@ -1,4 +1,5 @@
 #include "material.h"
+#include "constants.h"
 
 #include <iostream>
 
@@ -12,7 +13,8 @@ const Material::TextureInfo Material::textureInfos[] =
     {Material::TextureType::DISPLACEMENT, "DisplacementTex", GL_TEXTURE2, 2},
 };
 
-Material::Material()
+Material::Material() :
+    specularity(0.0f)
 {
 }
 
@@ -27,6 +29,11 @@ void Material::execute()
         glActiveTexture(std::get<1>(textures[i])->unit);
         glBindTexture(std::get<2>(textures[i]), std::get<0>(textures[i]));
         glUniform1i(glGetUniformLocation(shader, std::get<1>(textures[i])->name), std::get<1>(textures[i])->value);
+    }
+
+    // Todo: OpenGL gives error if applied for a shader without specularity-uniform.
+    if (specularity > 0.0f) {
+        glUniform1f(SPECULAR_LOCATION, specularity);
     }
 }
 
@@ -45,7 +52,13 @@ void Material::setTexture(GLuint texture, TextureType type, GLenum target)
         }
     }
 
+
     textures.push_back(std::make_tuple(texture, getTextureInfo(type), target));
+}
+
+void Material::setSpecularity(float specularity)
+{
+    this->specularity = specularity;
 }
 
 std::string Material::getName()

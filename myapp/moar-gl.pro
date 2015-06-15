@@ -27,7 +27,9 @@ DISTFILES += \
     ../shaders/ambient.frag \
     ../shaders/ambient.vert \
     ../shaders/skybox.frag \
-    ../shaders/skybox.vert
+    ../shaders/skybox.vert \
+    ../shaders/specular.frag \
+    ../shaders/specular.vert
 
 SOURCES += \
     main.cpp \

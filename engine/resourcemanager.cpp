@@ -8,6 +8,7 @@ namespace moar
 
 ResourceManager::ResourceManager()
 {
+    // Todo: Preload resources.
 }
 
 ResourceManager::~ResourceManager()

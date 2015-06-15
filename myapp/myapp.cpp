@@ -35,10 +35,11 @@ void MyApp::start()
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
 
-    monkey2 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
+    monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
     moar::Material* mat = monkey2->getComponent<moar::Material>();
-    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+//    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+    mat->setSpecularity(15.0f);
 
     light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 10.0f));
     light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
