@@ -49,6 +49,7 @@ SOURCES += \
     ../engine/material.cpp \
     ../engine/gui.cpp \
     ../engine/light.cpp \
+    ../engine/constants.cpp \
     ../engine/rendersettings.cpp
 
 HEADERS += \
