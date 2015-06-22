@@ -48,11 +48,12 @@ void Object::executeCustomComponents()
     }
 }
 
-void Object::prepareRender()
+void Object::prepareRender(bool ignoreMaterial)
 {
-    assert(material != nullptr);
-    material->execute();
-    assert(renderer != nullptr);
+    if (!ignoreMaterial) {
+        material->execute();
+    }
+
     glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
     glm::mat4x4 model = getModelMatrix();
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);

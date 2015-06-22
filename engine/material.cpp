@@ -14,6 +14,7 @@ const Material::TextureInfo Material::textureInfos[] =
 };
 
 Material::Material() :
+    isSpecular(false),
     specularity(0.0f)
 {
 }
@@ -31,15 +32,16 @@ void Material::execute()
         glUniform1i(glGetUniformLocation(shader, std::get<1>(textures[i])->name), std::get<1>(textures[i])->value);
     }
 
-    // Todo: OpenGL gives error if applied for a shader without specularity-uniform.
-    if (specularity > 0.0f) {
+    if (isSpecular) {
         glUniform1f(SPECULAR_LOCATION, specularity);
     }
 }
 
 void Material::setShader(GLuint shader)
 {
+    glGetError();
     this->shader = shader;
+    isSpecular = glGetUniformLocation(shader, "Specularity") != -1;
 }
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)
@@ -51,7 +53,6 @@ void Material::setTexture(GLuint texture, TextureType type, GLenum target)
             return;
         }
     }
-
 
     textures.push_back(std::make_tuple(texture, getTextureInfo(type), target));
 }

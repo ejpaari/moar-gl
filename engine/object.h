@@ -30,7 +30,7 @@ public:
     Object& operator=(Object&&) = delete;
 
     void executeCustomComponents();
-    void prepareRender();
+    void prepareRender(bool ignoreMaterial = false);
     void prepareLight();
     void render();
 

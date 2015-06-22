@@ -320,7 +320,7 @@ void Engine::render()
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
     for (auto renderObjs : renderObjects) {
         for (auto renderObj : renderObjs.second) {
-            renderObj->prepareRender();
+            renderObj->prepareRender(true);
             renderObj->render();
         }
     }

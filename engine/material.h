@@ -51,6 +51,7 @@ private:
 
     GLuint shader;
     std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
+    bool isSpecular;
     float specularity;
 };
 
