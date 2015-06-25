@@ -14,6 +14,7 @@ extern const GLchar* LIGHT_BLOCK_NAME;
 extern const GLuint VERTEX_LOCATION;
 extern const GLuint TEX_LOCATION;
 extern const GLuint NORMAL_LOCATION;
+extern const GLuint TANGENT_LOCATION;
 extern const GLuint AMBIENT_LOCATION;
 extern const GLuint SPECULAR_LOCATION;
 

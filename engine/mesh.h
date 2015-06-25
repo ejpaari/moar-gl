@@ -11,10 +11,6 @@ namespace moar
 class Mesh
 {
 public:
-    static const GLuint INDEX_VERTEX;
-    static const GLuint INDEX_TEX;
-    static const GLuint INDEX_NORMAL;
-
     explicit Mesh();
     ~Mesh();
     Mesh(const Mesh&) = delete;
@@ -26,6 +22,7 @@ public:
     void setVertices(const std::vector<glm::vec3>& vertices);
     void setTextureCoordinates(const std::vector<glm::vec2>& coords);
     void setNormals(const std::vector<glm::vec3>& normals);
+    void setTangents(const std::vector<glm::vec3>& tangents);
 
     void render() const;
     // Todo: AOS vs. SOA for better cache
@@ -38,6 +35,7 @@ private:
     GLuint vertexBuffer;
     GLuint indexBuffer;
     GLuint normalBuffer;
+    GLuint tangentBuffer;
     GLuint texBuffer;
     unsigned int numIndices;    
 };

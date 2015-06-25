@@ -1,0 +1,26 @@
+#version 450 core
+
+in vec3 vertexPos_World;
+in vec3 lightDir_Tan;
+in vec3 eyeDir_Tan;
+in vec2 texCoord;
+
+out vec4 outColor;
+
+uniform sampler2D DiffuseTex;
+uniform sampler2D NormalTex;
+
+layout (std140) uniform LightBlock {
+    vec4 lightColor;
+    vec3 lightPos;
+};
+
+void main()
+{
+    vec3 normal_Tan = normalize(texture(NormalTex, texCoord).rgb * 2.0 - vec3(1.0));
+
+    float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
+
+    float lightDistance = length(lightPos - vertexPos_World);
+    outColor = vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * texture(DiffuseTex, texCoord);
+}

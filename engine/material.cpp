@@ -39,7 +39,6 @@ void Material::execute()
 
 void Material::setShader(GLuint shader)
 {
-    glGetError();
     this->shader = shader;
     isSpecular = glGetUniformLocation(shader, "Specularity") != -1;
 }

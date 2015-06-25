@@ -21,7 +21,7 @@ bool Model::loadModel(const std::string& file)
 {
     Assimp::Importer importer;
     unsigned int flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices  |
-            aiProcess_GenSmoothNormals | aiProcess_GenUVCoords;
+            aiProcess_GenSmoothNormals | aiProcess_GenUVCoords | aiProcess_CalcTangentSpace;
     const aiScene* assimpScene = importer.ReadFile(file, flags);
 
     if (assimpScene) {
@@ -35,6 +35,7 @@ bool Model::loadModel(const std::string& file)
             const aiMesh* assimpMesh = assimpScene->mMeshes[i];
             std::vector<glm::vec3> vertices;
             std::vector<glm::vec3> normals;
+            std::vector<glm::vec3> tangents;
             std::vector<glm::vec2> texCoords;
             std::vector<unsigned int> indices;
 
@@ -51,12 +52,20 @@ bool Model::loadModel(const std::string& file)
                 n.z = assimpMesh->mNormals[j].z;
                 normals.push_back(n);
 
-                glm::vec2 t;
+                if (assimpMesh->HasTangentsAndBitangents()) {
+                    glm::vec3 tan;
+                    tan.x = assimpMesh->mTangents[j].x;
+                    tan.y = assimpMesh->mTangents[j].y;
+                    tan.z = assimpMesh->mTangents[j].z;
+                    tangents.push_back(tan);
+                }
+
                 if (assimpMesh->HasTextureCoords(0)) {
+                    glm::vec2 t;
                     t.x = assimpMesh->mTextureCoords[0][j].x;
                     t.y = assimpMesh->mTextureCoords[0][j].y;
-                }
-                texCoords.push_back(t);
+                    texCoords.push_back(t);
+                }                
             }
 
             for (unsigned int j = 0; j < assimpMesh->mNumFaces; ++j) {
@@ -75,7 +84,12 @@ bool Model::loadModel(const std::string& file)
             meshes[i]->setVertices(vertices);
             meshes[i]->setIndices(indices);
             meshes[i]->setNormals(normals);
-            meshes[i]->setTextureCoordinates(texCoords);
+            if (assimpMesh->HasTangentsAndBitangents()) {
+                meshes[i]->setTangents(tangents);
+            }
+            if (assimpMesh->HasTextureCoords(0)) {
+                meshes[i]->setTextureCoordinates(texCoords);
+            }
         }
         std::cout << "Loaded model: " << file << std::endl;
         return true;

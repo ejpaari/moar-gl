@@ -11,6 +11,7 @@ const GLchar* LIGHT_BLOCK_NAME = "LightBlock";
 const GLuint VERTEX_LOCATION = 1;
 const GLuint TEX_LOCATION = 2;
 const GLuint NORMAL_LOCATION = 3;
+const GLuint TANGENT_LOCATION = 4;
 const GLuint AMBIENT_LOCATION = 10;
 const GLuint SPECULAR_LOCATION = 11;
 

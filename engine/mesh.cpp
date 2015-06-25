@@ -15,6 +15,7 @@ Mesh::~Mesh()
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteBuffers(1, &indexBuffer);
     glDeleteBuffers(1, &normalBuffer);
+    glDeleteBuffers(1, &tangentBuffer);
     glDeleteBuffers(1, &texBuffer);
     glDeleteVertexArrays(1, &VAO);
 }
@@ -40,6 +41,11 @@ void Mesh::setTextureCoordinates(const std::vector<glm::vec2>& coords)
 void Mesh::setNormals(const std::vector<glm::vec3>& normals)
 {
     setBufferData<glm::vec3>(normalBuffer, normals, NORMAL_LOCATION, 3);
+}
+
+void Mesh::setTangents(const std::vector<glm::vec3>& tangents)
+{
+    setBufferData<glm::vec3>(tangentBuffer, tangents, TANGENT_LOCATION, 3);
 }
 
 void Mesh::render() const

@@ -29,7 +29,9 @@ DISTFILES += \
     ../shaders/skybox.frag \
     ../shaders/skybox.vert \
     ../shaders/specular.frag \
-    ../shaders/specular.vert
+    ../shaders/specular.vert \
+    ../shaders/normalmap.vert \
+    ../shaders/normalmap.frag
 
 SOURCES += \
     main.cpp \

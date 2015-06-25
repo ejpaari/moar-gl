@@ -38,14 +38,19 @@ void MyApp::start()
     monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
     moar::Material* mat = monkey2->getComponent<moar::Material>();
-//    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
-    mat->setSpecularity(15.0f);
+    mat->setSpecularity(50.0f);
 
-    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 10.0f));
+    icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
+    icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
+    mat = icosphere->getComponent<moar::Material>();
+    mat->setSpecularity(100.0f);
+    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
+
+    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 5.0f));
     light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
     light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 15.0f));
     light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
-    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 15.0f));
+    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 10.0f));
     light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     initGUI();
