@@ -1,5 +1,5 @@
 #include "shader.h"
-#include "constants.h"
+#include "globals.h"
 
 #include <cstdio>
 #include <algorithm>

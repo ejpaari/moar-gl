@@ -1,7 +1,7 @@
 #include "engine.h"
 #include "renderer.h"
 #include "material.h"
-#include "constants.h"
+#include "globals.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -266,6 +266,8 @@ void Engine::execute()
         if (glfwWindowShouldClose(window)) {
             app->quit();
         }
+
+        DRAW_COUNT = 0;
     }
 
     gui.uninit();

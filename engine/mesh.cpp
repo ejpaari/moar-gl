@@ -1,5 +1,5 @@
 #include "mesh.h"
-#include "constants.h"
+#include "globals.h"
 
 namespace moar
 {
@@ -52,6 +52,7 @@ void Mesh::render() const
 {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
+    ++DRAW_COUNT;
 }
 
 } // moar

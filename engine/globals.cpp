@@ -1,4 +1,4 @@
-#include "constants.h"
+#include "globals.h"
 
 namespace moar
 {
@@ -16,4 +16,6 @@ const GLuint AMBIENT_LOCATION = 10;
 const GLuint SPECULAR_LOCATION = 11;
 
 bool DEBUG = false;
+
+unsigned int DRAW_COUNT = 0;
 } // moar

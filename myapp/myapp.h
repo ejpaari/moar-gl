@@ -41,6 +41,7 @@ private:
     float rotationSpeed;
     int fps;
     int fpsCounter;
+    unsigned int* drawCount;
     double timeCounter;
 };
 

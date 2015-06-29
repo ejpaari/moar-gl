@@ -1,4 +1,5 @@
 #include "myapp.h"
+#include "../engine/globals.h"
 #include "../engine/renderer.h"
 #include "../engine/material.h"
 #include "../engine/light.h"
@@ -14,6 +15,7 @@ MyApp::MyApp() :
     rotationSpeed(0.5f),
     fps(0),
     fpsCounter(0),
+    drawCount(&moar::DRAW_COUNT),
     timeCounter(0.0)
 {    
     monkey1 = nullptr;
@@ -113,6 +115,7 @@ void MyApp::initGUI()
     TwAddVarRW(bar, "axis", TW_TYPE_DIR3F, &rotationAxis, "");
     TwAddVarRW(bar, "speed", TW_TYPE_FLOAT, &rotationSpeed, "");
     TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
+    TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
 }
 
 moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)

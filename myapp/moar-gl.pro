@@ -51,8 +51,8 @@ SOURCES += \
     ../engine/material.cpp \
     ../engine/gui.cpp \
     ../engine/light.cpp \
-    ../engine/constants.cpp \
-    ../engine/rendersettings.cpp
+    ../engine/rendersettings.cpp \
+    ../engine/globals.cpp
 
 HEADERS += \
     myapp.h \
@@ -71,8 +71,8 @@ HEADERS += \
     ../engine/material.h \
     ../engine/gui.h \
     ../engine/light.h \
-    ../engine/constants.h \
-    ../engine/rendersettings.h
+    ../engine/rendersettings.h \
+    ../engine/globals.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL

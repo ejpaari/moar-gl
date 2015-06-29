@@ -19,6 +19,8 @@ extern const GLuint AMBIENT_LOCATION;
 extern const GLuint SPECULAR_LOCATION;
 
 extern bool DEBUG;
+
+extern unsigned int DRAW_COUNT;
 } // moar
 
 #endif // CONSTANTS
