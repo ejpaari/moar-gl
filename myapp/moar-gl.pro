@@ -72,7 +72,8 @@ HEADERS += \
     ../engine/gui.h \
     ../engine/light.h \
     ../engine/rendersettings.h \
-    ../engine/globals.h
+    ../engine/globals.h \
+    ../engine/general.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL

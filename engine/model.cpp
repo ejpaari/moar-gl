@@ -3,13 +3,14 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <glm/glm.hpp>
 #include <iostream>
+#include <algorithm>
 
 namespace moar
 {
 
-Model::Model()
+Model::Model() :
+    boundingRadius(0.0f)
 {
 }
 
@@ -45,6 +46,7 @@ bool Model::loadModel(const std::string& file)
                 v.y = assimpMesh->mVertices[j].y;
                 v.z = assimpMesh->mVertices[j].z;
                 vertices.push_back(v);
+                checkBoundingBoxLimits(v);
 
                 glm::vec3 n;
                 n.x = assimpMesh->mNormals[j].x;
@@ -91,6 +93,7 @@ bool Model::loadModel(const std::string& file)
                 meshes[i]->setTextureCoordinates(texCoords);
             }
         }
+        calculateCenterPointAndRadius();
         std::cout << "Loaded model: " << file << std::endl;
         return true;
     } else {
@@ -105,6 +108,25 @@ void Model::render() const
     for (unsigned int i = 0; i < meshes.size(); ++i) {
         meshes[i]->render();
     }
+}
+
+void Model::checkBoundingBoxLimits(const glm::vec3& vert)
+{
+    boundingBoxMax.x = std::max(vert.x, boundingBoxMax.x);
+    boundingBoxMax.y = std::max(vert.y, boundingBoxMax.y);
+    boundingBoxMax.z = std::max(vert.z, boundingBoxMax.z);
+
+    boundingBoxMin.x = std::min(vert.x, boundingBoxMin.x);
+    boundingBoxMin.y = std::min(vert.y, boundingBoxMin.y);
+    boundingBoxMin.z = std::min(vert.z, boundingBoxMin.z);
+}
+
+void Model::calculateCenterPointAndRadius()
+{
+    centerPoint.x = (boundingBoxMax.x + boundingBoxMin.x) / 2.0f;
+    centerPoint.y = (boundingBoxMax.y + boundingBoxMin.y) / 2.0f;
+    centerPoint.z = (boundingBoxMax.z + boundingBoxMin.z) / 2.0f;
+    boundingRadius = glm::distance(centerPoint, boundingBoxMax);
 }
 
 } // moar

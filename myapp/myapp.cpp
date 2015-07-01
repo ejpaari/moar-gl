@@ -23,6 +23,7 @@ MyApp::MyApp() :
     light1 = nullptr;
     light2 = nullptr;
     light3 = nullptr;
+    icosphere = nullptr;
 }
 
 MyApp::~MyApp()

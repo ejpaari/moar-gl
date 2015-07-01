@@ -4,6 +4,7 @@
 #include "mesh.h"
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 #include <memory>
@@ -27,7 +28,14 @@ public:
     void render() const;
 
 private:
+    void checkBoundingBoxLimits(const glm::vec3& vert);
+    void calculateCenterPointAndRadius();
+
     std::vector<std::unique_ptr<Mesh>> meshes;
+    glm::vec3 boundingBoxMax;
+    glm::vec3 boundingBoxMin;
+    glm::vec3 centerPoint;
+    float boundingRadius;
 };
 
 } // moar

@@ -2,9 +2,11 @@
 #define CAMERA_H
 
 #include "object.h"
+#include "general.h"
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <vector>
 
 namespace moar
 {
@@ -33,12 +35,24 @@ public:
     // Todo: frustum culling
 
 private:
-    void updateViewMatrix();
+
+    enum Side
+    {
+        TOP = 1, LEFT = 2, RIGHT = 3, BOTTOM = 4
+    };
+
+    void calculateViewMatrix();
+    void calculateFrustum();
+    glm::vec2 getClipPlaneSize(float distance);
+    Quad getClipPlaneQuad(float distance, glm::vec2 size);
 
     float FOV;
     float ratio;
-    float nearClipPlane;
-    float farClipPlane;
+    float nearClipDistance;
+    float farClipDistance;
+    Quad farClipPlane;
+    Quad nearClipPlane;
+    Plane frustumPlanes[4];
 
     std::unique_ptr<glm::mat4> viewMatrix;
     std::unique_ptr<glm::mat4> projectionMatrix;
