@@ -110,6 +110,16 @@ void Model::render() const
     }
 }
 
+glm::vec3 Model::getCenterPoint() const
+{
+    return centerPoint;
+}
+
+float Model::getBoundingRadius() const
+{
+    return boundingRadius;
+}
+
 void Model::checkBoundingBoxLimits(const glm::vec3& vert)
 {
     boundingBoxMax.x = std::max(vert.x, boundingBoxMax.x);

@@ -43,6 +43,7 @@ private:
     void render();
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
+    bool objectInsideFrustum(const Object* obj, const Camera* cam) const;
 
     std::shared_ptr<Application> app;
 

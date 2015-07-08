@@ -58,6 +58,17 @@ const glm::mat4* Camera::getProjectionMatrixPointer() const
     return projectionMatrix.get();
 }
 
+bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
+{
+    for (int i = 0; i < SIZE; ++i) {
+        float distance = frustumPlanes[i].distance(point);
+        if (distance < -radius) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Camera::calculateViewMatrix()
 {
     *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));
@@ -68,8 +79,15 @@ void Camera::calculateFrustum()
     glm::vec2 nearClipPlaneSize = getClipPlaneSize(nearClipDistance);
     glm::vec2 farClipPlaneSize = getClipPlaneSize(farClipDistance);
 
-    nearClipPlane = getClipPlaneQuad(nearClipDistance, nearClipPlaneSize);
-    farClipPlane = getClipPlaneQuad(farClipDistance, farClipPlaneSize);
+    // ToDo: Clip quads are not really necessary.
+    nearClipQuad = getClipPlaneQuad(nearClipDistance, nearClipPlaneSize);
+    farClipQuad = getClipPlaneQuad(farClipDistance, farClipPlaneSize);
+    frustumPlanes[TOP] = calculatePlane(farClipQuad.topLeft, nearClipQuad.topLeft, nearClipQuad.topRight);
+    frustumPlanes[LEFT] = calculatePlane(farClipQuad.bottomLeft, nearClipQuad.bottomLeft, nearClipQuad.topLeft);
+    frustumPlanes[RIGHT] = calculatePlane(farClipQuad.topRight, nearClipQuad.topRight, nearClipQuad.bottomRight);
+    frustumPlanes[BOTTOM] = calculatePlane(farClipQuad.bottomRight, nearClipQuad.bottomRight, nearClipQuad.bottomLeft);
+    frustumPlanes[FRONT] = calculatePlane(nearClipQuad.topRight, nearClipQuad.topLeft, nearClipQuad.bottomLeft);
+    frustumPlanes[BACK] = calculatePlane(farClipQuad.topLeft, farClipQuad.topRight, farClipQuad.bottomRight);
 }
 
 glm::vec2 Camera::getClipPlaneSize(float distance)
@@ -82,7 +100,7 @@ glm::vec2 Camera::getClipPlaneSize(float distance)
 
 Quad Camera::getClipPlaneQuad(float distance, glm::vec2 size)
 {
-    glm::vec3 center = FORWARD * distance;
+    glm::vec3 center = Object::FORWARD * distance;
     Quad quad;
     quad.topLeft = center + (Object::UP * size.y / 2.0f) + (Object::LEFT * size.x / 2.0f);
     quad.topRight = center + (Object::UP * size.y / 2.0f) - (Object::LEFT * size.x / 2.0f);

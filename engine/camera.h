@@ -32,13 +32,14 @@ public:
     const glm::mat4* getViewMatrixPointer() const;
     const glm::mat4* getProjectionMatrixPointer() const;
 
-    // Todo: frustum culling
+    // Todo: frustum culling for box.
+    bool sphereInsideFrustum(const glm::vec3& point, float radius) const;
 
 private:
 
     enum Side
     {
-        TOP = 1, LEFT = 2, RIGHT = 3, BOTTOM = 4
+        TOP = 0, LEFT = 1, RIGHT = 2, BOTTOM = 3, FRONT = 4, BACK = 5, SIZE = 6
     };
 
     void calculateViewMatrix();
@@ -50,9 +51,9 @@ private:
     float ratio;
     float nearClipDistance;
     float farClipDistance;
-    Quad farClipPlane;
-    Quad nearClipPlane;
-    Plane frustumPlanes[4];
+    Quad farClipQuad;
+    Quad nearClipQuad;
+    Plane frustumPlanes[SIZE];
 
     std::unique_ptr<glm::mat4> viewMatrix;
     std::unique_ptr<glm::mat4> projectionMatrix;

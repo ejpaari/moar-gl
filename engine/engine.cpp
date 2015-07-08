@@ -322,6 +322,9 @@ void Engine::render()
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
     for (auto renderObjs : renderObjects) {
         for (auto renderObj : renderObjs.second) {
+            if (!objectInsideFrustum(renderObj, camera.get())) {
+                continue;
+            }
             renderObj->prepareRender(true);
             renderObj->render();
         }
@@ -334,6 +337,9 @@ void Engine::render()
     for (auto renderObjs : renderObjects) {
         glUseProgram(renderObjs.first);
         for (auto renderObj : renderObjs.second) {
+            if (!objectInsideFrustum(renderObj, camera.get())) {
+                continue;
+            }
             renderObj->prepareRender();
             for (unsigned int i = 0; i < lights.size(); ++i) {
                 lights[i]->prepareLight();
@@ -389,6 +395,15 @@ bool Engine::createSkybox()
     skybox->addComponent(material);
     skybox->addComponent(renderer);
     return true;
+}
+
+bool Engine::objectInsideFrustum(const Object* obj, const Camera* cam) const
+{
+    Model* model = obj->getComponent<Renderer>()->getModel();
+    glm::vec3 point = model->getCenterPoint();
+    point = glm::vec3((*Object::view) * obj->getModelMatrix() * glm::vec4(point.x, point.y, point.z, 1.0f));
+    float radius = model->getBoundingRadius();
+    return cam->sphereInsideFrustum(point, radius);
 }
 
 } // moar

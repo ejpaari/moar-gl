@@ -27,6 +27,11 @@ void Renderer::setModel(Model* model)
     this->model = model;
 }
 
+Model* Renderer::getModel()
+{
+    return model;
+}
+
 std::string Renderer::getName()
 {
     return "Renderer";

@@ -53,7 +53,7 @@ public:
     bool hasComponent(const std::string& name) const;
 
     template<typename T>
-    T* getComponent();
+    T* getComponent() const;
 
 protected:
     glm::vec3 position;
@@ -75,7 +75,7 @@ protected:
 };
 
 template<typename T>
-T* Object::getComponent()
+T* Object::getComponent() const
 {
     for (unsigned int i = 0; i < allComponents.size(); ++i) {
         if (typeid(*allComponents[i].get()) == typeid(T)) {

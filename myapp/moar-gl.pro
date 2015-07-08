@@ -52,7 +52,8 @@ SOURCES += \
     ../engine/gui.cpp \
     ../engine/light.cpp \
     ../engine/rendersettings.cpp \
-    ../engine/globals.cpp
+    ../engine/globals.cpp \
+    ../engine/general.cpp
 
 HEADERS += \
     myapp.h \

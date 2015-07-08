@@ -23,6 +23,7 @@ public:
     virtual void execute() final;
 
     void setModel(Model* model);
+    Model* getModel();
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;

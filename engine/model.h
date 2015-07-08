@@ -27,6 +27,9 @@ public:
     bool loadModel(const std::string& file);
     void render() const;
 
+    glm::vec3 getCenterPoint() const;
+    float getBoundingRadius() const;
+
 private:
     void checkBoundingBoxLimits(const glm::vec3& vert);
     void calculateCenterPointAndRadius();

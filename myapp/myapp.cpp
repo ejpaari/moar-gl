@@ -36,7 +36,7 @@ void MyApp::start()
     input = engine->getInput();
 
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
-    monkey1->setPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+    monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
 
     monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
@@ -89,8 +89,8 @@ void MyApp::handleInput(GLFWwindow *window)
         camera->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 
-    camera->rotate(glm::vec3(0.0f, 1.0f, 0.0f), -input->getCursorDeltaX() * boost::math::constants::degree<double>());
-    camera->rotate(glm::vec3(1.0f, 0.0f, 0.0f), input->getCursorDeltaY() * boost::math::constants::degree<double>());
+    camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());
+    camera->rotate(moar::Object::LEFT, -input->getCursorDeltaY() * boost::math::constants::degree<double>());
 }
 
 void MyApp::update(double time, double deltaTime)
