@@ -82,12 +82,12 @@ void Camera::calculateFrustum()
     // ToDo: Clip quads are not really necessary.
     nearClipQuad = getClipPlaneQuad(nearClipDistance, nearClipPlaneSize);
     farClipQuad = getClipPlaneQuad(farClipDistance, farClipPlaneSize);
-    frustumPlanes[TOP] = calculatePlane(farClipQuad.topLeft, nearClipQuad.topLeft, nearClipQuad.topRight);
-    frustumPlanes[LEFT] = calculatePlane(farClipQuad.bottomLeft, nearClipQuad.bottomLeft, nearClipQuad.topLeft);
-    frustumPlanes[RIGHT] = calculatePlane(farClipQuad.topRight, nearClipQuad.topRight, nearClipQuad.bottomRight);
-    frustumPlanes[BOTTOM] = calculatePlane(farClipQuad.bottomRight, nearClipQuad.bottomRight, nearClipQuad.bottomLeft);
-    frustumPlanes[FRONT] = calculatePlane(nearClipQuad.topRight, nearClipQuad.topLeft, nearClipQuad.bottomLeft);
-    frustumPlanes[BACK] = calculatePlane(farClipQuad.topLeft, farClipQuad.topRight, farClipQuad.bottomRight);
+    frustumPlanes[TOP] = Plane(farClipQuad.topLeft, nearClipQuad.topLeft, nearClipQuad.topRight);
+    frustumPlanes[LEFT] = Plane(farClipQuad.bottomLeft, nearClipQuad.bottomLeft, nearClipQuad.topLeft);
+    frustumPlanes[RIGHT] = Plane(farClipQuad.topRight, nearClipQuad.topRight, nearClipQuad.bottomRight);
+    frustumPlanes[BOTTOM] = Plane(farClipQuad.bottomRight, nearClipQuad.bottomRight, nearClipQuad.bottomLeft);
+    frustumPlanes[FRONT] = Plane(nearClipQuad.topRight, nearClipQuad.topLeft, nearClipQuad.bottomLeft);
+    frustumPlanes[BACK] = Plane(farClipQuad.topLeft, farClipQuad.topRight, farClipQuad.bottomRight);
 }
 
 glm::vec2 Camera::getClipPlaneSize(float distance)

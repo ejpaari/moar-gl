@@ -90,7 +90,7 @@ void MyApp::handleInput(GLFWwindow *window)
     }
 
     camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());
-    camera->rotate(moar::Object::LEFT, -input->getCursorDeltaY() * boost::math::constants::degree<double>());
+    camera->rotate(moar::Object::LEFT, input->getCursorDeltaY() * boost::math::constants::degree<double>());
 }
 
 void MyApp::update(double time, double deltaTime)

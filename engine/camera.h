@@ -2,7 +2,8 @@
 #define CAMERA_H
 
 #include "object.h"
-#include "general.h"
+#include "common/math.h"
+#include "common/plane.h"
 
 #include <glm/glm.hpp>
 #include <memory>
