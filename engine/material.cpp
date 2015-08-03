@@ -8,9 +8,9 @@ namespace moar
 
 const Material::TextureInfo Material::textureInfos[] =
 {
-    {Material::TextureType::DIFFUSE, "DiffuseTex", GL_TEXTURE0, 0},
-    {Material::TextureType::NORMAL, "NormalTex", GL_TEXTURE1, 1},
-    {Material::TextureType::DISPLACEMENT, "DisplacementTex", GL_TEXTURE2, 2},
+    {Material::TextureType::DIFFUSE, "DiffuseTex", GL_TEXTURE0, 0, DIFFUSE_TEX_LOCATION},
+    {Material::TextureType::NORMAL, "NormalTex", GL_TEXTURE1, 1, NORMAL_TEX_LOCATION},
+    {Material::TextureType::DISPLACEMENT, "DisplacementTex", GL_TEXTURE2, 2, DISPLACEMENT_TEX_LOCATION},
 };
 
 Material::Material() :
@@ -25,11 +25,10 @@ Material::~Material()
 
 void Material::execute()
 {
-    // Todo: Specify texture locations so it does not have to be queried.
     for (unsigned int i = 0; i < textures.size(); ++i) {
         glActiveTexture(std::get<1>(textures[i])->unit);
         glBindTexture(std::get<2>(textures[i]), std::get<0>(textures[i]));
-        glUniform1i(glGetUniformLocation(shader, std::get<1>(textures[i])->name), std::get<1>(textures[i])->value);
+        glUniform1i(std::get<1>(textures[i])->location, std::get<1>(textures[i])->value);
     }
 
     if (isSpecular) {

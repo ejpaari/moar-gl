@@ -25,6 +25,7 @@ public:
         const GLchar* name;
         int unit;
         int value;
+        GLuint location;
     };
 
     static const TextureInfo textureInfos[];

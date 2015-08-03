@@ -14,6 +14,9 @@ const GLuint NORMAL_LOCATION = 3;
 const GLuint TANGENT_LOCATION = 4;
 const GLuint AMBIENT_LOCATION = 10;
 const GLuint SPECULAR_LOCATION = 11;
+const GLuint DIFFUSE_TEX_LOCATION = 20;
+const GLuint NORMAL_TEX_LOCATION = 21;
+const GLuint DISPLACEMENT_TEX_LOCATION = 22;
 
 bool DEBUG = false;
 

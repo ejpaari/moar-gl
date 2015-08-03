@@ -17,6 +17,9 @@ extern const GLuint NORMAL_LOCATION;
 extern const GLuint TANGENT_LOCATION;
 extern const GLuint AMBIENT_LOCATION;
 extern const GLuint SPECULAR_LOCATION;
+extern const GLuint DIFFUSE_TEX_LOCATION;
+extern const GLuint NORMAL_TEX_LOCATION;
+extern const GLuint DISPLACEMENT_TEX_LOCATION;
 
 extern bool DEBUG;
 

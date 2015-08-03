@@ -5,7 +5,7 @@ in vec2 texCoord;
 out vec4 outColor;
 
 layout (location = 10) uniform vec3 ambient;
-uniform sampler2D DiffuseTex;
+layout (location = 20) uniform sampler2D DiffuseTex;
 
 void main()
 {
