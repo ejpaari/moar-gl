@@ -79,9 +79,8 @@ void Camera::calculateFrustum()
     glm::vec2 nearClipPlaneSize = getClipPlaneSize(nearClipDistance);
     glm::vec2 farClipPlaneSize = getClipPlaneSize(farClipDistance);
 
-    // ToDo: Clip quads are not really necessary.
-    nearClipQuad = getClipPlaneQuad(nearClipDistance, nearClipPlaneSize);
-    farClipQuad = getClipPlaneQuad(farClipDistance, farClipPlaneSize);
+    Quad nearClipQuad = getClipPlaneQuad(nearClipDistance, nearClipPlaneSize);
+    Quad farClipQuad = getClipPlaneQuad(farClipDistance, farClipPlaneSize);
     frustumPlanes[TOP] = Plane(farClipQuad.topLeft, nearClipQuad.topLeft, nearClipQuad.topRight);
     frustumPlanes[LEFT] = Plane(farClipQuad.bottomLeft, nearClipQuad.bottomLeft, nearClipQuad.topLeft);
     frustumPlanes[RIGHT] = Plane(farClipQuad.topRight, nearClipQuad.topRight, nearClipQuad.bottomRight);

@@ -39,11 +39,11 @@ Plane::Plane(Plane&& rhs) :
 {
 }
 
-Plane& Plane::operator=(Plane rhs) {
-   std::swap(point, rhs.point);
-   std::swap(normal, rhs.normal);
-   std::swap(d, rhs.d);
-   return *this;
+Plane& Plane::operator=(const Plane& rhs) {
+    point = rhs.point;
+    normal = rhs.normal;
+    d = rhs.d;
+    return *this;
 }
 
 Plane& Plane::operator=(Plane&& rhs) {

@@ -52,8 +52,6 @@ private:
     float ratio;
     float nearClipDistance;
     float farClipDistance;
-    Quad farClipQuad;
-    Quad nearClipQuad;
     Plane frustumPlanes[SIZE];
 
     std::unique_ptr<glm::mat4> viewMatrix;

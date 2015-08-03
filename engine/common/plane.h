@@ -14,7 +14,7 @@ public:
     ~Plane();
     Plane(const Plane& rhs);
     Plane(Plane&& rhs);
-    Plane& operator=(Plane rhs);
+    Plane& operator=(const Plane& rhs);
     Plane& operator=(Plane&& rhs);
 
     float distance(const glm::vec3& p) const;
