@@ -2,7 +2,7 @@
 
 in vec3 texCoord;
 
-out vec4 outColor;
+layout(location = 0) out vec4 outColor;
 
 layout (location = 20) uniform samplerCube DiffuseTex;
 

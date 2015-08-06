@@ -34,6 +34,9 @@ public:
     GLuint ambientShader;
     glm::vec3 ambientColor;
 
+    int windowWidth;
+    int windowHeight;
+
 private:
     bool loaded;
 };

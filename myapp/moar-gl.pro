@@ -31,7 +31,9 @@ DISTFILES += \
     ../shaders/specular.frag \
     ../shaders/specular.vert \
     ../shaders/normalmap.vert \
-    ../shaders/normalmap.frag
+    ../shaders/normalmap.frag \
+    ../shaders/offset.frag \
+    ../shaders/offset.vert
 
 SOURCES += \
     main.cpp \

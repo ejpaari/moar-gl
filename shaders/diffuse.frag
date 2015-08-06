@@ -5,7 +5,7 @@ in vec3 vertexPos_World;
 in vec3 lightDir_Cam;
 in vec2 texCoord;
 
-out vec4 outColor;
+layout(location = 0) out vec4 outColor;
 
 layout (location = 20) uniform sampler2D DiffuseTex;
 

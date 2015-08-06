@@ -43,6 +43,7 @@ private:
     void render();
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
+    bool initFramebuffer();
     bool objectInsideFrustum(const Object* obj, const Camera* cam) const;
 
     std::shared_ptr<Application> app;
@@ -52,6 +53,14 @@ private:
     GUI gui;
     Input input;
     RenderSettings renderSettings;
+
+    // ToDo: Own class for framebuffer etc. Remember to glDelete these!
+    GLuint framebuffer;
+    GLuint renderedTexture;
+    GLuint depthRenderbuffer;
+    GLuint quadVAO;
+    GLuint quadBuffer;
+    GLuint offsetShader;
 
     std::shared_ptr<Camera> camera;
     std::map<GLuint, std::vector<Object*>> renderObjects;

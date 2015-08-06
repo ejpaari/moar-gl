@@ -17,6 +17,9 @@ const GLuint SPECULAR_LOCATION = 11;
 const GLuint DIFFUSE_TEX_LOCATION = 20;
 const GLuint NORMAL_TEX_LOCATION = 21;
 const GLuint DISPLACEMENT_TEX_LOCATION = 22;
+const GLuint RENDERED_TEX_LOCATION = 30;
+const GLuint TIME_LOCATION = 40;
+const GLuint SCREEN_SIZE_LOCATION = 41;
 
 bool DEBUG = false;
 

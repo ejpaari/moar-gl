@@ -6,7 +6,7 @@ in vec3 lightDir_Cam;
 in vec2 texCoord;
 in vec3 eyeDir_Cam;
 
-out vec4 outColor;
+layout(location = 0) out vec4 outColor;
 
 layout (location = 11) uniform float Specularity;
 layout (location = 20) uniform sampler2D DiffuseTex;

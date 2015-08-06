@@ -7,6 +7,8 @@ namespace moar
 {
 
 RenderSettings::RenderSettings() :
+    windowWidth(800),
+    windowHeight(600),
     loaded(false)
 {    
 }

@@ -14,7 +14,7 @@ namespace
 void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei /*length*/,
                                     const GLchar* message, void* /*userParam*/)
 {
-    //if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
 
     std::cerr << "OpenGL debug callback function" << std::endl;
     std::cerr << "    Message: "<< message << std::endl;
@@ -99,6 +99,11 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
     std::cerr << std::endl << std::endl;
 }
 
+void glfwErrorCallback(int error, const char* description )
+{
+    std::cerr << "ERROR GLFW: " << error << " " << description << std::endl;
+}
+
 } // anonymous
 
 namespace moar
@@ -106,6 +111,12 @@ namespace moar
 
 Engine::Engine() :
     window(nullptr),
+    framebuffer(0),
+    renderedTexture(0),
+    depthRenderbuffer(0),
+    quadVAO(0),
+    quadBuffer(0),
+    offsetShader(0),
     time(0.0)
 {    
 }
@@ -113,6 +124,11 @@ Engine::Engine() :
 Engine::~Engine()
 {
     glfwTerminate();
+    glDeleteFramebuffers(1, &framebuffer);
+    glDeleteTextures(1, &renderedTexture);
+    glDeleteRenderbuffers(1, &depthRenderbuffer);
+    glDeleteVertexArrays(1, &quadVAO);
+    glDeleteBuffers(1, &quadBuffer);
 }
 
 void Engine::setApplication(std::shared_ptr<Application> application)
@@ -127,6 +143,8 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "ERROR: Failed to initialize GLFW" << std::endl;
         return false;
     }
+
+    glfwSetErrorCallback(glfwErrorCallback);
 
     boost::property_tree::ptree pt;
     try {
@@ -170,6 +188,8 @@ bool Engine::init(const std::string& settingsFile)
         glfwTerminate();
         return false;
     }
+    renderSettings.windowWidth = windowWidth;
+    renderSettings.windowHeight = windowHeight;
 
     int windowPosX = 0;
     int windowPosY = 0;
@@ -239,6 +259,10 @@ bool Engine::init(const std::string& settingsFile)
 
     if (!createSkybox()) {
         std::cerr << "WARNING: Failed to create the skybox" << std::endl;
+    }
+
+    if (!initFramebuffer()) {
+        std::cerr << "WARNING: Failed to initialize framebuffer" << std::endl;
     }
 
     return true;
@@ -311,6 +335,8 @@ void Engine::executeCustomComponents()
 
 void Engine::render()
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glViewport(0, 0, renderSettings.windowWidth, renderSettings.windowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -357,6 +383,17 @@ void Engine::render()
         skybox->prepareRender();
         skybox->render();
     }
+
+    // Post-process
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glUseProgram(offsetShader);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, renderedTexture);
+    glUniform1i(RENDERED_TEX_LOCATION, 0);
+    glUniform1f(TIME_LOCATION, time);
+    glUniform2f(SCREEN_SIZE_LOCATION, renderSettings.windowWidth, renderSettings.windowHeight);
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)
@@ -395,6 +432,47 @@ bool Engine::createSkybox()
     skybox->addComponent(material);
     skybox->addComponent(renderer);
     return true;
+}
+
+bool Engine::initFramebuffer()
+{
+    int width = renderSettings.windowWidth;
+    int height = renderSettings.windowHeight;
+    glGenTextures(1, &renderedTexture);
+    glBindTexture(GL_TEXTURE_2D, renderedTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+    GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, drawBuffers);
+
+    glGenRenderbuffers(1, &depthRenderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
+
+    GLfloat quadData[] = {
+        -1.0f, -1.0f, 0.0f,   1.0f, -1.0f, 0.0f,   -1.0f,  1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,   1.0f, -1.0f, 0.0f,    1.0f,  1.0f, 0.0f,
+    };
+
+    glGenVertexArrays(1, &quadVAO);
+    glBindVertexArray(quadVAO);
+
+    glGenBuffers(1, &quadBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, quadBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadData), quadData, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(VERTEX_LOCATION);
+
+    offsetShader = manager.getShader("offset");
+
+    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
 bool Engine::objectInsideFrustum(const Object* obj, const Camera* cam) const
