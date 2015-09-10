@@ -11,7 +11,6 @@ layout (location = 41) uniform vec2 ScreenSize;
 
 void main()
 {
-    outColor = texture(RenderedTex,
-                       texCoord + 0.005 * vec2(sin(Time + ScreenSize.x * texCoord.x),
-                                               cos(Time + ScreenSize.y * texCoord.y)));
+    outColor = texture(RenderedTex, texCoord + 0.005 * vec2(sin(Time + ScreenSize.x * texCoord.x),
+                                                            cos(Time + ScreenSize.y * texCoord.y)));
 }

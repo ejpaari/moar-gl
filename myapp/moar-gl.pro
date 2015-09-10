@@ -15,11 +15,6 @@ TEMPLATE = app
 
 DISTFILES += \
     settings.ini \
-    shaders/normals.frag \
-    shaders/normals.vert \
-    shaders/textured_normals.frag \
-    shaders/textured_normals.vert \
-    shaders/diffuse.vert \
     ../shaders/diffuse.frag \
     ../shaders/normals.frag \
     ../shaders/diffuse.vert \
@@ -33,7 +28,9 @@ DISTFILES += \
     ../shaders/normalmap.vert \
     ../shaders/normalmap.frag \
     ../shaders/offset.frag \
-    ../shaders/offset.vert
+    ../shaders/offset.vert \
+    ../shaders/passthrough.frag \
+    ../shaders/passthrough.vert
 
 SOURCES += \
     main.cpp \
@@ -55,7 +52,9 @@ SOURCES += \
     ../engine/light.cpp \
     ../engine/rendersettings.cpp \
     ../engine/globals.cpp \
-    ../engine/common/plane.cpp
+    ../engine/common/plane.cpp \
+    ../engine/postprocess.cpp \
+    ../engine/framebuffer.cpp
 
 HEADERS += \
     myapp.h \
@@ -77,7 +76,9 @@ HEADERS += \
     ../engine/rendersettings.h \
     ../engine/globals.h \
     ../engine/common/math.h \
-    ../engine/common/plane.h
+    ../engine/common/plane.h \
+    ../engine/postprocess.h \
+    ../engine/framebuffer.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL

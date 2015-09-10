@@ -14,13 +14,15 @@ namespace moar
 class Material : public Component
 {
 public:
-    enum TextureType {
+    enum TextureType
+    {
         DIFFUSE,
         NORMAL,
         DISPLACEMENT
     };
 
-    struct TextureInfo {
+    struct TextureInfo
+    {
         TextureType type;
         const GLchar* name;
         int unit;

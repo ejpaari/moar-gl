@@ -63,6 +63,7 @@ protected:
     glm::vec3 up;
     glm::vec3 left;    
 
+    // Todo: No reason to store these as Component, use Material, Light etc. instead.
     Component* material;
     Component* renderer;
     Component* light;

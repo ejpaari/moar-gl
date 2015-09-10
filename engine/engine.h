@@ -8,11 +8,14 @@
 #include "rendersettings.h"
 #include "camera.h"
 #include "object.h"
+#include "framebuffer.h"
+#include "postprocess.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <string>
 #include <vector>
+#include <deque>
 #include <map>
 #include <memory>
 
@@ -43,7 +46,6 @@ private:
     void render();
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
-    bool initFramebuffer();
     bool objectInsideFrustum(const Object* obj, const Camera* cam) const;
 
     std::shared_ptr<Application> app;
@@ -54,20 +56,17 @@ private:
     Input input;
     RenderSettings renderSettings;
 
-    // ToDo: Own class for framebuffer etc. Remember to glDelete these!
-    GLuint framebuffer;
-    GLuint renderedTexture;
-    GLuint depthRenderbuffer;
-    GLuint quadVAO;
-    GLuint quadBuffer;
-    GLuint offsetShader;
-
     std::shared_ptr<Camera> camera;
     std::map<GLuint, std::vector<Object*>> renderObjects;
     std::vector<Object*> lights;
     std::vector<std::shared_ptr<Object>> allObjects;
 
     std::shared_ptr<Object> skybox;
+
+    Framebuffer fb1;
+    Framebuffer fb2;
+    Framebuffer* fb;
+    std::deque<Postprocess> postprocs;
 
     double time;
 };
