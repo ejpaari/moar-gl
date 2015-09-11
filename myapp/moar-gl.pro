@@ -27,10 +27,12 @@ DISTFILES += \
     ../shaders/specular.vert \
     ../shaders/normalmap.vert \
     ../shaders/normalmap.frag \
-    ../shaders/offset.frag \
-    ../shaders/offset.vert \
-    ../shaders/passthrough.frag \
-    ../shaders/passthrough.vert
+    ../shaders/postproc/invert.frag \
+    ../shaders/postproc/offset.frag \
+    ../shaders/postproc/passthrough.frag \
+    ../shaders/postproc/invert.vert \
+    ../shaders/postproc/offset.vert \
+    ../shaders/postproc/passthrough.vert
 
 SOURCES += \
     main.cpp \

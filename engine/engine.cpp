@@ -252,18 +252,21 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "WARNING: Failed to create the skybox" << std::endl;
     }
 
-    Framebuffer::setWidth(windowWidth);
-    Framebuffer::setHeight(windowHeight);
+    Framebuffer::setWidth(renderSettings.windowWidth);
+    Framebuffer::setHeight(renderSettings.windowHeight);
     bool framebuffersInitialized = fb1.init() && fb2.init();
     if (!framebuffersInitialized) {
         std::cerr << "ERROR: Framebuffer status is incomplete" << std::endl;
         return false;
     }
 
-    Postprocess offset("offset", manager.getShader("offset"));
+    // Todo: These should be in the application / camera.
+    Postprocess offset("offset", manager.getShader("postproc/offset"));
     offset.setUniform("screensize", std::bind(glUniform2f, SCREEN_SIZE_LOCATION, renderSettings.windowWidth, renderSettings.windowHeight));
     postprocs.push_back(std::move(offset));
-    Postprocess passthrough("passthrough", manager.getShader("passthrough"));
+    Postprocess invert("invert", manager.getShader("postproc/invert"));
+    postprocs.push_back(std::move(invert));
+    Postprocess passthrough("passthrough", manager.getShader("postproc/passthrough"));
     postprocs.push_back(std::move(passthrough));
 
     return true;
@@ -386,12 +389,13 @@ void Engine::render()
     }
 
     // Post-process ping-pong
+    // Todo: Update post proc uniforms somewhere else. Probably in the application?
     postprocs.front().setUniform("time", std::bind(glUniform1f, TIME_LOCATION, time));
     GLuint renderedTex = fb1.getRenderedTexture();
     for (unsigned int i = 0; i < postprocs.size() - 1; ++i) {
         fb = i % 2 == 0 ? &fb2 : &fb1;
         fb->setPreviousFrame(renderedTex);
-        fb->bind();
+        fb->bind();        
         postprocs[i].bind();
         fb->activate();
         glDrawArrays(GL_TRIANGLES, 0, 6);
