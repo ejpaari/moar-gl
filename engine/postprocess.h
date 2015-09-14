@@ -12,7 +12,8 @@ namespace moar
 class Postprocess
 {
 public:
-    explicit Postprocess(const std::string& name, GLuint shader);
+    explicit Postprocess();
+    explicit Postprocess(const std::string& name, GLuint shader, int priority);
     ~Postprocess();
     Postprocess(const Postprocess&);
     Postprocess(Postprocess&&);
@@ -22,11 +23,14 @@ public:
     void bind() const;
     void setUniform(const std::string& name, std::function<void()> func);
     void removeUniform(const std::string& name);
+
     std::string getName() const;
+    int getPriority() const;
 
 private:
     std::string name;
     GLuint shader;
+    int priority;
     std::map<std::string, std::function<void()>> uniforms;
 };
 

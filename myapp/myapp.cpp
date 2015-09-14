@@ -3,6 +3,7 @@
 #include "../engine/renderer.h"
 #include "../engine/material.h"
 #include "../engine/light.h"
+#include "../engine/globals.h"
 
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
@@ -10,6 +11,7 @@
 MyApp::MyApp() :
     camera(nullptr),
     input(nullptr),
+    renderSettings(nullptr),
     bar(nullptr),
     rotationAxis(0.0f, 1.0f, 0.0f),
     rotationSpeed(0.5f),
@@ -34,6 +36,7 @@ void MyApp::start()
 {
     camera = engine->getCamera();
     input = engine->getInput();
+    renderSettings = engine->getRenderSettings();
 
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
@@ -55,6 +58,12 @@ void MyApp::start()
     light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
     light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 10.0f));
     light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    offset = moar::Postprocess("offset", engine->getResourceManager()->getShader("postproc/offset"), 1);
+    offset.setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
+    camera->addPostprocess(offset);
+    moar::Postprocess invert("invert", engine->getResourceManager()->getShader("postproc/invert"), 1);
+    camera->addPostprocess(invert);
 
     initGUI();
 }
@@ -108,6 +117,8 @@ void MyApp::update(double time, double deltaTime)
 
     light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
     light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
+
+    offset.setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, *engine->getTime()));
 }
 
 void MyApp::initGUI()

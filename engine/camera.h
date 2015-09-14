@@ -2,12 +2,14 @@
 #define CAMERA_H
 
 #include "object.h"
+#include "postprocess.h"
 #include "common/math.h"
 #include "common/plane.h"
 
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+#include <deque>
 
 namespace moar
 {
@@ -36,6 +38,10 @@ public:
     // Todo: frustum culling for box.
     bool sphereInsideFrustum(const glm::vec3& point, float radius) const;
 
+    void addPostprocess(const Postprocess& postproc);
+    void removePostprocess(const std::string& name);
+    const std::deque<Postprocess>& getPostprocesses() const;
+
 private:
 
     enum Side
@@ -56,6 +62,8 @@ private:
 
     std::unique_ptr<glm::mat4> viewMatrix;
     std::unique_ptr<glm::mat4> projectionMatrix;
+
+    std::deque<Postprocess> postprocs;
 };
 
 } // moar

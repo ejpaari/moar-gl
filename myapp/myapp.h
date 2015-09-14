@@ -6,6 +6,7 @@
 #include "../engine/input.h"
 #include "../engine/camera.h"
 #include "../engine/object.h"
+#include "../engine/rendersettings.h"
 
 #include <glm/glm.hpp>
 #include <AntTweakBar.h>
@@ -28,6 +29,8 @@ private:
 
     moar::Camera* camera;
     moar::Input* input;
+    moar::RenderSettings* renderSettings;
+    moar::Postprocess offset;
     moar::Object* monkey1;
     moar::Object* monkey2;
     moar::Object* icosphere;

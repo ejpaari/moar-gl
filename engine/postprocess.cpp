@@ -5,9 +5,17 @@
 namespace moar
 {
 
-Postprocess::Postprocess(const std::string& name, GLuint shader) :
+Postprocess::Postprocess() :
+    name(""),
+    shader(0),
+    priority(0)
+{
+}
+
+Postprocess::Postprocess(const std::string& name, GLuint shader, int priority) :
     name(name),
-    shader(shader)
+    shader(shader),
+    priority(priority)
 {
 }
 
@@ -17,23 +25,29 @@ Postprocess::~Postprocess()
 
 Postprocess::Postprocess(const Postprocess& rhs) :
    shader(rhs.shader),
-   uniforms(rhs.uniforms) {
+   priority(rhs.priority),
+   uniforms(rhs.uniforms)
+{
 }
 
 Postprocess::Postprocess(Postprocess&& rhs) :
    shader(std::move(rhs.shader)),
-   uniforms(std::move(rhs.uniforms)) {
+   priority(std::move(rhs.priority)),
+   uniforms(std::move(rhs.uniforms))
+{
 }
 
 Postprocess& Postprocess::operator=(Postprocess& rhs) {
    std::swap(shader, rhs.shader);
-   std::swap(uniforms, rhs.uniforms);
+   std::swap(priority, rhs.priority);
+   std::swap(uniforms, rhs.uniforms);   
    return *this;
 }
 
 Postprocess& Postprocess::operator=(Postprocess&& rhs) {
    shader = std::move(rhs.shader);
-   uniforms = std::move(rhs.uniforms);
+   priority = std::move(rhs.priority);
+   uniforms = std::move(rhs.uniforms);   
    return *this;
 }
 
@@ -58,6 +72,11 @@ void Postprocess::removeUniform(const std::string& name)
 std::string Postprocess::getName() const
 {
     return name;
+}
+
+int Postprocess::getPriority() const
+{
+    return priority;
 }
 
 } // moar

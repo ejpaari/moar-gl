@@ -69,6 +69,38 @@ bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
     return true;
 }
 
+void Camera::addPostprocess(const Postprocess& postproc)
+{
+    if (postprocs.empty()) {
+        postprocs.push_back(postproc);
+        return;
+    }
+
+    for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
+        if (postproc.getPriority() <= iter->getPriority()) {
+            postprocs.insert(iter, postproc);
+            return;
+        }
+    }
+
+    postprocs.push_back(postproc);
+}
+
+void Camera::removePostprocess(const std::string& name)
+{
+    for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
+        if (iter->getName() == name) {
+            postprocs.erase(iter);
+            return;
+        }
+    }
+}
+
+const std::deque<Postprocess>& Camera::getPostprocesses() const
+{
+    return postprocs;
+}
+
 void Camera::calculateViewMatrix()
 {
     *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));

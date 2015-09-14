@@ -9,13 +9,11 @@
 #include "camera.h"
 #include "object.h"
 #include "framebuffer.h"
-#include "postprocess.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <string>
 #include <vector>
-#include <deque>
 #include <map>
 #include <memory>
 
@@ -39,6 +37,9 @@ public:
     ResourceManager* getResourceManager();
     Camera* getCamera();
     Input* getInput();
+    RenderSettings* getRenderSettings();
+    double* getTime();
+
     void addObject(Object* object);
 
 private:
@@ -66,8 +67,9 @@ private:
     Framebuffer fb1;
     Framebuffer fb2;
     Framebuffer* fb;
-    std::deque<Postprocess> postprocs;
+    Postprocess passthrough;
 
+    // Todo: Global singleton
     double time;
 };
 

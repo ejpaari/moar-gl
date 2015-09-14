@@ -260,14 +260,7 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    // Todo: These should be in the application / camera.
-    Postprocess offset("offset", manager.getShader("postproc/offset"));
-    offset.setUniform("screensize", std::bind(glUniform2f, SCREEN_SIZE_LOCATION, renderSettings.windowWidth, renderSettings.windowHeight));
-    postprocs.push_back(std::move(offset));
-    Postprocess invert("invert", manager.getShader("postproc/invert"));
-    postprocs.push_back(std::move(invert));
-    Postprocess passthrough("passthrough", manager.getShader("postproc/passthrough"));
-    postprocs.push_back(std::move(passthrough));
+    passthrough = Postprocess("passthrough", manager.getShader("postproc/passthrough"), 0);
 
     return true;
 }
@@ -314,6 +307,16 @@ Camera* Engine::getCamera()
 Input* Engine::getInput()
 {
     return &input;
+}
+
+RenderSettings* Engine::getRenderSettings()
+{
+    return &renderSettings;
+}
+
+double*Engine::getTime()
+{
+    return &time;
 }
 
 void Engine::addObject(Object* object)
@@ -388,11 +391,10 @@ void Engine::render()
         skybox->render();
     }
 
-    // Post-process ping-pong
-    // Todo: Update post proc uniforms somewhere else. Probably in the application?
-    postprocs.front().setUniform("time", std::bind(glUniform1f, TIME_LOCATION, time));
+    // Post-process ping-pong    
     GLuint renderedTex = fb1.getRenderedTexture();
-    for (unsigned int i = 0; i < postprocs.size() - 1; ++i) {
+    const std::deque<Postprocess>& postprocs = camera->getPostprocesses();
+    for (unsigned int i = 0; i < postprocs.size(); ++i) {
         fb = i % 2 == 0 ? &fb2 : &fb1;
         fb->setPreviousFrame(renderedTex);
         fb->bind();        
@@ -401,7 +403,7 @@ void Engine::render()
         glDrawArrays(GL_TRIANGLES, 0, 6);
         renderedTex = fb->getRenderedTexture();
     }
-    postprocs.back().bind();
+    passthrough.bind();
     fb = postprocs.size() % 2 == 0 ? &fb1 : &fb2;
     fb->setPreviousFrame(renderedTex);
     fb->activate();
