@@ -38,7 +38,6 @@ public:
     Camera* getCamera();
     Input* getInput();
     RenderSettings* getRenderSettings();
-    double* getTime();
 
     void addObject(Object* object);
 
@@ -69,7 +68,6 @@ private:
     Framebuffer* fb;
     Postprocess passthrough;
 
-    // Todo: Global singleton
     double time;
 };
 

@@ -118,7 +118,7 @@ void MyApp::update(double time, double deltaTime)
     light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
     light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
 
-    offset.setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, *engine->getTime()));
+    offset.setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }
 
 void MyApp::initGUI()

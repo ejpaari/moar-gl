@@ -10,6 +10,7 @@
 
 #include <glm/glm.hpp>
 #include <AntTweakBar.h>
+#include <GLFW/glfw3.h>
 #include <string>
 
 class MyApp : public moar::Application

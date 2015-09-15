@@ -314,11 +314,6 @@ RenderSettings* Engine::getRenderSettings()
     return &renderSettings;
 }
 
-double*Engine::getTime()
-{
-    return &time;
-}
-
 void Engine::addObject(Object* object)
 {
     std::shared_ptr<Object> obj(object);
