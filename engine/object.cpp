@@ -102,17 +102,17 @@ void Object::setScale(const glm::vec3& scale)
     this->scale = scale;
 }
 
-glm::vec3 Object::getPosition()
+glm::vec3 Object::getPosition() const
 {
     return position;
 }
 
-glm::vec3 Object::getRotation()
+glm::vec3 Object::getRotation() const
 {
     return rotation;
 }
 
-glm::vec3 Object::getScale()
+glm::vec3 Object::getScale() const
 {
     return scale;
 }

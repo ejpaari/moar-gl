@@ -41,9 +41,9 @@ public:
     virtual void setRotation(const glm::vec3& rotation);
     virtual void setScale(const glm::vec3& scale);
 
-    glm::vec3 getPosition();
-    glm::vec3 getRotation();
-    glm::vec3 getScale();
+    glm::vec3 getPosition() const;
+    glm::vec3 getRotation() const;
+    glm::vec3 getScale() const;
     glm::mat4x4 getModelMatrix() const;    
     glm::vec3 getForward() const;
     glm::vec3 getUp() const;

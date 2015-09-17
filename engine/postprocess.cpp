@@ -24,31 +24,35 @@ Postprocess::~Postprocess()
 }
 
 Postprocess::Postprocess(const Postprocess& rhs) :
-   shader(rhs.shader),
-   priority(rhs.priority),
-   uniforms(rhs.uniforms)
+    name(rhs.name),
+    shader(rhs.shader),
+    priority(rhs.priority),
+    uniforms(rhs.uniforms)
 {
 }
 
 Postprocess::Postprocess(Postprocess&& rhs) :
-   shader(std::move(rhs.shader)),
-   priority(std::move(rhs.priority)),
-   uniforms(std::move(rhs.uniforms))
+    name(std::move(rhs.name)),
+    shader(std::move(rhs.shader)),
+    priority(std::move(rhs.priority)),
+    uniforms(std::move(rhs.uniforms))
 {
 }
 
 Postprocess& Postprocess::operator=(Postprocess& rhs) {
-   std::swap(shader, rhs.shader);
-   std::swap(priority, rhs.priority);
-   std::swap(uniforms, rhs.uniforms);   
-   return *this;
+    std::swap(name, rhs.name);
+    std::swap(shader, rhs.shader);
+    std::swap(priority, rhs.priority);
+    std::swap(uniforms, rhs.uniforms);
+    return *this;
 }
 
 Postprocess& Postprocess::operator=(Postprocess&& rhs) {
-   shader = std::move(rhs.shader);
-   priority = std::move(rhs.priority);
-   uniforms = std::move(rhs.uniforms);   
-   return *this;
+    name = std::move(rhs.name);
+    shader = std::move(rhs.shader);
+    priority = std::move(rhs.priority);
+    uniforms = std::move(rhs.uniforms);
+    return *this;
 }
 
 void Postprocess::bind() const

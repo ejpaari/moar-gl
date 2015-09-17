@@ -449,7 +449,9 @@ bool Engine::objectInsideFrustum(const Object* obj, const Camera* cam) const
     Model* model = obj->getComponent<Renderer>()->getModel();
     glm::vec3 point = model->getCenterPoint();
     point = glm::vec3((*Object::view) * obj->getModelMatrix() * glm::vec4(point.x, point.y, point.z, 1.0f));
-    float radius = model->getBoundingRadius();
+    glm::vec3 scale = obj->getScale();
+    float scaleMultiplier = std::max(std::max(scale.x, scale.y), scale.z);
+    float radius = model->getBoundingRadius() * scaleMultiplier ;
     return cam->sphereInsideFrustum(point, radius);
 }
 

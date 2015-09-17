@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include <deque>
+#include <string>
 
 namespace moar
 {
@@ -38,7 +39,7 @@ public:
     // Todo: frustum culling for box.
     bool sphereInsideFrustum(const glm::vec3& point, float radius) const;
 
-    void addPostprocess(const Postprocess& postproc);
+    Postprocess* addPostprocess(const std::string& name, GLuint shader, int priority);
     void removePostprocess(const std::string& name);
     const std::deque<Postprocess>& getPostprocesses() const;
 
@@ -46,7 +47,13 @@ private:
 
     enum Side
     {
-        TOP = 0, LEFT = 1, RIGHT = 2, BOTTOM = 3, FRONT = 4, BACK = 5, SIZE = 6
+        TOP = 0,
+        LEFT = 1,
+        RIGHT = 2,
+        BOTTOM = 3,
+        FRONT = 4,
+        BACK = 5,
+        SIZE = 6
     };
 
     void calculateViewMatrix();

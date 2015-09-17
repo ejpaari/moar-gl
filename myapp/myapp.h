@@ -6,6 +6,7 @@
 #include "../engine/input.h"
 #include "../engine/camera.h"
 #include "../engine/object.h"
+#include "../engine/light.h"
 #include "../engine/rendersettings.h"
 
 #include <glm/glm.hpp>
@@ -26,12 +27,12 @@ public:
 private:
     void initGUI();
     moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
-    moar::Object* createLight(const glm::vec4& color);
+    moar::Object* createLight(const glm::vec4& color, moar::Light::Type type = moar::Light::POINT);
 
     moar::Camera* camera;
     moar::Input* input;
     moar::RenderSettings* renderSettings;
-    moar::Postprocess offset;
+    moar::Postprocess* offset;
     moar::Object* monkey1;
     moar::Object* monkey2;
     moar::Object* icosphere;

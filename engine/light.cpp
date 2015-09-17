@@ -9,7 +9,8 @@
 namespace moar
 {
 
-Light::Light() :
+Light::Light(Type type) :
+    type(type),
     color(1.0f, 1.0f, 1.0f, 10.0f)
 {
     glGenBuffers(1, &lightBlockBuffer);
@@ -36,6 +37,11 @@ void Light::execute()
 void Light::setColor(const glm::vec4& color)
 {
     this->color = color;
+}
+
+void Light::setDirection(const glm::vec3& direction)
+{
+    this->direction = direction;
 }
 
 std::string Light::getName()

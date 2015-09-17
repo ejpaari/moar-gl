@@ -69,21 +69,26 @@ bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
     return true;
 }
 
-void Camera::addPostprocess(const Postprocess& postproc)
+Postprocess* Camera::addPostprocess(const std::string& name, GLuint shader, int priority)
 {
-    if (postprocs.empty()) {
-        postprocs.push_back(postproc);
-        return;
-    }
+    Postprocess proc(name, shader, priority);
 
-    for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
-        if (postproc.getPriority() <= iter->getPriority()) {
-            postprocs.insert(iter, postproc);
-            return;
+    if (postprocs.empty() || priority >= postprocs.back().getPriority()) {
+        postprocs.push_back(proc);
+        return &postprocs.back();
+    } else {
+        auto iter = postprocs.end();
+        for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
+            if (priority <= iter->getPriority()) {
+                iter = postprocs.insert(iter, proc);
+            }
+        }
+        if (iter == postprocs.end()) {
+            throw std::runtime_error("Could not add postprocess effect.");
+        } else {
+            return &*iter;
         }
     }
-
-    postprocs.push_back(postproc);
 }
 
 void Camera::removePostprocess(const std::string& name)

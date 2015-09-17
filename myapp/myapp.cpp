@@ -2,7 +2,6 @@
 #include "../engine/globals.h"
 #include "../engine/renderer.h"
 #include "../engine/material.h"
-#include "../engine/light.h"
 #include "../engine/globals.h"
 
 #include <boost/math/constants/constants.hpp>
@@ -12,6 +11,7 @@ MyApp::MyApp() :
     camera(nullptr),
     input(nullptr),
     renderSettings(nullptr),
+    offset(nullptr),
     bar(nullptr),
     rotationAxis(0.0f, 1.0f, 0.0f),
     rotationSpeed(0.5f),
@@ -38,6 +38,10 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
+    moar::Object* plane = createRenderObject("diffuse", "cube.3ds", "white.png");
+    plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
+    plane->setScale(glm::vec3(5.0f, 0.1f, 5.0f));
+
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
 
@@ -58,12 +62,13 @@ void MyApp::start()
     light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
     light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 10.0f));
     light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    moar::Object* dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 10.0f), moar::Light::DIRECTIONAL);
+    dirLight->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
+    dirLight->getComponent<moar::Light>()->setDirection(glm::vec3(0.0f, -1.0f, 0.2f));
 
-    offset = moar::Postprocess("offset", engine->getResourceManager()->getShader("postproc/offset"), 1);
-    offset.setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-    camera->addPostprocess(offset);
-    moar::Postprocess invert("invert", engine->getResourceManager()->getShader("postproc/invert"), 1);
-    camera->addPostprocess(invert);
+    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("postproc/offset"), 1);
+    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
+    camera->addPostprocess("invert", engine->getResourceManager()->getShader("postproc/invert"), 1);
 
     initGUI();
 }
@@ -118,7 +123,7 @@ void MyApp::update(double time, double deltaTime)
     light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
     light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
 
-    offset.setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
+    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }
 
 void MyApp::initGUI()
@@ -152,9 +157,9 @@ moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std
     return renderObj;
 }
 
-moar::Object* MyApp::createLight(const glm::vec4& color)
+moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
 {
-    moar::Light* lightComponent = new moar::Light();
+    moar::Light* lightComponent = new moar::Light(type);
     lightComponent->setColor(color);
     moar::Object* light = new moar::Object();
     light->addComponent(lightComponent);

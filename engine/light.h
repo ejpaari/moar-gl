@@ -12,7 +12,16 @@ namespace moar
 class Light : public Component
 {
 public:
-    explicit Light();
+    // Todo: Directional light.
+
+    enum Type
+    {
+        POINT,
+        DIRECTIONAL
+        // Todo: Spotlight.
+    };
+
+    explicit Light(Type type);
     virtual ~Light();
     Light(const Light&) = delete;
     Light(Light&&) = delete;
@@ -22,13 +31,16 @@ public:
     virtual void execute() final;
 
     void setColor(const glm::vec4& color);
+    void setDirection(const glm::vec3& direction);
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
 
 private:
     GLuint lightBlockBuffer;
+    Type type;
     glm::vec4 color;
+    glm::vec3 direction;
 };
 
 } // moar

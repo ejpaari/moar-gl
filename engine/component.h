@@ -11,7 +11,8 @@ class Object;
 class Component
 {
 public:
-    enum Type {
+    enum Type
+    {
         RENDERER,
         MATERIAL,
         LIGHT,
