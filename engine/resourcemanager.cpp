@@ -1,10 +1,20 @@
 #include "resourcemanager.h"
 
 #include <iostream>
-#include <utility>
+#include <exception>
 
 namespace moar
 {
+
+const std::unordered_map<std::pair<Shader::Type, Light::Type>, std::string, ResourceManager::PairHash> ResourceManager::shaderNames =
+{
+    {std::make_pair(Shader::DIFFUSE, Light::POINT), "diffuse_point"},
+    {std::make_pair(Shader::SPECULAR, Light::POINT), "specular_point"},
+    {std::make_pair(Shader::NORMAL_MAP, Light::POINT), "normalmap_point"},
+    {std::make_pair(Shader::DIFFUSE, Light::DIRECTIONAL), "diffuse_dir"},
+    {std::make_pair(Shader::SPECULAR, Light::DIRECTIONAL), "specular_dir"},
+    {std::make_pair(Shader::NORMAL_MAP, Light::DIRECTIONAL), "normalmap_dir"}
+};
 
 ResourceManager::ResourceManager()
 {
@@ -30,13 +40,13 @@ void ResourceManager::setTexturePath(const std::string& path)
     texturePath = path;
 }
 
-GLuint ResourceManager::getShader(const std::string& shaderName)
+GLuint ResourceManager::getShader(const std::string& name)
 {
-    auto found = shaders.find(shaderName);
-    if (found == shaders.end()) {
+    auto found = shadersByName.find(name);
+    if (found == shadersByName.end()) {
         std::unique_ptr<Shader> shader(new Shader());
-        std::string vertexShader = shaderPath + shaderName + ".vert";
-        std::string fragmentShader = shaderPath + shaderName + ".frag";
+        std::string vertexShader = shaderPath + name + ".vert";
+        std::string fragmentShader = shaderPath + name + ".frag";
 
         bool isGood;
         isGood = shader->attachShader(GL_VERTEX_SHADER, vertexShader.c_str());
@@ -54,12 +64,29 @@ GLuint ResourceManager::getShader(const std::string& shaderName)
         if (!shader->linkProgram()) {
             return 0;
         }
-        std::cout << "Created shader: " << shaderName << std::endl;
+        std::cout << "Created shader: " << name << std::endl;
         GLuint shaderProgram = shader->getProgram();
-        shaders.insert(std::make_pair(shaderName, std::move(shader)));
+        shadersByName.insert(std::make_pair(name, std::move(shader)));
         return shaderProgram;
     } else {
         return found->second->getProgram();
+    }
+}
+
+GLuint ResourceManager::getShader(const Shader::Type shader, const Light::Type light)
+{
+    auto typepair = std::make_pair(shader, light);
+    auto found = shadersByType.find(typepair );
+    if (found == shadersByType.end()) {
+        auto shaderName = shaderNames.find(typepair);
+        if (shaderName== shaderNames.end()) {
+            throw std::logic_error("Shader combination does not exist");
+        }
+        GLuint shaderProgram = getShader(shaderName->second);
+        shadersByType.insert(std::make_pair(typepair, shaderProgram));
+        return shaderProgram;
+    } else {
+        return found->second;
     }
 }
 

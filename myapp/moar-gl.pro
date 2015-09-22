@@ -15,24 +15,22 @@ TEMPLATE = app
 
 DISTFILES += \
     settings.ini \
-    ../shaders/diffuse.frag \
-    ../shaders/normals.frag \
-    ../shaders/diffuse.vert \
-    ../shaders/normals.vert \
     ../shaders/ambient.frag \
     ../shaders/ambient.vert \
     ../shaders/skybox.frag \
     ../shaders/skybox.vert \
-    ../shaders/specular.frag \
-    ../shaders/specular.vert \
-    ../shaders/normalmap.vert \
-    ../shaders/normalmap.frag \
     ../shaders/postproc/invert.frag \
     ../shaders/postproc/offset.frag \
     ../shaders/postproc/passthrough.frag \
     ../shaders/postproc/invert.vert \
     ../shaders/postproc/offset.vert \
-    ../shaders/postproc/passthrough.vert
+    ../shaders/postproc/passthrough.vert \
+    ../shaders/diffuse_point.frag \
+    ../shaders/diffuse_point.vert \
+    ../shaders/normalmap_point.frag \
+    ../shaders/normalmap_point.vert \
+    ../shaders/specular_point.frag \
+    ../shaders/specular_point.vert
 
 SOURCES += \
     main.cpp \

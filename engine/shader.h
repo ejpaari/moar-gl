@@ -10,6 +10,15 @@ namespace moar
 class Shader
 {
 public:
+
+    enum Type
+    {
+        DIFFUSE = 0,
+        SPECULAR = 1,
+        NORMAL_MAP = 2,
+        LAST = 3
+    };
+
     explicit Shader();
     ~Shader();
     Shader(const Shader& rhs) = delete;

@@ -38,19 +38,19 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
-    moar::Object* plane = createRenderObject("diffuse", "cube.3ds", "white.png");
+    moar::Object* plane = createRenderObject("diffuse_point", "cube.3ds", "white.png");
     plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
     plane->setScale(glm::vec3(5.0f, 0.1f, 5.0f));
 
-    monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
+    monkey1 = createRenderObject("diffuse_point", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
 
-    monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
+    monkey2 = createRenderObject("specular_point", "monkey.3ds", "checker.png");
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
     moar::Material* mat = monkey2->getComponent<moar::Material>();
     mat->setSpecularity(50.0f);
 
-    icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
+    icosphere = createRenderObject("normalmap_point", "icosphere.3ds", "brick.png");
     icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
     mat = icosphere->getComponent<moar::Material>();
     mat->setSpecularity(100.0f);
