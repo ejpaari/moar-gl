@@ -16,8 +16,9 @@ public:
 
     enum Type
     {
-        POINT,
-        DIRECTIONAL
+        POINT = 0,
+        DIRECTIONAL = 1,
+        NUM_TYPES = 2
         // Todo: Spotlight.
     };
 
@@ -33,6 +34,7 @@ public:
     void setColor(const glm::vec4& color);
     void setDirection(const glm::vec3& direction);
 
+    Type getLightType() const;
     virtual std::string getName() final;
     virtual Component::Type getType() final;
 

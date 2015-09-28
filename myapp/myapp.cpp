@@ -38,22 +38,21 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
-    moar::Object* plane = createRenderObject("diffuse_point", "cube.3ds", "white.png");
+    moar::Object* plane = createRenderObject("diffuse", "cube.3ds", "white.png");
     plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
     plane->setScale(glm::vec3(5.0f, 0.1f, 5.0f));
 
-    monkey1 = createRenderObject("diffuse_point", "monkey.3ds", "checker.png");
+    monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
 
-    monkey2 = createRenderObject("specular_point", "monkey.3ds", "checker.png");
+    monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
     moar::Material* mat = monkey2->getComponent<moar::Material>();
     mat->setSpecularity(50.0f);
 
-    icosphere = createRenderObject("normalmap_point", "icosphere.3ds", "brick.png");
+    icosphere = createRenderObject("normal_map", "icosphere.3ds", "brick.png");
     icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
     mat = icosphere->getComponent<moar::Material>();
-    mat->setSpecularity(100.0f);
     mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
     light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 5.0f));
@@ -68,7 +67,7 @@ void MyApp::start()
 
     offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("postproc/offset"), 1);
     offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-    camera->addPostprocess("invert", engine->getResourceManager()->getShader("postproc/invert"), 1);
+    //camera->addPostprocess("invert", engine->getResourceManager()->getShader("postproc/invert"), 1);
 
     initGUI();
 }
@@ -135,15 +134,14 @@ void MyApp::initGUI()
     TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
 }
 
-moar::Object* MyApp::createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName)
+moar::Object* MyApp::createRenderObject(const std::string& shader, const std::string& modelName, const std::string& textureName)
 {
-    GLuint shader = engine->getResourceManager()->getShader(shaderName);
     GLuint texture = 0;
     if (!textureName.empty()) {
         texture = engine->getResourceManager()->getTexture(textureName);
     }
     moar::Material* material = new moar::Material();
-    material->setShader(shader);
+    material->setShaderType(shader);
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
 
     moar::Renderer* renderer = new moar::Renderer();

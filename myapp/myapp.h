@@ -8,6 +8,7 @@
 #include "../engine/object.h"
 #include "../engine/light.h"
 #include "../engine/rendersettings.h"
+#include "../engine/shader.h"
 
 #include <glm/glm.hpp>
 #include <AntTweakBar.h>
@@ -26,7 +27,7 @@ public:
 
 private:
     void initGUI();
-    moar::Object* createRenderObject(const std::string& shaderName, const std::string& modelName, const std::string& textureName);
+    moar::Object* createRenderObject(const std::string& shader, const std::string& modelName, const std::string& textureName);
     moar::Object* createLight(const glm::vec4& color, moar::Light::Type type = moar::Light::POINT);
 
     moar::Camera* camera;

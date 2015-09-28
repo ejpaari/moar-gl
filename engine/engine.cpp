@@ -262,6 +262,8 @@ bool Engine::init(const std::string& settingsFile)
 
     passthrough = Postprocess("passthrough", manager.getShader("postproc/passthrough"), 0);
 
+    lights.resize(Light::Type::NUM_TYPES);
+
     return true;
 }
 
@@ -270,6 +272,7 @@ void Engine::execute()
     app->start();
     double x = 0.0;
     double y = 0.0;
+    loadShaders();
     while (app->isRunning()) {
         glfwGetCursorPos(window, &x, &y);
         input.setCursorPosition(x, y);
@@ -320,11 +323,11 @@ void Engine::addObject(Object* object)
     allObjects.push_back(obj);
 
     if (object->hasComponent("Renderer")) {
-        GLuint shaderProgram = object->getComponent<Material>()->getShader();
-        renderObjects[shaderProgram].push_back(object);
+        std::string type = object->getComponent<Material>()->getShaderType();
+        renderObjects[type].push_back(object);
     }
     if (object->hasComponent("Light")) {
-        lights.push_back(object);
+        lights[object->getComponent<Light>()->getLightType()].push_back(object);
     }
 }
 
@@ -358,19 +361,26 @@ void Engine::render()
         }
     }
 
-    // Lighting.
     glEnable(GL_BLEND);
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
+
+    // Todo: Make a function for lighting.
+    // Todo: Directional lighting.
+    // Light::Type lightType = Light::DIRECTIONAL;
+
+    // Point lighting.
+    Light::Type lightType = Light::POINT;
     for (auto renderObjs : renderObjects) {
-        glUseProgram(renderObjs.first);
+        glUseProgram(manager.getShader(renderObjs.first, lightType));
         for (auto renderObj : renderObjs.second) {
             if (!objectInsideFrustum(renderObj, camera.get())) {
                 continue;
             }
+
             renderObj->prepareRender();
-            for (unsigned int i = 0; i < lights.size(); ++i) {
-                lights[i]->prepareLight();
+            for (unsigned int i = 0; i < lights[lightType].size(); ++i) {
+                lights[lightType][i]->prepareLight();
                 renderObj->render();
             }
         }
@@ -422,6 +432,13 @@ void Engine::printInfo(int windowWidth, int windowHeight)
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
 
     std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl << std::endl;
+}
+
+void Engine::loadShaders()
+{
+    for (auto renderObjs : renderObjects) {        
+        manager.getShader(renderObjs.first, Light::POINT);
+    }
 }
 
 bool Engine::createSkybox()

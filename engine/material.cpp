@@ -14,7 +14,8 @@ const Material::TextureInfo Material::textureInfos[] =
 };
 
 Material::Material() :
-    isSpecular(false),
+    shaderType(""),
+    shader(0),
     specularity(0.0f)
 {
 }
@@ -31,15 +32,22 @@ void Material::execute()
         glUniform1i(std::get<1>(textures[i])->location, std::get<1>(textures[i])->value);
     }
 
-    if (isSpecular) {
+    // Todo: Custom uniforms like in postprocess.
+    if (specularity > 0.0f) {
         glUniform1f(SPECULAR_LOCATION, specularity);
     }
+}
+
+void Material::setShaderType(const std::string& shaderType)
+{
+    this->shaderType = shaderType;
+    shader = 0;
 }
 
 void Material::setShader(GLuint shader)
 {
     this->shader = shader;
-    isSpecular = glGetUniformLocation(shader, "Specularity") != -1;
+    shaderType = "";
 }
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)
@@ -80,6 +88,11 @@ const Material::TextureInfo* Material::getTextureInfo(TextureType type)
 
     std::cerr << "WARNING: Could not map material texture information" << std::endl;
     return nullptr;
+}
+
+std::string Material::getShaderType() const
+{
+    return shaderType;
 }
 
 GLuint Material::getShader() const

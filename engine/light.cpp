@@ -44,6 +44,11 @@ void Light::setDirection(const glm::vec3& direction)
     this->direction = direction;
 }
 
+Light::Type Light::getLightType() const
+{
+    return type;
+}
+
 std::string Light::getName()
 {
     return "Light";

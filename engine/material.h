@@ -41,20 +41,22 @@ public:
 
     virtual void execute() final;
 
+    void setShaderType(const std::string& shaderType);
     void setShader(GLuint shader);
     void setTexture(GLuint texture, TextureType type, GLenum target);
     void setSpecularity(float specularity);
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
+    std::string getShaderType() const;
     GLuint getShader() const;
 
 private:
     const TextureInfo* getTextureInfo(TextureType type);
 
+    std::string shaderType;
     GLuint shader;
     std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
-    bool isSpecular;
     float specularity;
 };
 

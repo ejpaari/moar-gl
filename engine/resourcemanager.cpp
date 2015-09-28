@@ -6,14 +6,15 @@
 namespace moar
 {
 
-const std::unordered_map<std::pair<Shader::Type, Light::Type>, std::string, ResourceManager::PairHash> ResourceManager::shaderNames =
+std::unordered_map<ResourceManager::ShaderKey, std::string, ResourceManager::ShaderKeyHash> ResourceManager::shaderNames =
 {
-    {std::make_pair(Shader::DIFFUSE, Light::POINT), "diffuse_point"},
-    {std::make_pair(Shader::SPECULAR, Light::POINT), "specular_point"},
-    {std::make_pair(Shader::NORMAL_MAP, Light::POINT), "normalmap_point"},
-    {std::make_pair(Shader::DIFFUSE, Light::DIRECTIONAL), "diffuse_dir"},
-    {std::make_pair(Shader::SPECULAR, Light::DIRECTIONAL), "specular_dir"},
-    {std::make_pair(Shader::NORMAL_MAP, Light::DIRECTIONAL), "normalmap_dir"}
+    // Todo: Shader combinations, e.g. diffuse.vert + diffuse_dir.frag
+    {std::make_pair("diffuse", Light::POINT), "diffuse_point"},
+    {std::make_pair("diffuse", Light::DIRECTIONAL), "diffuse_dir"},
+    {std::make_pair("specular", Light::POINT), "specular_point"},
+    {std::make_pair("specular", Light::DIRECTIONAL), "specular_dir"},
+    {std::make_pair("normal_map", Light::POINT), "normalmap_point"},
+    {std::make_pair("normal_map", Light::DIRECTIONAL), "normalmap_dir"}
 };
 
 ResourceManager::ResourceManager()
@@ -73,7 +74,7 @@ GLuint ResourceManager::getShader(const std::string& name)
     }
 }
 
-GLuint ResourceManager::getShader(const Shader::Type shader, const Light::Type light)
+GLuint ResourceManager::getShader(const std::string& shader, const Light::Type light)
 {
     auto typepair = std::make_pair(shader, light);
     auto found = shadersByType.find(typepair );

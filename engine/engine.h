@@ -45,6 +45,7 @@ private:
     void executeCustomComponents();
     void render();
     void printInfo(int windowWidth, int windowHeight);
+    void loadShaders();
     bool createSkybox();
     bool objectInsideFrustum(const Object* obj, const Camera* cam) const;
 
@@ -57,8 +58,8 @@ private:
     RenderSettings renderSettings;
 
     std::shared_ptr<Camera> camera;
-    std::map<GLuint, std::vector<Object*>> renderObjects;
-    std::vector<Object*> lights;
+    std::map<std::string, std::vector<Object*>> renderObjects;
+    std::vector<std::vector<Object*>> lights;
     std::vector<std::shared_ptr<Object>> allObjects;
 
     std::shared_ptr<Object> skybox;
