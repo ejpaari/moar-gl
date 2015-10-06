@@ -229,13 +229,19 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
+    std::string shaderInfoFile = "";
     try {
         manager.setShaderPath(pt.get<std::string>("Engine.shaderPath"));
         manager.setModelPath(pt.get<std::string>("Engine.modelPath"));
         manager.setTexturePath(pt.get<std::string>("Engine.texturePath"));
+        shaderInfoFile = pt.get<std::string>("Engine.shaders");
     } catch (boost::property_tree::ptree_error& e) {
         std::cerr << "ERROR: Could not load resource path info from the .ini-file" << std::endl;
         std::cerr << e.what() << std::endl;
+        return false;
+    }
+
+    if (!manager.loadShaders(shaderInfoFile)) {
         return false;
     }
 
@@ -260,7 +266,7 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    passthrough = Postprocess("passthrough", manager.getShader("postproc/passthrough"), 0);
+    passthrough = Postprocess("passthrough", manager.getShader("passthrough"), 0);
 
     lights.resize(Light::Type::NUM_TYPES);
 
@@ -272,7 +278,6 @@ void Engine::execute()
     app->start();
     double x = 0.0;
     double y = 0.0;
-    loadShaders();
     while (app->isRunning()) {
         glfwGetCursorPos(window, &x, &y);
         input.setCursorPosition(x, y);
@@ -434,19 +439,12 @@ void Engine::printInfo(int windowWidth, int windowHeight)
     std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl << std::endl;
 }
 
-void Engine::loadShaders()
-{
-    for (auto renderObjs : renderObjects) {        
-        manager.getShader(renderObjs.first, Light::POINT);
-    }
-}
-
 bool Engine::createSkybox()
 {
     if (!renderSettings.isLoaded()) {
         return false;
     }
-    GLuint texture = manager.getTexture(renderSettings.skyboxTextures);
+    GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);
     Material* material = new Material();
     material->setShader(renderSettings.skyboxShader);
     material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);

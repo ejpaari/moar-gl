@@ -12,7 +12,6 @@ namespace moar
 class Light : public Component
 {
 public:
-    // Todo: Directional light.
 
     enum Type
     {

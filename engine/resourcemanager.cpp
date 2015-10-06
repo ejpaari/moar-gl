@@ -1,25 +1,13 @@
 #include "resourcemanager.h"
 
 #include <iostream>
-#include <exception>
+#include <fstream>
 
 namespace moar
 {
 
-std::unordered_map<ResourceManager::ShaderKey, std::string, ResourceManager::ShaderKeyHash> ResourceManager::shaderNames =
-{
-    // Todo: Shader combinations, e.g. diffuse.vert + diffuse_dir.frag
-    {std::make_pair("diffuse", Light::POINT), "diffuse_point"},
-    {std::make_pair("diffuse", Light::DIRECTIONAL), "diffuse_dir"},
-    {std::make_pair("specular", Light::POINT), "specular_point"},
-    {std::make_pair("specular", Light::DIRECTIONAL), "specular_dir"},
-    {std::make_pair("normal_map", Light::POINT), "normalmap_point"},
-    {std::make_pair("normal_map", Light::DIRECTIONAL), "normalmap_dir"}
-};
-
 ResourceManager::ResourceManager()
 {
-    // Todo: Preload resources?
 }
 
 ResourceManager::~ResourceManager()
@@ -41,53 +29,92 @@ void ResourceManager::setTexturePath(const std::string& path)
     texturePath = path;
 }
 
+bool ResourceManager::loadShaders(const std::string& path)
+{
+    std::string line = "";
+    std::string vertex = "";
+    std::string fragment = "";
+    std::ifstream shaderInfo(path.c_str());
+    if (shaderInfo.is_open()) {
+        while (std::getline(shaderInfo, line)) {
+            if (line.empty()) {
+                continue;
+            } else if (line.find(".vert") != std::string::npos) {
+                vertex = line;
+            } else if (line.find(".frag") != std::string::npos) {
+                fragment = line;
+            } else if (!vertex.empty() && !fragment.empty()){
+                auto found = shadersByName.find(line);
+                if (found == shadersByName.end()) {
+                    std::unique_ptr<Shader> shader(new Shader());
+                    std::string vertexShader = shaderPath + vertex;
+                    std::string fragmentShader = shaderPath + fragment;
+
+                    bool isGood;
+                    isGood = shader->attachShader(GL_VERTEX_SHADER, vertexShader.c_str());
+                    if (!isGood) {
+                        std::cerr << "WARNING: Failed to attach vertex shader: " << vertexShader << std::endl;
+                        return 0;
+                    }
+
+                    isGood = shader->attachShader(GL_FRAGMENT_SHADER, fragmentShader.c_str());
+                    if (!isGood) {
+                        std::cerr << "WARNING: Failed to attach fragment shader: " << fragmentShader << std::endl;
+                        return 0;
+                    }
+
+                    if (!shader->linkProgram()) {
+                        return 0;
+                    }
+                    std::cout << "Created shader: " << line << std::endl;
+                    GLuint shaderProgram = shader->getProgram();
+                    shadersByName.insert(std::make_pair(line, shaderProgram));
+
+                    if (fragment.find("_point") != std::string::npos) {
+                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find(".vert")), Light::POINT);
+                        shadersByType.insert(std::make_pair(key, shaderProgram));
+                    } else if (fragment.find("_dir") != std::string::npos) {
+                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find(".vert")), Light::DIRECTIONAL);
+                        shadersByType.insert(std::make_pair(key, shaderProgram));
+                    }
+                    shaders.push_back(std::move(shader));
+                } else {
+                    std::cerr << "ERROR: Duplicate shader names, can not initialize" << std::endl;
+                    return false;
+                }
+            } else {
+                std::cerr << "ERROR: Failed to parse shaders file" << std::endl;
+                return false;
+            }
+        }
+        shaderInfo.close();
+        return true;
+    } else {
+        std::cerr << "ERROR: Could not open shader info file: " << path << std::endl;
+        return false;
+    }
+    return true;
+}
+
 GLuint ResourceManager::getShader(const std::string& name)
 {
     auto found = shadersByName.find(name);
-    if (found == shadersByName.end()) {
-        std::unique_ptr<Shader> shader(new Shader());
-        std::string vertexShader = shaderPath + name + ".vert";
-        std::string fragmentShader = shaderPath + name + ".frag";
-
-        bool isGood;
-        isGood = shader->attachShader(GL_VERTEX_SHADER, vertexShader.c_str());
-        if (!isGood) {
-            std::cerr << "WARNING: Failed to attach vertex shader: " << vertexShader << std::endl;
-            return 0;
-        }
-
-        isGood = shader->attachShader(GL_FRAGMENT_SHADER, fragmentShader.c_str());
-        if (!isGood) {
-            std::cerr << "WARNING: Failed to attach fragment shader: " << fragmentShader << std::endl;
-            return 0;
-        }
-
-        if (!shader->linkProgram()) {
-            return 0;
-        }
-        std::cout << "Created shader: " << name << std::endl;
-        GLuint shaderProgram = shader->getProgram();
-        shadersByName.insert(std::make_pair(name, std::move(shader)));
-        return shaderProgram;
+    if (found != shadersByName.end()) {
+        return found->second;
     } else {
-        return found->second->getProgram();
+        std::cerr << "ERROR: Could not find shader: " << name << std::endl;
+        return 0;
     }
 }
 
 GLuint ResourceManager::getShader(const std::string& shader, const Light::Type light)
 {
-    auto typepair = std::make_pair(shader, light);
-    auto found = shadersByType.find(typepair );
-    if (found == shadersByType.end()) {
-        auto shaderName = shaderNames.find(typepair);
-        if (shaderName== shaderNames.end()) {
-            throw std::logic_error("Shader combination does not exist");
-        }
-        GLuint shaderProgram = getShader(shaderName->second);
-        shadersByType.insert(std::make_pair(typepair, shaderProgram));
-        return shaderProgram;
-    } else {
+    auto found = shadersByType.find(std::make_pair(shader, light));
+    if (found != shadersByType.end()) {
         return found->second;
+    } else {
+        std::cerr << "ERROR: Could not find shader \"" << shader << "\" with light type " << light << std::endl;
+        return 0;
     }
 }
 
@@ -131,7 +158,7 @@ GLuint ResourceManager::getTexture(const std::string& textureName)
     }
 }
 
-GLuint ResourceManager::getTexture(std::vector<std::string> textureNames)
+GLuint ResourceManager::getCubeTexture(std::vector<std::string> textureNames)
 {
     std::string textureKey = "";
     for (auto& name : textureNames) {

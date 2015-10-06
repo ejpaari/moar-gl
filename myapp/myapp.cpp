@@ -50,7 +50,7 @@ void MyApp::start()
     moar::Material* mat = monkey2->getComponent<moar::Material>();
     mat->setSpecularity(50.0f);
 
-    icosphere = createRenderObject("normal_map", "icosphere.3ds", "brick.png");
+    icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
     icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
     mat = icosphere->getComponent<moar::Material>();
     mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
@@ -65,9 +65,9 @@ void MyApp::start()
     dirLight->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
     dirLight->getComponent<moar::Light>()->setDirection(glm::vec3(0.0f, -1.0f, 0.2f));
 
-    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("postproc/offset"), 1);
+    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
     offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-    //camera->addPostprocess("invert", engine->getResourceManager()->getShader("postproc/invert"), 1);
+    //camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
 
     initGUI();
 }

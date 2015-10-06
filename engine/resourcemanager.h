@@ -31,12 +31,13 @@ public:
     void setShaderPath(const std::string& path);
     void setModelPath(const std::string& path);
     void setTexturePath(const std::string& path);
+    bool loadShaders(const std::string& path);
 
-    GLuint getShader(const std::string& name);    
+    GLuint getShader(const std::string& name);
     GLuint getShader(const std::string& shader, const Light::Type light);
     Model* getModel(const std::string& modelName);
     GLuint getTexture(const std::string& textureName);
-    GLuint getTexture(std::vector<std::string> textureNames);
+    GLuint getCubeTexture(std::vector<std::string> textureNames);
 
 private:
 
@@ -50,13 +51,12 @@ private:
         }
     };
 
-    static std::unordered_map<ShaderKey, std::string, ShaderKeyHash> shaderNames;
-
     std::string shaderPath;
     std::string modelPath;
     std::string texturePath;
+    std::vector<std::unique_ptr<Shader>> shaders;
     std::unordered_map<ShaderKey, GLuint, ShaderKeyHash> shadersByType;
-    std::unordered_map<std::string, std::unique_ptr<Shader>> shadersByName;
+    std::unordered_map<std::string, GLuint> shadersByName;    
     std::unordered_map<std::string, std::unique_ptr<Model>> models;
     std::unordered_map<std::string, std::unique_ptr<Texture>> textures;
     std::unordered_map<std::string, std::unique_ptr<Texture>> cubeTextures;

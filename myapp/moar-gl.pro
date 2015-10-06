@@ -26,11 +26,14 @@ DISTFILES += \
     ../shaders/postproc/offset.vert \
     ../shaders/postproc/passthrough.vert \
     ../shaders/diffuse_point.frag \
-    ../shaders/diffuse_point.vert \
     ../shaders/normalmap_point.frag \
-    ../shaders/normalmap_point.vert \
     ../shaders/specular_point.frag \
-    ../shaders/specular_point.vert
+    ../shaders/diffuse.vert \
+    ../shaders/normalmap.vert \
+    ../shaders/specular.vert \
+    ../shaders/diffuse_dir.frag \
+    ../shaders/normalmap_dir.frag \
+    ../shaders/specular_dir.frag
 
 SOURCES += \
     main.cpp \
