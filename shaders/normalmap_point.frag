@@ -13,6 +13,7 @@ layout (location = 21) uniform sampler2D NormalTex;
 layout (std140) uniform LightBlock {
     vec4 lightColor;
     vec3 lightPos;
+    vec3 lightForward;
 };
 
 void main()

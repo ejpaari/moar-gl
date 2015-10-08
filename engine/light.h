@@ -31,7 +31,6 @@ public:
     virtual void execute() final;
 
     void setColor(const glm::vec4& color);
-    void setDirection(const glm::vec3& direction);
 
     Type getLightType() const;
     virtual std::string getName() final;
@@ -41,7 +40,6 @@ private:
     GLuint lightBlockBuffer;
     Type type;
     glm::vec4 color;
-    glm::vec3 direction;
 };
 
 } // moar

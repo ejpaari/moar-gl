@@ -15,7 +15,7 @@ Light::Light(Type type) :
 {
     glGenBuffers(1, &lightBlockBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
-    GLsizeiptr bufferSize = sizeof(color) + sizeof(parent->getPosition());
+    GLsizeiptr bufferSize = 16 + 16 + 16;
     glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
 }
 
@@ -29,19 +29,17 @@ void Light::execute()
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
     GLintptr offset = 0;
     glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(color), glm::value_ptr(color));
-    offset += sizeof(color);
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(parent->getPosition()), glm::value_ptr(parent->getPosition()));
+    offset += 16;
+    glm::vec3 pos = parent->getPosition();
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(pos), glm::value_ptr(pos));
+    offset += 16;
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(parent->getForward()), glm::value_ptr(parent->getForward()));
     glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
 }
 
 void Light::setColor(const glm::vec4& color)
 {
     this->color = color;
-}
-
-void Light::setDirection(const glm::vec3& direction)
-{
-    this->direction = direction;
 }
 
 Light::Type Light::getLightType() const

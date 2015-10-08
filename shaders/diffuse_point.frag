@@ -12,6 +12,7 @@ layout (location = 20) uniform sampler2D DiffuseTex;
 layout (std140) uniform LightBlock {
     vec4 lightColor;
     vec3 lightPos;
+    vec3 lightForward;
 };
 
 void main()

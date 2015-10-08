@@ -5,6 +5,7 @@ layout (location = 2) in vec2 tex;
 layout (location = 3) in vec3 normal;
 
 out vec3 normal_Cam;
+out vec3 normal_World;
 out vec3 vertexPos_World;
 out vec3 lightDir_Cam;
 out vec2 texCoord;
@@ -19,11 +20,13 @@ layout (std140) uniform TransformationBlock {
 layout (std140) uniform LightBlock {
     vec4 lightColor;
     vec3 lightPos;
+    vec3 lightForward;
 };
 
 void main()
 {
     normal_Cam = vec3(MV * vec4(normal, 0.0));
+    normal_World = vec3(M * vec4(normal, 0.0));
     vertexPos_World = vec3(M * vec4(position, 1.0));
 
     vec3 vertexPos_Cam = vec3(V * vec4(vertexPos_World, 1.0));

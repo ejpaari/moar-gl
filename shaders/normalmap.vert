@@ -20,6 +20,7 @@ layout (std140) uniform TransformationBlock {
 layout (std140) uniform LightBlock {
     vec4 lightColor;
     vec3 lightPos;
+    vec3 lightForward;
 };
 
 void main()

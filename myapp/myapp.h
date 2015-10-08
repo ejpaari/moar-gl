@@ -41,6 +41,7 @@ private:
     moar::Object* light1;
     moar::Object* light2;
     moar::Object* light3;
+    moar::Object* dirLight;
 
     TwBar* bar;
     glm::vec3 rotationAxis;

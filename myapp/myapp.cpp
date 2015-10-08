@@ -38,6 +38,7 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
+    // Todo: Cube normals are not OK.
     moar::Object* plane = createRenderObject("diffuse", "cube.3ds", "white.png");
     plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
     plane->setScale(glm::vec3(5.0f, 0.1f, 5.0f));
@@ -57,17 +58,16 @@ void MyApp::start()
 
     light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 5.0f));
     light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
-    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 15.0f));
+    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 4.0f));
     light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
-    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 10.0f));
+    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 3.0f));
     light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    moar::Object* dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 10.0f), moar::Light::DIRECTIONAL);
-    dirLight->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
-    dirLight->getComponent<moar::Light>()->setDirection(glm::vec3(0.0f, -1.0f, 0.2f));
-
-    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
-    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-    //camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
+    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
+    dirLight->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    dirLight->setRotation(glm::vec3(-2.0f, 1.0f, 0.0f));
+//    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
+//    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
+//    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
 
     initGUI();
 }
@@ -122,7 +122,7 @@ void MyApp::update(double time, double deltaTime)
     light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
     light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
 
-    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
+//    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }
 
 void MyApp::initGUI()

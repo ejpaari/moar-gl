@@ -371,11 +371,25 @@ void Engine::render()
     glBlendFunc(GL_ONE, GL_ONE);
 
     // Todo: Make a function for lighting.
-    // Todo: Directional lighting.
-    // Light::Type lightType = Light::DIRECTIONAL;
+    // Todo: Create directional light shaders.
+    Light::Type lightType = Light::DIRECTIONAL;
+    for (auto renderObjs : renderObjects) {
+        glUseProgram(manager.getShader(renderObjs.first, lightType));
+        for (auto renderObj : renderObjs.second) {
+            if (!objectInsideFrustum(renderObj, camera.get())) {
+                continue;
+            }
+
+            renderObj->prepareRender();
+            for (unsigned int i = 0; i < lights[lightType].size(); ++i) {
+                lights[lightType][i]->prepareLight();
+                renderObj->render();
+            }
+        }
+    }
 
     // Point lighting.
-    Light::Type lightType = Light::POINT;
+    lightType = Light::POINT;
     for (auto renderObjs : renderObjects) {
         glUseProgram(manager.getShader(renderObjs.first, lightType));
         for (auto renderObj : renderObjs.second) {
