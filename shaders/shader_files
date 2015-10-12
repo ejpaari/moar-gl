@@ -1,24 +1,24 @@
-diffuse.vert
+diffuse_point.vert
 diffuse_point.frag
 diffuse_point
 
-diffuse.vert
+diffuse_dir.vert
 diffuse_dir.frag
 diffuse_dir
 
-specular.vert
+specular_point.vert
 specular_point.frag
 specular_point
 
-specular.vert
+specular_dir.vert
 specular_dir.frag
 specular_dir
 
-normalmap.vert
+normalmap_point.vert
 normalmap_point.frag
 normalmap_point
 
-normalmap.vert
+normalmap_dir.vert
 normalmap_dir.frag
 normalmap_dir
 

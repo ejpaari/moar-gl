@@ -71,10 +71,10 @@ bool ResourceManager::loadShaders(const std::string& path)
                     shadersByName.insert(std::make_pair(line, shaderProgram));
 
                     if (fragment.find("_point") != std::string::npos) {
-                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find(".vert")), Light::POINT);
+                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find("_")), Light::POINT);
                         shadersByType.insert(std::make_pair(key, shaderProgram));
                     } else if (fragment.find("_dir") != std::string::npos) {
-                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find(".vert")), Light::DIRECTIONAL);
+                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find("_")), Light::DIRECTIONAL);
                         shadersByType.insert(std::make_pair(key, shaderProgram));
                     }
                     shaders.push_back(std::move(shader));

@@ -1,8 +1,6 @@
 #version 450 core
 
-in vec3 normal_Cam;
-in vec3 vertexPos_World;
-in vec3 lightDir_Cam;
+in vec3 normal_World;
 in vec2 texCoord;
 in vec3 eyeDir_Cam;
 
@@ -19,19 +17,18 @@ layout (std140) uniform LightBlock {
 
 void main()
 {    
-    vec3 n = normalize(normal_Cam);
-    vec3 l = normalize(lightDir_Cam);
+    vec3 n = normalize(normal_World);
+    vec3 l = -lightForward;
     float diff = clamp(dot(n,l), 0, 1);
 
     vec3 e = normalize(eyeDir_Cam);
     vec3 r = reflect(-l,n);
     float spec = clamp(dot(e,r), 0, 1);
 
-    float lightDistance = length(lightPos - vertexPos_World);
     vec4 diffuseColor = texture(DiffuseTex, texCoord);
     float power = lightColor.w;
     float specular = pow(spec, Specularity);
     outColor = 
-        vec4(lightColor.xyz * power * diff / (lightDistance * lightDistance), 1.0) * diffuseColor +
-        vec4(vec3(1.0, 1.0, 1.0) * power * specular / (lightDistance * lightDistance), 1.0);
+        vec4(lightColor.xyz * power * diff, 1.0) * diffuseColor +
+        vec4(vec3(1.0, 1.0, 1.0) * power * specular, 1.0);
 }

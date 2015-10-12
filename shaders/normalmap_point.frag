@@ -2,7 +2,6 @@
 
 in vec3 vertexPos_World;
 in vec3 lightDir_Tan;
-in vec3 eyeDir_Tan;
 in vec2 texCoord;
 
 layout(location = 0) out vec4 outColor;

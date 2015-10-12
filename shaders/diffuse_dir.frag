@@ -1,9 +1,6 @@
 #version 450 core
 
-in vec3 normal_Cam;
 in vec3 normal_World;
-in vec3 vertexPos_World;
-in vec3 lightDir_Cam;
 in vec2 texCoord;
 
 layout(location = 0) out vec4 outColor;

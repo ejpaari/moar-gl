@@ -14,26 +14,7 @@ CONFIG += c++11
 TEMPLATE = app
 
 DISTFILES += \
-    settings.ini \
-    ../shaders/ambient.frag \
-    ../shaders/ambient.vert \
-    ../shaders/skybox.frag \
-    ../shaders/skybox.vert \
-    ../shaders/postproc/invert.frag \
-    ../shaders/postproc/offset.frag \
-    ../shaders/postproc/passthrough.frag \
-    ../shaders/postproc/invert.vert \
-    ../shaders/postproc/offset.vert \
-    ../shaders/postproc/passthrough.vert \
-    ../shaders/diffuse_point.frag \
-    ../shaders/normalmap_point.frag \
-    ../shaders/specular_point.frag \
-    ../shaders/diffuse.vert \
-    ../shaders/normalmap.vert \
-    ../shaders/specular.vert \
-    ../shaders/diffuse_dir.frag \
-    ../shaders/normalmap_dir.frag \
-    ../shaders/specular_dir.frag
+    settings.ini
 
 SOURCES += \
     main.cpp \
