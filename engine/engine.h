@@ -44,6 +44,7 @@ public:
 private:
     void executeCustomComponents();
     void render();
+    void lighting(Light::Type lightType);
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
     bool objectInsideFrustum(const Object* obj, const Camera* cam) const;

@@ -370,40 +370,8 @@ void Engine::render()
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    // Todo: Make a function for lighting.
-    // Todo: Create directional light shaders.
-    Light::Type lightType = Light::DIRECTIONAL;
-    for (auto renderObjs : renderObjects) {
-        glUseProgram(manager.getShader(renderObjs.first, lightType));
-        for (auto renderObj : renderObjs.second) {
-            if (!objectInsideFrustum(renderObj, camera.get())) {
-                continue;
-            }
-
-            renderObj->prepareRender();
-            for (unsigned int i = 0; i < lights[lightType].size(); ++i) {
-                lights[lightType][i]->prepareLight();
-                renderObj->render();
-            }
-        }
-    }
-
-    // Point lighting.
-    lightType = Light::POINT;
-    for (auto renderObjs : renderObjects) {
-        glUseProgram(manager.getShader(renderObjs.first, lightType));
-        for (auto renderObj : renderObjs.second) {
-            if (!objectInsideFrustum(renderObj, camera.get())) {
-                continue;
-            }
-
-            renderObj->prepareRender();
-            for (unsigned int i = 0; i < lights[lightType].size(); ++i) {
-                lights[lightType][i]->prepareLight();
-                renderObj->render();
-            }
-        }
-    }
+    lighting(Light::DIRECTIONAL);
+    lighting(Light::POINT);
 
     if (skybox) {
         glDisable(GL_BLEND);
@@ -433,6 +401,24 @@ void Engine::render()
     fb->activate();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Engine::lighting(Light::Type lightType)
+{
+    for (auto renderObjs : renderObjects) {
+        glUseProgram(manager.getShader(renderObjs.first, lightType));
+        for (auto renderObj : renderObjs.second) {
+            if (!objectInsideFrustum(renderObj, camera.get())) {
+                continue;
+            }
+
+            renderObj->prepareRender();
+            for (unsigned int i = 0; i < lights[lightType].size(); ++i) {
+                lights[lightType][i]->prepareLight();
+                renderObj->render();
+            }
+        }
+    }
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)

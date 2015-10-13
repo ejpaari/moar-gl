@@ -39,10 +39,9 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
-    // Todo: Cube normals are not OK.
-    moar::Object* plane = createRenderObject("diffuse", "cube.3ds", "white.png");
+    moar::Object* plane = createRenderObject("diffuse", "plane.3ds", "white.png");
     plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
-    plane->setScale(glm::vec3(5.0f, 0.1f, 5.0f));
+    plane->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
 
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
