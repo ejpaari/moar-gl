@@ -56,6 +56,7 @@ private:
 
     std::string shaderType;
     GLuint shader;
+    // Todo: Maybe a struct would be simpler.
     std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
     float specularity;
 };

@@ -32,7 +32,7 @@ void Material::execute()
         glUniform1i(std::get<1>(textures[i])->location, std::get<1>(textures[i])->value);
     }
 
-    // Todo: Custom uniforms like in postprocess.
+    // Todo: Custom uniforms like in postprocess; std::map<std::string, std::function<void()>>.
     if (specularity > 0.0f) {
         glUniform1f(SPECULAR_LOCATION, specularity);
     }

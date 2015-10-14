@@ -71,22 +71,33 @@ bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
 
 Postprocess* Camera::addPostprocess(const std::string& name, GLuint shader, int priority)
 {
+    for (auto p : postprocs) {
+        if (p.getName() == name) {
+            std::cerr << "ERROR: Post process effect already exist: " << name << std::endl;
+            return nullptr;
+        }
+    }
+
     Postprocess proc(name, shader, priority);
 
     if (postprocs.empty() || priority >= postprocs.back().getPriority()) {
         postprocs.push_back(proc);
         return &postprocs.back();
     } else {
-        auto iter = postprocs.end();
-        for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
+        bool postprocAdded = false;
+        auto iter = postprocs.begin();
+        for (; iter != postprocs.end(); ++iter) {
             if (priority <= iter->getPriority()) {
                 iter = postprocs.insert(iter, proc);
+                postprocAdded = true;
+                break;
             }
         }
-        if (iter == postprocs.end()) {
-            throw std::runtime_error("Could not add postprocess effect.");
-        } else {
+        if (postprocAdded) {
             return &*iter;
+        } else {
+            std::cerr << "ERROR: Could not post processing effect: " << name << std::endl;
+            return nullptr;
         }
     }
 }
@@ -137,11 +148,13 @@ glm::vec2 Camera::getClipPlaneSize(float distance)
 Quad Camera::getClipPlaneQuad(float distance, glm::vec2 size)
 {
     glm::vec3 center = Object::FORWARD * distance;
+    glm::vec3 y = Object::UP * size.y / 2.0f;
+    glm::vec3 x = Object::LEFT * size.x / 2.0f;
     Quad quad;
-    quad.topLeft = center + (Object::UP * size.y / 2.0f) + (Object::LEFT * size.x / 2.0f);
-    quad.topRight = center + (Object::UP * size.y / 2.0f) - (Object::LEFT * size.x / 2.0f);
-    quad.bottomLeft = center - (Object::UP * size.y / 2.0f) + (Object::LEFT * size.x / 2.0f);
-    quad.bottomRight = center - (Object::UP * size.y / 2.0f) - (Object::LEFT * size.x / 2.0f);
+    quad.topLeft = center + y + x;
+    quad.topRight = center + y - x;
+    quad.bottomLeft = center - y + x;
+    quad.bottomRight = center - y - x;
     return quad;
 }
 

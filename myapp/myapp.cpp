@@ -2,10 +2,10 @@
 #include "../engine/globals.h"
 #include "../engine/renderer.h"
 #include "../engine/material.h"
-#include "../engine/globals.h"
 
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
+#include <memory>
 
 MyApp::MyApp() :
     camera(nullptr),
@@ -13,20 +13,20 @@ MyApp::MyApp() :
     renderSettings(nullptr),
     offset(nullptr),
     bar(nullptr),
+    monkey1(nullptr),
+    monkey2(nullptr),
+    icosphere(nullptr),
+    light1(nullptr),
+    light2(nullptr),
+    light3(nullptr),
+    dirLight(nullptr),
     rotationAxis(0.0f, 1.0f, 0.0f),
     rotationSpeed(0.5f),
     fps(0),
     fpsCounter(0),
     drawCount(&moar::DRAW_COUNT),
     timeCounter(0.0)
-{    
-    monkey1 = nullptr;
-    monkey2 = nullptr;
-    light1 = nullptr;
-    light2 = nullptr;
-    light3 = nullptr;
-    dirLight = nullptr;
-    icosphere = nullptr;
+{
 }
 
 MyApp::~MyApp()

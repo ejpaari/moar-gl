@@ -122,9 +122,9 @@ Engine::~Engine()
     glfwTerminate();
 }
 
-void Engine::setApplication(std::shared_ptr<Application> application)
+void Engine::setApplication(Application* application)
 {
-    app = application;
+    app.reset(application);
     app->setEngine(this);
 }
 

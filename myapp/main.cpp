@@ -6,7 +6,7 @@
 int main(/*int argc, char* argv[]*/)
 {
     moar::Engine engine;
-    std::shared_ptr<MyApp> app(new MyApp());
+    MyApp* app = new MyApp();
     engine.setApplication(app);
     if (!engine.init("../moar-gl/myapp/settings.ini")) {
         return -1;

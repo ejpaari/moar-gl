@@ -6,13 +6,11 @@
 #include "../engine/input.h"
 #include "../engine/camera.h"
 #include "../engine/object.h"
-#include "../engine/light.h"
 #include "../engine/rendersettings.h"
-#include "../engine/shader.h"
+#include "../engine/light.h"
 
 #include <glm/glm.hpp>
 #include <AntTweakBar.h>
-#include <GLFW/glfw3.h>
 #include <string>
 
 class MyApp : public moar::Application
@@ -34,6 +32,8 @@ private:
     moar::Input* input;
     moar::RenderSettings* renderSettings;
     moar::Postprocess* offset;
+    TwBar* bar;
+
     moar::Object* monkey1;
     moar::Object* monkey2;
     moar::Object* icosphere;
@@ -43,7 +43,6 @@ private:
     moar::Object* light3;
     moar::Object* dirLight;
 
-    TwBar* bar;
     glm::vec3 rotationAxis;
     float rotationSpeed;
     int fps;

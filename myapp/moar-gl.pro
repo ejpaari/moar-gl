@@ -59,10 +59,10 @@ HEADERS += \
     ../engine/light.h \
     ../engine/rendersettings.h \
     ../engine/globals.h \
-    ../engine/common/math.h \
     ../engine/common/plane.h \
     ../engine/postprocess.h \
-    ../engine/framebuffer.h
+    ../engine/framebuffer.h \
+    ../engine/common/quad.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL

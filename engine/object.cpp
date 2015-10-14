@@ -150,7 +150,7 @@ glm::vec3 Object::getLeft() const
     return glm::vec3(v.x, v.y, v.z);
 }
 
-void Object::addComponent(Component *comp)
+void Object::addComponent(Component* comp)
 {
     comp->setParent(this);
     std::unique_ptr<Component> component(comp);

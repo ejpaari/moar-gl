@@ -3,12 +3,11 @@
 
 #include "object.h"
 #include "postprocess.h"
-#include "common/math.h"
+#include "common/quad.h"
 #include "common/plane.h"
 
 #include <glm/glm.hpp>
 #include <memory>
-#include <vector>
 #include <deque>
 #include <string>
 

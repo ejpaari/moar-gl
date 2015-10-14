@@ -30,7 +30,7 @@ public:
     Engine& operator=(const Engine&) = delete;
     Engine& operator=(Engine&&) = delete;
 
-    void setApplication(std::shared_ptr<Application> application);
+    void setApplication(Application* application);
     bool init(const std::string& settingsFile);
     void execute();
 

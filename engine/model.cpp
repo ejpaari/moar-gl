@@ -136,7 +136,7 @@ void Model::calculateCenterPointAndRadius()
     centerPoint.x = (boundingBoxMax.x + boundingBoxMin.x) / 2.0f;
     centerPoint.y = (boundingBoxMax.y + boundingBoxMin.y) / 2.0f;
     centerPoint.z = (boundingBoxMax.z + boundingBoxMin.z) / 2.0f;
-    boundingRadius = glm::distance(centerPoint, boundingBoxMax);
+    boundingRadius = std::max(glm::distance(centerPoint, boundingBoxMax), glm::distance(centerPoint, boundingBoxMax));
 }
 
 } // moar
