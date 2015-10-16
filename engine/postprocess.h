@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <string>
 #include <functional>
-#include <map>
+#include <unordered_map>
 
 namespace moar
 {
@@ -31,7 +31,7 @@ private:
     std::string name;
     GLuint shader;
     int priority;
-    std::map<std::string, std::function<void()>> uniforms;
+    std::unordered_map<std::string, std::function<void()>> uniforms;
 };
 
 } // moar

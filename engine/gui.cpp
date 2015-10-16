@@ -1,7 +1,6 @@
 #include "gui.h"
 
 #include <AntTweakBar.h>
-#include <iostream>
 
 namespace
 {

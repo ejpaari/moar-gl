@@ -31,7 +31,6 @@ public:
 
     void setParent(Object* parentObject);
 
-    Object* getParent() const;
     virtual std::string getName() = 0;
     virtual Component::Type getType() = 0;
 

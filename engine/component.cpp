@@ -17,9 +17,4 @@ void Component::setParent(Object* parentObject)
     parent = parentObject;
 }
 
-Object* Component::getParent() const
-{
-    return parent;
-}
-
 } // moar

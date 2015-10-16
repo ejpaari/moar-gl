@@ -45,11 +45,6 @@ double Input::getCursorDeltaY() const
     return sensitivity * deltaY;
 }
 
-double Input::getSensitivity() const
-{
-    return sensitivity;
-}
-
 float Input::getMovementSpeed() const
 {
     return movementSpeed;

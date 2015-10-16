@@ -65,9 +65,9 @@ void MyApp::start()
     dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
     dirLight->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
     dirLight->setRotation(glm::vec3(-2.0f, 1.0f, 0.0f));
-//    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
-//    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-//    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
+    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
+    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
+    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
 
     initGUI();
 }

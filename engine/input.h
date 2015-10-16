@@ -20,7 +20,6 @@ public:
 
     double getCursorDeltaX() const;
     double getCursorDeltaY() const;
-    double getSensitivity() const;
     float getMovementSpeed() const;
 
 private:
