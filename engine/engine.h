@@ -39,7 +39,7 @@ public:
     Input* getInput();
     RenderSettings* getRenderSettings();
 
-    void addObject(Object* object);
+    void addObject(std::shared_ptr<Object> object);
 
 private:
     void executeCustomComponents();

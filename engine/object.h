@@ -49,7 +49,7 @@ public:
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
 
-    void addComponent(Component* comp);
+    void addComponent(std::shared_ptr<Component> comp);
     bool hasComponent(const std::string& name) const;
 
     template<typename T>
@@ -67,7 +67,7 @@ protected:
     Component* renderer;
     Component* light;
     std::vector<Component*> customComponents;
-    std::vector<std::unique_ptr<Component>> allComponents;
+    std::vector<std::shared_ptr<Component>> allComponents;
 
     static GLint currentShader;
 

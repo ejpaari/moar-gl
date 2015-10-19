@@ -150,36 +150,35 @@ glm::vec3 Object::getLeft() const
     return glm::vec3(v.x, v.y, v.z);
 }
 
-void Object::addComponent(Component* comp)
+void Object::addComponent(std::shared_ptr<Component> comp)
 {
     comp->setParent(this);
-    std::unique_ptr<Component> component(comp);
     bool componentExists = false;
     for (unsigned int i = 0; i < allComponents.size(); ++i) {
         if (allComponents[i]->getName() == comp->getName()) {
-            allComponents[i].reset(comp);
+            allComponents[i] = comp;
             componentExists = true;
         }
     }
 
     if (!componentExists) {
-        allComponents.push_back(std::move(component));
+        allComponents.push_back(comp);
     }
 
     switch (comp->getType()) {
     case Component::RENDERER:
-        renderer = comp;
+        renderer = comp.get();
         break;
     case Component::MATERIAL:
-        material = comp;
+        material = comp.get();
         break;
     case Component::LIGHT:
-        light = comp;
+        light = comp.get();
         break;
     case Component::CUSTOM:
         for (auto custom : customComponents) {
             if (custom->getName() == comp->getName()) {
-                custom = comp;
+                custom = comp.get();
                 return;
             }
         }

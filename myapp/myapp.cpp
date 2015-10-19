@@ -65,9 +65,9 @@ void MyApp::start()
     dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
     dirLight->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
     dirLight->setRotation(glm::vec3(-2.0f, 1.0f, 0.0f));
-    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
-    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
+//    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
+//    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
+//    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
 
     initGUI();
 }
@@ -140,27 +140,27 @@ moar::Object* MyApp::createRenderObject(const std::string& shader, const std::st
     if (!textureName.empty()) {
         texture = engine->getResourceManager()->getTexture(textureName);
     }
-    moar::Material* material = new moar::Material();
+    std::shared_ptr<moar::Material> material(new moar::Material());
     material->setShaderType(shader);
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
 
-    moar::Renderer* renderer = new moar::Renderer();
+    std::shared_ptr<moar::Renderer> renderer(new moar::Renderer());
     moar::Model* model = engine->getResourceManager()->getModel(modelName);
     renderer->setModel(model);
 
-    moar::Object* renderObj = new moar::Object();
+    std::shared_ptr<moar::Object> renderObj(new moar::Object());
     renderObj->addComponent(material);
     renderObj->addComponent(renderer);
     engine->addObject(renderObj);
-    return renderObj;
+    return renderObj.get();
 }
 
 moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
 {
-    moar::Light* lightComponent = new moar::Light(type);
+    std::shared_ptr<moar::Light> lightComponent(new moar::Light(type));
     lightComponent->setColor(color);
-    moar::Object* light = new moar::Object();
+    std::shared_ptr<moar::Object> light(new moar::Object());
     light->addComponent(lightComponent);
     engine->addObject(light);
-    return light;
+    return light.get();
 }
