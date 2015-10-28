@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <typeinfo>
+#include <string>
 
 namespace moar
 {
@@ -30,7 +31,7 @@ public:
     Object& operator=(Object&&) = delete;
 
     void executeCustomComponents();
-    void prepareRender(bool ignoreMaterial = false);
+    void prepareRender();
     void prepareLight();
     void render();
 
@@ -40,14 +41,16 @@ public:
     virtual void setPosition(const glm::vec3& position);
     virtual void setRotation(const glm::vec3& rotation);
     virtual void setScale(const glm::vec3& scale);
+    void setName(const std::string& name);
 
     glm::vec3 getPosition() const;
     glm::vec3 getRotation() const;
     glm::vec3 getScale() const;
-    glm::mat4x4 getModelMatrix() const;    
+    glm::mat4x4 getModelMatrix() const;
     glm::vec3 getForward() const;
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
+    std::string getName() const;
 
     void addComponent(std::shared_ptr<Component> comp);
     bool hasComponent(const std::string& name) const;
@@ -56,6 +59,8 @@ public:
     T* getComponent() const;
 
 protected:
+    static GLint currentShader;
+
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
@@ -67,11 +72,11 @@ protected:
     Component* renderer;
     Component* light;
     std::vector<Component*> customComponents;
-    std::vector<std::shared_ptr<Component>> allComponents;
-
-    static GLint currentShader;
+    std::vector<std::shared_ptr<Component>> allComponents;    
 
     GLuint transformationBlockBuffer;
+
+    std::string name;
 };
 
 template<typename T>

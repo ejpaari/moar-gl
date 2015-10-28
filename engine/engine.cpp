@@ -3,6 +3,8 @@
 #include "material.h"
 #include "globals.h"
 
+#define GLM_FORCE_RADIANS
+#include <glm/gtc/type_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/exceptions.hpp>
@@ -154,7 +156,7 @@ bool Engine::init(const std::string& settingsFile)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, pt.get<int>("OpenGL.major"));
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);        
         if (DEBUG) {
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
         }
@@ -258,6 +260,12 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "WARNING: Failed to create the skybox" << std::endl;
     }
 
+    depthMap.setWidth(renderSettings.windowWidth);
+    depthMap.setHeight(renderSettings.windowHeight);
+    if (!depthMap.init(manager.getShader("depthmap"))) {
+        return false;
+    }
+
     Framebuffer::setWidth(renderSettings.windowWidth);
     Framebuffer::setHeight(renderSettings.windowHeight);
     bool framebuffersInitialized = fb1.init() && fb2.init();
@@ -344,7 +352,8 @@ void Engine::executeCustomComponents()
 
 void Engine::render()
 {
-    fb1.bind();
+    fb = &fb1;
+    fb->bind();
     glViewport(0, 0, renderSettings.windowWidth, renderSettings.windowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -355,12 +364,14 @@ void Engine::render()
     glDisable(GL_BLEND);
     glUseProgram(renderSettings.ambientShader);
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
-    for (auto renderObjs : renderObjects) {
-        for (auto renderObj : renderObjs.second) {
+    for (auto& renderObjs : renderObjects) {
+        for (auto& renderObj : renderObjs.second) {
+            // Todo: Information is calculated here, no need to re-calculate it in lighting functions!
             if (!objectInsideFrustum(renderObj, camera.get())) {
                 continue;
             }
-            renderObj->prepareRender(true);
+            // Todo: Currently all textures are uploaded though not needed for ambient pass.
+            renderObj->prepareRender();
             renderObj->render();
         }
     }
@@ -383,12 +394,12 @@ void Engine::render()
     }
 
     // Post-process ping-pong    
-    GLuint renderedTex = fb1.getRenderedTexture();
+    GLuint renderedTex = fb->getRenderedTexture();
     const std::deque<Postprocess>& postprocs = camera->getPostprocesses();
     for (unsigned int i = 0; i < postprocs.size(); ++i) {
         fb = i % 2 == 0 ? &fb2 : &fb1;
         fb->setPreviousFrame(renderedTex);
-        fb->bind();        
+        fb->bind();
         postprocs[i].bind();
         fb->activate();
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -404,16 +415,26 @@ void Engine::render()
 
 void Engine::lighting(Light::Type lightType)
 {
-    for (auto renderObjs : renderObjects) {
-        glUseProgram(manager.getShader(renderObjs.first, lightType));
-        for (auto renderObj : renderObjs.second) {
-            if (!objectInsideFrustum(renderObj, camera.get())) {
-                continue;
+    // Todo: Shadow mapping for point lights.
+    for (auto& light : lights[lightType]) {        
+        depthMap.bind(light->getPosition(), light->getForward());
+        for (auto& renderObjs : renderObjects) {
+            for (auto& renderObj : renderObjs.second) {
+                glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
+                renderObj->render();
             }
-
-            renderObj->prepareRender();
-            for (unsigned int i = 0; i < lights[lightType].size(); ++i) {
-                lights[lightType][i]->prepareLight();
+        }
+        fb->bind();
+        for (auto& renderObjs : renderObjects) {
+            glUseProgram(manager.getShader(renderObjs.first, lightType));
+            light->prepareLight();
+            depthMap.activate();
+            for (auto& renderObj : renderObjs.second) {
+                if (!objectInsideFrustum(renderObj, camera.get())) {
+                    continue;
+                }
+                // Todo: Aliasing for shadows (PFC, Poisson, ...).
+                renderObj->prepareRender();
                 renderObj->render();
             }
         }

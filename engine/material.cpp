@@ -8,9 +8,9 @@ namespace moar
 
 const Material::TextureInfo Material::textureInfos[] =
 {
-    {Material::TextureType::DIFFUSE, "DiffuseTex", GL_TEXTURE0, 0, DIFFUSE_TEX_LOCATION},
-    {Material::TextureType::NORMAL, "NormalTex", GL_TEXTURE1, 1, NORMAL_TEX_LOCATION},
-    {Material::TextureType::DISPLACEMENT, "DisplacementTex", GL_TEXTURE2, 2, DISPLACEMENT_TEX_LOCATION},
+    {Material::TextureType::DIFFUSE, "DiffuseTex", GL_TEXTURE1, 1, DIFFUSE_TEX_LOCATION},
+    {Material::TextureType::NORMAL, "NormalTex", GL_TEXTURE2, 2, NORMAL_TEX_LOCATION},
+    {Material::TextureType::DISPLACEMENT, "DisplacementTex", GL_TEXTURE3, 3, DISPLACEMENT_TEX_LOCATION},
 };
 
 Material::Material() :

@@ -15,6 +15,7 @@ MyApp::MyApp() :
     bar(nullptr),
     monkey1(nullptr),
     monkey2(nullptr),
+    monkey3(nullptr),
     icosphere(nullptr),
     light1(nullptr),
     light2(nullptr),
@@ -42,29 +43,40 @@ void MyApp::start()
     moar::Object* plane = createRenderObject("diffuse", "plane.3ds", "white.png");
     plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
     plane->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
+    plane->setName("plane");
 
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
+    monkey1->setName("diffuse_monkey");
 
     monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+    monkey2->setName("specular_monkey");
     moar::Material* mat = monkey2->getComponent<moar::Material>();
     mat->setSpecularity(50.0f);
 
+    monkey3 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
+    monkey3->setPosition(glm::vec3(0.0f, 3.0f, -10.0f));
+    monkey3->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
+    monkey3->setScale(glm::vec3(0.3f, 0.3f, 0.3f));
+
     icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
     icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
+    icosphere->setName("icosphere");
     mat = icosphere->getComponent<moar::Material>();
     mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
-    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
-    light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
-    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 4.0f));
-    light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
-    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
-    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    // Todo: Easy way to visualize light type, position and direction.
+
+//    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
+//    light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
+//    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 4.0f));
+//    light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
+//    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
+//    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
     dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
-    dirLight->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    dirLight->setRotation(glm::vec3(-2.0f, 1.0f, 0.0f));
+    dirLight->setPosition(glm::vec3(0.0f, 3.0f, -10.0f));
+    dirLight->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
 //    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
 //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
 //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
@@ -117,10 +129,11 @@ void MyApp::update(double time, double deltaTime)
         fpsCounter = 0;
     }
 
-    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+    monkey1->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
+    monkey2->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
 
-    light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
-    light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
+//    light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
+//    light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
 
 //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }

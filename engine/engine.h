@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "object.h"
 #include "framebuffer.h"
+#include "depthmap.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -64,6 +65,7 @@ private:
 
     std::shared_ptr<Object> skybox;
 
+    DepthMap depthMap;
     Framebuffer fb1;
     Framebuffer fb2;
     Framebuffer* fb;

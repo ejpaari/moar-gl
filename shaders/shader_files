@@ -30,6 +30,10 @@ ambient.vert
 ambient.frag
 ambient
 
+depthmap.vert
+depthmap.frag
+depthmap
+
 postproc/invert.vert
 postproc/invert.frag
 invert

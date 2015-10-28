@@ -36,6 +36,7 @@ private:
 
     moar::Object* monkey1;
     moar::Object* monkey2;
+    moar::Object* monkey3;
     moar::Object* icosphere;
 
     moar::Object* light1;

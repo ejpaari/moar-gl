@@ -5,6 +5,8 @@ layout (location = 2) in vec2 tex;
 layout (location = 3) in vec3 normal;
 layout (location = 4) in vec3 tangent;
 
+layout (location = 50) uniform mat4 LightSpaceProj;
+
 out vec3 vertexPos_World;
 out vec3 lightDir_Tan;
 out vec3 eyeDir_Tan;

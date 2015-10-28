@@ -7,6 +7,7 @@ layout(location = 0) out vec4 outColor;
 
 layout (location = 20) uniform sampler2D DiffuseTex;
 layout (location = 21) uniform sampler2D NormalTex;
+layout (location = 23) uniform sampler2D DepthTex;
 
 layout (std140) uniform LightBlock {
     vec4 lightColor;

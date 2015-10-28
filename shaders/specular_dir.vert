@@ -4,6 +4,8 @@ layout (location = 1) in vec3 position;
 layout (location = 2) in vec2 tex;
 layout (location = 3) in vec3 normal;
 
+layout (location = 50) uniform mat4 LightSpaceProj;
+
 out vec3 normal_World;
 out vec2 texCoord;
 out vec3 eyeDir_Cam;

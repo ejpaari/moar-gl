@@ -68,7 +68,6 @@ void Framebuffer::activate()
 void Framebuffer::bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void Framebuffer::setPreviousFrame(GLuint texture)

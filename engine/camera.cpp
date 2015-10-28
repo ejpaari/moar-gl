@@ -71,7 +71,7 @@ bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
 
 Postprocess* Camera::addPostprocess(const std::string& name, GLuint shader, int priority)
 {
-    for (auto p : postprocs) {
+    for (auto& p : postprocs) {
         if (p.getName() == name) {
             std::cerr << "ERROR: Post process effect already exist: " << name << std::endl;
             return nullptr;
@@ -159,17 +159,3 @@ Quad Camera::getClipPlaneQuad(float distance, glm::vec2 size)
 }
 
 } // moar
-
-
-
-
-
-
-
-
-
-
-
-
-
-

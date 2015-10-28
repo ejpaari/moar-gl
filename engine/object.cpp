@@ -29,7 +29,8 @@ Object::Object() :
     left(LEFT),
     material(nullptr),
     renderer(nullptr),
-    light(nullptr)
+    light(nullptr),
+    name("")
 {
     glGenBuffers(1, &transformationBlockBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
@@ -48,12 +49,11 @@ void Object::executeCustomComponents()
     }
 }
 
-void Object::prepareRender(bool ignoreMaterial)
+void Object::prepareRender()
 {
-    if (!ignoreMaterial) {
-        material->execute();
-    }
+    material->execute();
 
+    // Todo: avoid quering.
     glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
     glm::mat4x4 model = getModelMatrix();
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
@@ -100,6 +100,11 @@ void Object::setRotation(const glm::vec3& rotation)
 void Object::setScale(const glm::vec3& scale)
 {
     this->scale = scale;
+}
+
+void Object::setName(const std::string& name)
+{
+    this->name = name;
 }
 
 glm::vec3 Object::getPosition() const
@@ -150,6 +155,11 @@ glm::vec3 Object::getLeft() const
     return glm::vec3(v.x, v.y, v.z);
 }
 
+std::string Object::getName() const
+{
+    return name;
+}
+
 void Object::addComponent(std::shared_ptr<Component> comp)
 {
     comp->setParent(this);
@@ -176,7 +186,7 @@ void Object::addComponent(std::shared_ptr<Component> comp)
         light = comp.get();
         break;
     case Component::CUSTOM:
-        for (auto custom : customComponents) {
+        for (auto& custom : customComponents) {
             if (custom->getName() == comp->getName()) {
                 custom = comp.get();
                 return;
