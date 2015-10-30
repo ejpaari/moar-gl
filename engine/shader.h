@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <vector>
+#include <string>
 
 namespace moar
 {
@@ -24,6 +25,8 @@ public:
 
 private:
     bool compileShader(GLuint shader, const char* filename);
+
+    static const std::string INCLUDE_DIRECTIVE;
 
     GLuint program;    
     std::vector<GLuint> shaders;

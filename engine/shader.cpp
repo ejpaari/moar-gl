@@ -1,17 +1,20 @@
 #include "shader.h"
 #include "globals.h"
 
-#include <cstdio>
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 namespace moar
 {
 
+const std::string Shader::INCLUDE_DIRECTIVE = "#moar::include";
+
 Shader::Shader()
 {
-    program = glCreateProgram();    
+    program = glCreateProgram();
 }
 
 Shader::~Shader()
@@ -34,31 +37,53 @@ bool Shader::attachShader(GLenum shaderType, const char *filename)
 
 bool Shader::compileShader(GLuint shader, const char* filename)
 {
-    FILE* fp = fopen(filename, "r");
-    if (!fp) {
+    std::ifstream shaderFile(filename);
+    std::string line;
+    std::string shaderCode;
+
+    if (shaderFile.is_open()) {
+        shaderFile.seekg(0, std::ios_base::end);
+        size_t shaderSize = shaderFile.tellg();
+        shaderFile.seekg(0, std::ios_base::beg);
+        shaderCode.reserve(shaderSize);
+
+        while (std::getline(shaderFile, line)) {
+            if (!line.empty() && line[0] == '#' && line.find(INCLUDE_DIRECTIVE) != std::string::npos) {
+                auto start = line.find_first_of('"') + 1;
+                auto end = line.find_last_of('"');
+                std::string includeFilename = line.substr(start, end - start);
+                std::ifstream includeFile(includeFilename.c_str());
+                if (includeFile.is_open()) {
+                    includeFile.seekg(0, std::ios_base::end);
+                    size_t includeSize = includeFile.tellg();
+                    includeFile.seekg(0, std::ios_base::beg);
+                    shaderCode.reserve(shaderCode.capacity() + includeSize);
+                    std::stringstream buffer;
+                    buffer << includeFile.rdbuf();
+                    shaderCode += buffer.str() + "\n";
+                    includeFile.close();
+                } else {
+                    std::cerr << "ERROR: Could not open include file: " << includeFilename << std::endl;
+                    return false;
+                }
+            } else {
+                shaderCode += line + "\n";
+            }
+        }
+        shaderFile.close();
+    } else {
+        std::cerr << "ERROR: Could not open shader file: " << filename << std::endl;
         return false;
     }
 
-    fseek(fp, 0, SEEK_END);
-    size_t filesize = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-
-    GLchar* data = new char[filesize + 1];
-    if (!data) {
-        fclose(fp);
-        return false;
-    }
-    fread(data, 1, filesize, fp);
-    data[filesize] = '\0';
-    fclose(fp);
-
-    glShaderSource(shader, 1, const_cast<const GLchar**>(&data), NULL);
-    delete[] data;
+    const char* shaderCodeCstr = shaderCode.c_str();
+    glShaderSource(shader, 1, &shaderCodeCstr , NULL);
 
     glCompileShader(shader);
     GLint status = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     if (!status) {
+        // Todo: C++-style.
         char buffer[4096];
         glGetShaderInfoLog(shader, 4096, NULL, buffer);
         fprintf(stderr, "%s: %s\n", filename, buffer);
