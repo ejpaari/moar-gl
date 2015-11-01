@@ -32,6 +32,7 @@ MyApp::MyApp() :
 
 MyApp::~MyApp()
 {
+    TwDeleteBar(bar);
 }
 
 void MyApp::start()
@@ -68,10 +69,10 @@ void MyApp::start()
 
     // Todo: Easy way to visualize light type, position and direction.
 
-//    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
-//    light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
-//    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 4.0f));
-//    light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
+    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
+    light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
+    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 4.0f));
+    light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
 //    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
 //    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
     dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
@@ -132,8 +133,8 @@ void MyApp::update(double time, double deltaTime)
     monkey1->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
     monkey2->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
 
-//    light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
-//    light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
+    light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
+    light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
 
 //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }

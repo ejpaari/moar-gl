@@ -5,10 +5,6 @@ layout (location = 2) in vec2 tex;
 layout (location = 3) in vec3 normal;
 layout (location = 4) in vec3 tangent;
 
-out vec3 vertexPos_World;
-out vec3 lightDir_Tan;
-out vec2 texCoord;
-
 layout (std140) uniform TransformationBlock {
     mat4 M;
     mat4 V;
@@ -21,6 +17,10 @@ layout (std140) uniform LightBlock {
     vec3 lightPos;
     vec3 lightForward;
 };
+
+out vec3 vertexPos_World;
+out vec3 lightDir_Tan;
+out vec2 texCoord;
 
 void main()
 {

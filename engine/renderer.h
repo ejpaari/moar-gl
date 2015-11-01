@@ -28,6 +28,9 @@ public:
     virtual std::string getName() final;
     virtual Component::Type getType() final;
 
+    // Todo: Receive / cast shadows.
+    // Todo: Affected by lights.
+
 private:
     Model* model;
 };

@@ -4,9 +4,9 @@ in vec3 texCoord;
 
 layout(location = 0) out vec4 outColor;
 
-layout (location = 20) uniform samplerCube DiffuseTex;
+layout (location = 20) uniform samplerCube diffuseTex;
 
 void main()
 {
-    outColor = texture(DiffuseTex, texCoord);
+    outColor = texture(diffuseTex, texCoord);
 }

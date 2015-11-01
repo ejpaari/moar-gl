@@ -83,7 +83,6 @@ bool Shader::compileShader(GLuint shader, const char* filename)
     GLint status = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     if (!status) {
-        // Todo: C++-style.
         char buffer[4096];
         glGetShaderInfoLog(shader, 4096, NULL, buffer);
         fprintf(stderr, "%s: %s\n", filename, buffer);

@@ -30,6 +30,8 @@ public:
 
     virtual void execute() final;
 
+    // Todo: Enable shadows.
+
     void setColor(const glm::vec4& color);
 
     Type getLightType() const;

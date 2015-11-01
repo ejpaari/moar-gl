@@ -416,19 +416,21 @@ void Engine::render()
 void Engine::lighting(Light::Type lightType)
 {
     // Todo: Shadow mapping for point lights.
-    for (auto& light : lights[lightType]) {        
-        depthMap.bind(light->getPosition(), light->getForward());
-        for (auto& renderObjs : renderObjects) {
-            for (auto& renderObj : renderObjs.second) {
-                glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
-                renderObj->render();
+    for (auto& light : lights[lightType]) {
+        if (lightType == Light::DIRECTIONAL) {
+            depthMap.bind(light->getPosition(), light->getForward());
+            for (auto& renderObjs : renderObjects) {
+                for (auto& renderObj : renderObjs.second) {
+                    glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
+                    renderObj->render();
+                }
             }
+            fb->bind();
         }
-        fb->bind();
         for (auto& renderObjs : renderObjects) {
             glUseProgram(manager.getShader(renderObjs.first, lightType));
             light->prepareLight();
-            depthMap.activate();
+            if (lightType == Light::DIRECTIONAL) depthMap.activate();
             for (auto& renderObj : renderObjs.second) {
                 if (!objectInsideFrustum(renderObj, camera.get())) {
                     continue;

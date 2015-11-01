@@ -8,8 +8,8 @@ in vec3 eyeDir_Cam;
 
 layout(location = 0) out vec4 outColor;
 
-layout (location = 11) uniform float Specularity;
-layout (location = 20) uniform sampler2D DiffuseTex;
+layout (location = 11) uniform float specularity;
+layout (location = 20) uniform sampler2D diffuseTex;
 
 layout (std140) uniform LightBlock {
     vec4 lightColor;
@@ -28,9 +28,9 @@ void main()
     float spec = clamp(dot(e,r), 0, 1);
 
     float lightDistance = length(lightPos - vertexPos_World);
-    vec4 diffuseColor = texture(DiffuseTex, texCoord);
+    vec4 diffuseColor = texture(diffuseTex, texCoord);
     float power = lightColor.w;
-    float specular = pow(spec, Specularity);
+    float specular = pow(spec, specularity);
     outColor = 
         vec4(lightColor.xyz * power * diff / (lightDistance * lightDistance), 1.0) * diffuseColor +
         vec4(vec3(1.0, 1.0, 1.0) * power * specular / (lightDistance * lightDistance), 1.0);

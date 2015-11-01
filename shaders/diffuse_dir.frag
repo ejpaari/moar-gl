@@ -9,8 +9,6 @@ layout(location = 0) out vec4 outColor;
 layout (location = 20) uniform sampler2D diffuseTex;
 layout (location = 23) uniform sampler2D depthTex;
 
-layout (location = 50) uniform mat4 LightSpaceProj;
-
 layout (std140) uniform LightBlock {
     vec4 lightColor;
     vec3 lightPos;
