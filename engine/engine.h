@@ -8,6 +8,7 @@
 #include "rendersettings.h"
 #include "camera.h"
 #include "object.h"
+#include "light.h"
 #include "framebuffer.h"
 #include "depthmap.h"
 

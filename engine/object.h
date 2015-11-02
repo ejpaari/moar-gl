@@ -31,7 +31,6 @@ public:
     Object& operator=(Object&&) = delete;
 
     void executeCustomComponents();
-    void prepareRender();
     void prepareLight();
     void render();
 

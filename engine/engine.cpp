@@ -371,7 +371,6 @@ void Engine::render()
                 continue;
             }
             // Todo: Currently all textures are uploaded though not needed for ambient pass.
-            renderObj->prepareRender();
             renderObj->render();
         }
     }
@@ -389,7 +388,7 @@ void Engine::render()
         glDepthFunc(GL_LEQUAL);
         glUseProgram(renderSettings.skyboxShader);
         skybox->setPosition(camera->getPosition());
-        skybox->prepareRender();
+        // Todo: Disable shadow component.
         skybox->render();
     }
 
@@ -417,12 +416,18 @@ void Engine::lighting(Light::Type lightType)
 {
     // Todo: Shadow mapping for point lights.
     for (auto& light : lights[lightType]) {
-        if (lightType == Light::DIRECTIONAL) {
+        bool shadowingEnabled = light->getComponent<Light>()->isShadowingEnabled();
+        if (lightType == Light::DIRECTIONAL && shadowingEnabled) {
             depthMap.bind(light->getPosition(), light->getForward());
-            for (auto& renderObjs : renderObjects) {
+            for (auto& renderObjs : renderObjects) {                
                 for (auto& renderObj : renderObjs.second) {
-                    glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
-                    renderObj->render();
+                    if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
+                        glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
+                        Material* mat = renderObj->getComponent<Material>();
+                        mat->setEnabled(false);
+                        renderObj->render();
+                        mat->setEnabled(true);
+                    }
                 }
             }
             fb->bind();
@@ -430,13 +435,13 @@ void Engine::lighting(Light::Type lightType)
         for (auto& renderObjs : renderObjects) {
             glUseProgram(manager.getShader(renderObjs.first, lightType));
             light->prepareLight();
-            if (lightType == Light::DIRECTIONAL) depthMap.activate();
+
+            if (lightType == Light::DIRECTIONAL && shadowingEnabled) depthMap.activate();
+
             for (auto& renderObj : renderObjs.second) {
                 if (!objectInsideFrustum(renderObj, camera.get())) {
                     continue;
                 }
-                // Todo: Aliasing for shadows (PFC, Poisson, ...).
-                renderObj->prepareRender();
                 renderObj->render();
             }
         }
@@ -474,6 +479,8 @@ bool Engine::createSkybox()
     std::shared_ptr<Renderer> renderer(new Renderer());
     Model* model = getResourceManager()->getModel("cube.3ds");
     renderer->setModel(model);
+    renderer->setShadowCaster(false);
+    renderer->setShadowReceiver(false);
 
     skybox.reset(new Object());
     skybox->addComponent(material);

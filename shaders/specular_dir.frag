@@ -10,6 +10,7 @@ layout(location = 0) out vec4 outColor;
 layout (location = 11) uniform float specularity;
 layout (location = 20) uniform sampler2D diffuseTex;
 layout (location = 23) uniform sampler2D depthTex;
+layout (location = 42) uniform int receiveShadows;
 
 layout (std140) uniform LightBlock {
     vec4 lightColor;
@@ -29,7 +30,7 @@ void main()
     vec3 r = reflect(-l,n);
     float spec = clamp(dot(e,r), 0, 1);
 
-    float shadow = calcShadow(depthTex, pos_Light);
+        float shadow = receiveShadows != 0 ? calcShadow(depthTex, pos_Light) : 1.0;
 
     vec4 diffuseColor = texture(diffuseTex, texCoord);
     float power = lightColor.w;

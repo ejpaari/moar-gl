@@ -30,12 +30,14 @@ public:
     virtual void execute() = 0;
 
     void setParent(Object* parentObject);
+    void setEnabled(bool enabled);
 
     virtual std::string getName() = 0;
     virtual Component::Type getType() = 0;
 
 protected:
     Object* parent;
+    bool enabled;
 };
 
 } // moar

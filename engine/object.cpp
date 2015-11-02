@@ -49,7 +49,13 @@ void Object::executeCustomComponents()
     }
 }
 
-void Object::prepareRender()
+void Object::prepareLight()
+{
+    assert(light != nullptr);
+    light->execute();
+}
+
+void Object::render()
 {
     material->execute();
 
@@ -63,16 +69,7 @@ void Object::prepareRender()
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * model));
     glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * model));
     glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
-}
 
-void Object::prepareLight()
-{
-    assert(light != nullptr);
-    light->execute();
-}
-
-void Object::render()
-{
     assert(renderer != nullptr);
     renderer->execute();
 }

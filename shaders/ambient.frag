@@ -8,6 +8,7 @@ layout (location = 10) uniform vec3 ambient;
 layout (location = 11) uniform float specularity;
 layout (location = 20) uniform sampler2D diffuseTex;
 layout (location = 21) uniform sampler2D normalTex;
+layout (location = 42) uniform int receiveShadows;
 
 void main()
 {

@@ -28,6 +28,7 @@ extern const GLuint RENDERED_TEX_LOCATION;
 
 extern const GLuint TIME_LOCATION;
 extern const GLuint SCREEN_SIZE_LOCATION;
+extern const GLuint RECEIVE_SHADOWS_LOCATION;
 
 extern const GLuint LIGHT_SPACE_PROJ_LOCATION;
 extern const GLuint LIGHT_SPACE_MODEL_LOCATION;

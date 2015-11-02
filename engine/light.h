@@ -30,18 +30,19 @@ public:
 
     virtual void execute() final;
 
-    // Todo: Enable shadows.
-
     void setColor(const glm::vec4& color);
+    void setShadowingEnabled(bool enabled);
 
     Type getLightType() const;
     virtual std::string getName() final;
     virtual Component::Type getType() final;
+    bool isShadowingEnabled() const;
 
 private:
     GLuint lightBlockBuffer;
     Type type;
     glm::vec4 color;
+    bool shadowingEnabled;
 };
 
 } // moar

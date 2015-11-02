@@ -11,7 +11,8 @@ namespace moar
 
 Light::Light(Type type) :
     type(type),
-    color(1.0f, 1.0f, 1.0f, 10.0f)
+    color(1.0f, 1.0f, 1.0f, 10.0f),
+    shadowingEnabled(true)
 {
     glGenBuffers(1, &lightBlockBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
@@ -37,9 +38,19 @@ void Light::execute()
     glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
 }
 
+void Light::setShadowingEnabled(bool enabled)
+{
+    shadowingEnabled = enabled;
+}
+
 void Light::setColor(const glm::vec4& color)
 {
     this->color = color;
+}
+
+bool Light::isShadowingEnabled() const
+{
+    return shadowingEnabled;
 }
 
 Light::Type Light::getLightType() const

@@ -13,6 +13,10 @@ namespace moar
 class Renderer : public Component
 {
 public:
+
+    // Todo: Remove this component.
+    // Todo: Add shadow-component.
+
     explicit Renderer();
     virtual ~Renderer();
     Renderer(const Renderer&) = delete;
@@ -23,16 +27,22 @@ public:
     virtual void execute() final;
 
     void setModel(Model* model);
+    void setShadowCaster(bool caster);
+    void setShadowReceiver(bool receiver);
+
     Model* getModel();
+    bool isShadowCaster() const;
+    bool isShadowReceiver() const;
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
 
-    // Todo: Receive / cast shadows.
     // Todo: Affected by lights.
 
 private:
     Model* model;
+    bool shadowCaster;
+    bool shadowReceiver;
 };
 
 } // moar
