@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_set>
 #include <memory>
 
 namespace moar
@@ -65,6 +66,7 @@ private:
     std::vector<std::shared_ptr<Object>> allObjects;
 
     std::shared_ptr<Object> skybox;
+    std::unordered_set<unsigned int> objectsInFrustum;
 
     DepthMap depthMap;
     Framebuffer fb1;

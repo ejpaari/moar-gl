@@ -354,6 +354,7 @@ void Engine::render()
 {
     fb = &fb1;
     fb->bind();
+    objectsInFrustum.clear();
     glViewport(0, 0, renderSettings.windowWidth, renderSettings.windowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -366,12 +367,12 @@ void Engine::render()
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
     for (auto& renderObjs : renderObjects) {
         for (auto& renderObj : renderObjs.second) {
-            // Todo: Information is calculated here, no need to re-calculate it in lighting functions!
             if (!objectInsideFrustum(renderObj, camera.get())) {
                 continue;
             }
             // Todo: Currently all textures are uploaded though not needed for ambient pass.
             renderObj->render();
+            objectsInFrustum.insert(renderObj->getId());
         }
     }
 
@@ -388,7 +389,6 @@ void Engine::render()
         glDepthFunc(GL_LEQUAL);
         glUseProgram(renderSettings.skyboxShader);
         skybox->setPosition(camera->getPosition());
-        // Todo: Disable shadow component.
         skybox->render();
     }
 
@@ -421,6 +421,7 @@ void Engine::lighting(Light::Type lightType)
             depthMap.bind(light->getPosition(), light->getForward());
             for (auto& renderObjs : renderObjects) {                
                 for (auto& renderObj : renderObjs.second) {
+                    // Todo: frustum culling.
                     if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
                         glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
                         Material* mat = renderObj->getComponent<Material>();
@@ -439,7 +440,7 @@ void Engine::lighting(Light::Type lightType)
             if (lightType == Light::DIRECTIONAL && shadowingEnabled) depthMap.activate();
 
             for (auto& renderObj : renderObjs.second) {
-                if (!objectInsideFrustum(renderObj, camera.get())) {
+                if (objectsInFrustum.find(renderObj->getId()) == objectsInFrustum.end()) {
                     continue;
                 }
                 renderObj->render();

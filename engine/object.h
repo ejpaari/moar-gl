@@ -42,6 +42,7 @@ public:
     virtual void setScale(const glm::vec3& scale);
     void setName(const std::string& name);
 
+    unsigned int getId() const;
     glm::vec3 getPosition() const;
     glm::vec3 getRotation() const;
     glm::vec3 getScale() const;
@@ -59,7 +60,9 @@ public:
 
 protected:
     static GLint currentShader;
+    static unsigned int idCounter;
 
+    unsigned int id;
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;

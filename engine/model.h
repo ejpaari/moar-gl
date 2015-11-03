@@ -18,7 +18,6 @@ class Model
 {
 public:
     explicit Model();
-    ~Model();
     Model(const Model&) = delete;
     Model(Model&&) = delete;
     Model& operator=(const Model&) = delete;

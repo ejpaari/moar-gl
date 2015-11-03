@@ -14,12 +14,10 @@ class Postprocess
 public:
     explicit Postprocess();
     explicit Postprocess(const std::string& name, GLuint shader, int priority);
-    ~Postprocess();
     Postprocess(const Postprocess&);
     Postprocess(Postprocess&&);
     Postprocess& operator=(Postprocess&);
     Postprocess& operator=(Postprocess&&);
-
     void bind() const;
     void setUniform(const std::string& name, std::function<void()> func);
     void removeUniform(const std::string& name);

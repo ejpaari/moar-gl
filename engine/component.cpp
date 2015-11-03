@@ -23,4 +23,9 @@ void Component::setEnabled(bool enabled)
     this->enabled = enabled;
 }
 
+bool Component::isEnabled() const
+{
+    return enabled;
+}
+
 } // moar

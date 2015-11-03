@@ -19,8 +19,10 @@ const glm::mat4* Object::projection = nullptr;
 const glm::mat4* Object::view = nullptr;
 
 GLint Object::currentShader = 0;
+unsigned int Object::idCounter = 1;
 
 Object::Object() :
+    id(idCounter),
     position(0.0f, 0.0f, 0.0f),
     rotation(0.0f, 0.0f, 0.0f),
     scale(1.0f, 1.0f, 1.0f),
@@ -31,7 +33,8 @@ Object::Object() :
     renderer(nullptr),
     light(nullptr),
     name("")
-{
+{    
+    ++idCounter;
     glGenBuffers(1, &transformationBlockBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLsizeiptr bufferSize = 4 * sizeof(*projection);
@@ -51,27 +54,33 @@ void Object::executeCustomComponents()
 
 void Object::prepareLight()
 {
-    assert(light != nullptr);
-    light->execute();
+    if (light->isEnabled()) {
+        assert(light != nullptr);
+        light->execute();
+    }
 }
 
 void Object::render()
 {
-    material->execute();
+    if (material->isEnabled()) {
+        material->execute();
+    }
 
-    // Todo: avoid quering.
-    glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
-    glm::mat4x4 model = getModelMatrix();
-    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
-    GLintptr matrixSize = sizeof(model);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(model));
-    glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
-    glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * model));
-    glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * model));
-    glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
+    if (renderer->isEnabled()) {
+        // Todo: avoid quering.
+        glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
+        glm::mat4x4 model = getModelMatrix();
+        glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+        GLintptr matrixSize = sizeof(model);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(model));
+        glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
+        glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * model));
+        glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * model));
+        glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
 
-    assert(renderer != nullptr);
-    renderer->execute();
+        assert(renderer != nullptr);
+        renderer->execute();
+    }
 }
 
 void Object::move(const glm::vec3& translation)
@@ -102,6 +111,11 @@ void Object::setScale(const glm::vec3& scale)
 void Object::setName(const std::string& name)
 {
     this->name = name;
+}
+
+unsigned int Object::getId() const
+{
+    return id;
 }
 
 glm::vec3 Object::getPosition() const

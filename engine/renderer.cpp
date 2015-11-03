@@ -22,7 +22,9 @@ Renderer::~Renderer()
 
 void Renderer::execute()
 {
-    glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
+    if (shadowReceiver) {
+        glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
+    }
     model->render();
 }
 
@@ -49,11 +51,6 @@ Model* Renderer::getModel()
 bool Renderer::isShadowCaster() const
 {
     return shadowCaster;
-}
-
-bool Renderer::isShadowReceiver() const
-{
-    return shadowReceiver;
 }
 
 std::string Renderer::getName()

@@ -11,7 +11,6 @@ class GUI
 {
 public:
     GUI();
-    ~GUI();
     GUI(const GUI&) = delete;
     GUI(GUI&&) = delete;
     GUI& operator=(const GUI&) = delete;

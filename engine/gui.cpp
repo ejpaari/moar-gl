@@ -34,10 +34,6 @@ GUI::GUI()
 {
 }
 
-GUI::~GUI()
-{    
-}
-
 bool GUI::init(GLFWwindow* window)
 {
     int ok = TwInit(TW_OPENGL_CORE, NULL);

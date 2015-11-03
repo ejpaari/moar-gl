@@ -34,6 +34,7 @@ public:
 
     virtual std::string getName() = 0;
     virtual Component::Type getType() = 0;
+    bool isEnabled() const;
 
 protected:
     Object* parent;

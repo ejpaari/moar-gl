@@ -14,9 +14,6 @@ class Renderer : public Component
 {
 public:
 
-    // Todo: Remove this component.
-    // Todo: Add shadow-component.
-
     explicit Renderer();
     virtual ~Renderer();
     Renderer(const Renderer&) = delete;
@@ -32,7 +29,6 @@ public:
 
     Model* getModel();
     bool isShadowCaster() const;
-    bool isShadowReceiver() const;
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;

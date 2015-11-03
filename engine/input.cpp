@@ -13,10 +13,6 @@ Input::Input() :
 {
 }
 
-Input::~Input()
-{
-}
-
 void Input::setCursorPosition(double x, double y)
 {
     deltaX = x - this->x;

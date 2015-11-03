@@ -26,10 +26,6 @@ Material::~Material()
 
 void Material::execute()
 {
-    if (!enabled) {
-        return;
-    }
-
     for (unsigned int i = 0; i < textures.size(); ++i) {
         glActiveTexture(std::get<1>(textures[i])->unit);
         glBindTexture(std::get<2>(textures[i]), std::get<0>(textures[i]));

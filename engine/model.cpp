@@ -14,10 +14,6 @@ Model::Model() :
 {
 }
 
-Model::~Model()
-{
-}
-
 bool Model::loadModel(const std::string& file)
 {
     Assimp::Importer importer;
