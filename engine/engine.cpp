@@ -370,7 +370,7 @@ void Engine::render()
             if (!objectInsideFrustum(renderObj, camera.get())) {
                 continue;
             }
-            // Todo: Currently all textures are uploaded though not needed for ambient pass.
+            // Todo: Currently all textures/uniforms are uploaded though not needed for ambient pass.
             renderObj->render();
             objectsInFrustum.insert(renderObj->getId());
         }

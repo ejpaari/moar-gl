@@ -32,7 +32,6 @@ MyApp::MyApp() :
 
 MyApp::~MyApp()
 {
-    TwDeleteBar(bar);
 }
 
 void MyApp::start()
@@ -44,7 +43,7 @@ void MyApp::start()
     moar::Object* plane = createRenderObject("diffuse", "plane.3ds", "white.png");
     plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
     plane->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-    plane->setName("plane");
+    plane->setName("plane");    
 
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
@@ -54,12 +53,7 @@ void MyApp::start()
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
     monkey2->setName("specular_monkey");
     moar::Material* mat = monkey2->getComponent<moar::Material>();
-    mat->setSpecularity(50.0f);
-
-    monkey3 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
-    monkey3->setPosition(glm::vec3(0.0f, 3.0f, -10.0f));
-    monkey3->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
-    monkey3->setScale(glm::vec3(0.3f, 0.3f, 0.3f));
+    mat->setUniform("specularity", std::bind(glUniform1f, moar::SPECULAR_LOCATION, 50.0f));
 
     icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
     icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
@@ -67,12 +61,10 @@ void MyApp::start()
     mat = icosphere->getComponent<moar::Material>();
     mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
-    // Todo: Easy way to visualize light type, position and direction.
-
     light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
-    light1->setPosition(glm::vec3(0.0f, 3.0f, 0.0f));
+    light1->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
     light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 4.0f));
-    light2->setPosition(glm::vec3(0.0f, -3.0f, 0.0f));
+    light2->setPosition(glm::vec3(0.0f, -1.5f, 0.0f));
 //    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
 //    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
     dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
@@ -157,6 +149,9 @@ moar::Object* MyApp::createRenderObject(const std::string& shader, const std::st
     std::shared_ptr<moar::Material> material(new moar::Material());
     material->setShaderType(shader);
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+    if (shader == "diffuse") {
+        material->setUniform("solidColor", std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, 1.0f, 1.0f, 1.0f));
+    }
 
     std::shared_ptr<moar::Renderer> renderer(new moar::Renderer());
     moar::Model* model = engine->getResourceManager()->getModel(modelName);
@@ -173,8 +168,23 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
 {
     std::shared_ptr<moar::Light> lightComponent(new moar::Light(type));
     lightComponent->setColor(color);
+
+    std::shared_ptr<moar::Material> material(new moar::Material());
+    material->setShaderType("diffuse");
+    GLuint texture = engine->getResourceManager()->getTexture("white.png");
+    material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+    material->setUniform("solidColor", std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, color.x, color.y, color.z));
+
+    std::shared_ptr<moar::Renderer> renderer(new moar::Renderer());
+    std::string modelName = type == moar::Light::POINT ? "sphere.3ds" : "cylinder.3ds";
+    moar::Model* model = engine->getResourceManager()->getModel(modelName);
+    renderer->setModel(model);
+
     std::shared_ptr<moar::Object> light(new moar::Object());
     light->addComponent(lightComponent);
+    light->addComponent(material);
+    light->addComponent(renderer);
+    light->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
     engine->addObject(light);
     return light.get();
 }

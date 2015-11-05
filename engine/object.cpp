@@ -18,7 +18,6 @@ const glm::vec3 Object::LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
 const glm::mat4* Object::projection = nullptr;
 const glm::mat4* Object::view = nullptr;
 
-GLint Object::currentShader = 0;
 unsigned int Object::idCounter = 1;
 
 Object::Object() :
@@ -67,8 +66,6 @@ void Object::render()
     }
 
     if (renderer->isEnabled()) {
-        // Todo: avoid quering.
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
         glm::mat4x4 model = getModelMatrix();
         glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
         GLintptr matrixSize = sizeof(model);

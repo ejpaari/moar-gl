@@ -59,7 +59,6 @@ public:
     T* getComponent() const;
 
 protected:
-    static GLint currentShader;
     static unsigned int idCounter;
 
     unsigned int id;

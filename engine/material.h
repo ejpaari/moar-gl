@@ -7,6 +7,8 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <functional>
+#include <unordered_map>
 
 namespace moar
 {
@@ -44,7 +46,7 @@ public:
     void setShaderType(const std::string& shaderType);
     void setShader(GLuint shader);
     void setTexture(GLuint texture, TextureType type, GLenum target);
-    void setSpecularity(float specularity);
+    void setUniform(const std::string& name, std::function<void()> func);
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
@@ -56,9 +58,8 @@ private:
 
     std::string shaderType;
     GLuint shader;
-    // Todo: Maybe a struct would be simpler.
     std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
-    float specularity;
+    std::unordered_map<std::string, std::function<void()>> uniforms;
 };
 
 } // moar

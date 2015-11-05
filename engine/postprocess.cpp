@@ -64,11 +64,6 @@ void Postprocess::setUniform(const std::string& name, std::function<void()> func
     uniforms[name] = func;
 }
 
-void Postprocess::removeUniform(const std::string& name)
-{
-    uniforms.erase(name);
-}
-
 std::string Postprocess::getName() const
 {
     return name;

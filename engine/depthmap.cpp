@@ -12,7 +12,7 @@ namespace moar
 DepthMap::DepthMap() :
     width(0),
     height(0),
-    // Todo: Proper frustum calculation.
+    // Todo: Proper frustum calculation / CSM.
     frustum(-10.0f, 10.0f, -10.0f, 10.0f),
     nearClipDistance(1.0f),
     farClipDistance(100.0f)

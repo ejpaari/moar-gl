@@ -15,8 +15,7 @@ const Material::TextureInfo Material::textureInfos[] =
 
 Material::Material() :
     shaderType(""),
-    shader(0),
-    specularity(0.0f)
+    shader(0)
 {
 }
 
@@ -32,9 +31,8 @@ void Material::execute()
         glUniform1i(std::get<1>(textures[i])->location, std::get<1>(textures[i])->value);
     }
 
-    // Todo: Custom uniforms like in postprocess; std::map<std::string, std::function<void()>>.
-    if (specularity > 0.0f) {
-        glUniform1f(SPECULAR_LOCATION, specularity);
+    for (auto iter = uniforms.begin(); iter != uniforms.end(); ++iter) {
+        iter->second();
     }
 }
 
@@ -63,9 +61,9 @@ void Material::setTexture(GLuint texture, TextureType type, GLenum target)
     textures.push_back(std::make_tuple(texture, getTextureInfo(type), target));
 }
 
-void Material::setSpecularity(float specularity)
+void Material::setUniform(const std::string& name, std::function<void ()> func)
 {
-    this->specularity = specularity;
+    uniforms[name] = func;
 }
 
 std::string Material::getName()
