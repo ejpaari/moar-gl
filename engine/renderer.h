@@ -33,8 +33,6 @@ public:
     virtual std::string getName() final;
     virtual Component::Type getType() final;
 
-    // Todo: Affected by lights.
-
 private:
     Model* model;
     bool shadowCaster;

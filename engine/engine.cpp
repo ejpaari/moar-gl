@@ -423,6 +423,7 @@ void Engine::lighting(Light::Type lightType)
                 for (auto& renderObj : renderObjs.second) {
                     // Todo: frustum culling.
                     if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
+                        // Todo: recalculating model matrix is slow
                         glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
                         Material* mat = renderObj->getComponent<Material>();
                         mat->setEnabled(false);
