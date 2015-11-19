@@ -35,11 +35,13 @@ SOURCES += \
     ../engine/gui.cpp \
     ../engine/light.cpp \
     ../engine/rendersettings.cpp \
-    ../engine/globals.cpp \
     ../engine/common/plane.cpp \
     ../engine/postprocess.cpp \
     ../engine/framebuffer.cpp \
-    ../engine/depthmap.cpp
+    ../engine/depthmap.cpp \
+    ../engine/depthmap_dir.cpp \
+    ../engine/depthmap_point.cpp \
+    ../engine/common/globals.cpp
 
 HEADERS += \
     myapp.h \
@@ -59,12 +61,14 @@ HEADERS += \
     ../engine/gui.h \
     ../engine/light.h \
     ../engine/rendersettings.h \
-    ../engine/globals.h \
     ../engine/common/plane.h \
     ../engine/postprocess.h \
     ../engine/framebuffer.h \
     ../engine/common/quad.h \
-    ../engine/depthmap.h
+    ../engine/depthmap.h \
+    ../engine/depthmap_dir.h \
+    ../engine/depthmap_point.h \
+    ../engine/common/globals.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL

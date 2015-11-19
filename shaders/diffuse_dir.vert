@@ -27,6 +27,7 @@ void main()
 {
     normal_World = vec3(M * vec4(normal, 0.0));
     texCoord = tex;
+// Todo: maybe if (!receiveShadows) then skip matrix calculation?
     pos_Light = lightSpaceProj * M * vec4(position, 1.0);
     gl_Position = MVP * vec4(position, 1.0);
 }

@@ -34,6 +34,7 @@ bool ResourceManager::loadShaders(const std::string& path)
     std::string line = "";
     std::string vertex = "";
     std::string fragment = "";
+    std::string geometry = "";
     std::ifstream shaderInfo(path.c_str());
     if (shaderInfo.is_open()) {
         while (std::getline(shaderInfo, line)) {
@@ -43,28 +44,41 @@ bool ResourceManager::loadShaders(const std::string& path)
                 vertex = line;
             } else if (line.find(".frag") != std::string::npos) {
                 fragment = line;
+            } else if (line.find(".geom") != std::string::npos) {
+                geometry = line;
             } else if (!vertex.empty() && !fragment.empty()){
                 auto found = shadersByName.find(line);
                 if (found == shadersByName.end()) {
                     std::unique_ptr<Shader> shader(new Shader());
-                    std::string vertexShader = shaderPath + vertex;
-                    std::string fragmentShader = shaderPath + fragment;
 
-                    bool isGood;
+                    // Todo: Create function for attaching a shader.
+                    std::string vertexShader = shaderPath + vertex;
+                    bool isGood;                    
                     isGood = shader->attachShader(GL_VERTEX_SHADER, vertexShader.c_str());
                     if (!isGood) {
                         std::cerr << "WARNING: Failed to attach vertex shader: " << vertexShader << std::endl;
-                        return 0;
+                        return false;
                     }
 
+                    std::string fragmentShader = shaderPath + fragment;
                     isGood = shader->attachShader(GL_FRAGMENT_SHADER, fragmentShader.c_str());
                     if (!isGood) {
                         std::cerr << "WARNING: Failed to attach fragment shader: " << fragmentShader << std::endl;
-                        return 0;
+                        return false;
+                    }
+
+                    if (!geometry.empty()) {
+                        std::string geometryShader = shaderPath + geometry;
+                        isGood = shader->attachShader(GL_GEOMETRY_SHADER, geometryShader.c_str());
+                        if (!isGood) {
+                            std::cerr << "WARNING: Failed to attach geometry shader: " << geometryShader << std::endl;
+                            return false;
+                        }
                     }
 
                     if (!shader->linkProgram()) {
-                        return 0;
+                        std::cerr << "WARNING: Failed to link shader program: " << line << std::endl;
+                        return false;
                     }
                     std::cout << "Created shader: " << line << std::endl;
                     GLuint shaderProgram = shader->getProgram();
@@ -78,6 +92,10 @@ bool ResourceManager::loadShaders(const std::string& path)
                         shadersByType.insert(std::make_pair(key, shaderProgram));
                     }
                     shaders.push_back(std::move(shader));
+
+                    vertex.clear();
+                    geometry.clear();
+                    fragment.clear();
                 } else {
                     std::cerr << "ERROR: Duplicate shader names, can not initialize" << std::endl;
                     return false;

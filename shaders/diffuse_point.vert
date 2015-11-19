@@ -31,5 +31,6 @@ void main()
     lightDir_Cam = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
 
     texCoord = tex;
+    
     gl_Position = MVP * vec4(position, 1.0);
 }

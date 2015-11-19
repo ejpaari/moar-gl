@@ -30,9 +30,14 @@ ambient.vert
 ambient.frag
 ambient
 
-depthmap.vert
-depthmap.frag
-depthmap
+depthmap_dir.vert
+depthmap_dir.frag
+depthmap_dir
+
+depthmap_point.vert
+depthmap_point.geom
+depthmap_point.frag
+depthmap_point
 
 postproc/invert.vert
 postproc/invert.frag

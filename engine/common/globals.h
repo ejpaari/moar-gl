@@ -1,5 +1,5 @@
-#ifndef CONSTANTS
-#define CONSTANTS
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
 #include <GL/glew.h>
 
@@ -30,14 +30,15 @@ extern const GLuint RENDERED_TEX_LOCATION;
 extern const GLuint TIME_LOCATION;
 extern const GLuint SCREEN_SIZE_LOCATION;
 extern const GLuint RECEIVE_SHADOWS_LOCATION;
+extern const GLuint FAR_CLIP_DISTANCE_LOCATION;
 
 extern const GLuint LIGHT_SPACE_PROJ_LOCATION;
-extern const GLuint LIGHT_SPACE_MODEL_LOCATION;
+extern const GLuint LIGHT_SPACE_VP_LOCATION;
 
 extern bool DEBUG;
 
 extern unsigned int DRAW_COUNT;
 } // moar
 
-#endif // CONSTANTS
+#endif // GLOBALS_H
 

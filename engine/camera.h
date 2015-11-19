@@ -34,6 +34,7 @@ public:
 
     const glm::mat4* getViewMatrixPointer() const;
     const glm::mat4* getProjectionMatrixPointer() const;
+    float getFarClipDistance() const;
 
     // Todo: frustum culling for box.
     bool sphereInsideFrustum(const glm::vec3& point, float radius) const;

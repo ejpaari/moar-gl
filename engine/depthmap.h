@@ -1,5 +1,5 @@
-#ifndef SHADOWMAP_H
-#define SHADOWMAPH
+#ifndef DEPTHMAP_H
+#define DEPTHMAP_H
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
@@ -11,34 +11,31 @@ class DepthMap
 {
 public:
     explicit DepthMap();
-    ~DepthMap();
+    virtual ~DepthMap();
     DepthMap(const DepthMap&) = delete;
     DepthMap(DepthMap&&) = delete;
     DepthMap& operator=(const DepthMap&) = delete;
     DepthMap& operator=(DepthMap&&) = delete;
 
-    bool init(GLuint shader);
-    void bind(const glm::vec3& lightPos, const glm::vec3& lightDir);
-    void activate();
+    virtual bool init(GLuint shader) = 0;
+    virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir) = 0;
+    virtual void activate() = 0;
 
     void setWidth(int width);
     void setHeight(int height);
 
-private:
+protected:
+    bool createFramebuffer(GLuint& framebuffer, GLuint& texture, bool cube);
+
     int width;
     int height;
-
-    GLuint shader;
-
-    GLuint framebuffer;
-    GLuint depthTexture;
-
-    glm::vec4 frustum;
     float nearClipDistance;
     float farClipDistance;
-    glm::mat4 lightSpace;
+
+    GLuint shader;
+    GLuint framebuffer;
 };
 
 } // moar
 
-#endif // FRAMEBUFFER_H
+#endif // DEPTHMAP_H

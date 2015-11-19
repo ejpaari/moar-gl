@@ -1,5 +1,5 @@
 #include "framebuffer.h"
-#include "globals.h"
+#include "common/globals.h"
 
 namespace moar
 {
@@ -67,6 +67,7 @@ void Framebuffer::activate()
 
 void Framebuffer::bind() const
 {
+    glViewport(0, 0, width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 

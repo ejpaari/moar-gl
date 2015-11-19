@@ -1,5 +1,5 @@
-#ifndef ENGINE
-#define ENGINE
+#ifndef ENGINE_H
+#define ENGINE_H
 
 #include "application.h"
 #include "resourcemanager.h"
@@ -10,7 +10,8 @@
 #include "object.h"
 #include "light.h"
 #include "framebuffer.h"
-#include "depthmap.h"
+#include "depthmap_dir.h"
+#include "depthmap_point.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -68,7 +69,8 @@ private:
     std::shared_ptr<Object> skybox;
     std::unordered_set<unsigned int> objectsInFrustum;
 
-    DepthMap depthMap;
+    DepthMapDirectional depthMapDir;
+    DepthMapPoint depthMapPoint;
     Framebuffer fb1;
     Framebuffer fb2;
     Framebuffer* fb;
@@ -79,5 +81,5 @@ private:
 
 } // moar
 
-#endif // ENGINE
+#endif // ENGINE_H
 

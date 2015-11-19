@@ -1,7 +1,7 @@
 #include "engine.h"
 #include "renderer.h"
 #include "material.h"
-#include "globals.h"
+#include "common/globals.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
@@ -10,6 +10,7 @@
 #include <boost/property_tree/exceptions.hpp>
 #include <exception>
 #include <utility>
+#include <algorithm>
 
 namespace
 {
@@ -260,9 +261,16 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "WARNING: Failed to create the skybox" << std::endl;
     }
 
-    depthMap.setWidth(renderSettings.windowWidth);
-    depthMap.setHeight(renderSettings.windowHeight);
-    if (!depthMap.init(manager.getShader("depthmap"))) {
+    depthMapDir.setWidth(renderSettings.windowWidth);
+    depthMapDir.setHeight(renderSettings.windowHeight);
+    if (!depthMapDir.init(manager.getShader("depthmap_dir"))) {
+        return false;
+    }
+
+    int size = std::max(renderSettings.windowWidth, renderSettings.windowHeight);
+    depthMapPoint.setWidth(size);
+    depthMapPoint.setHeight(size);
+    if (!depthMapPoint.init(manager.getShader("depthmap_point"))) {
         return false;
     }
 
@@ -355,7 +363,6 @@ void Engine::render()
     fb = &fb1;
     fb->bind();
     objectsInFrustum.clear();
-    glViewport(0, 0, renderSettings.windowWidth, renderSettings.windowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -414,35 +421,50 @@ void Engine::render()
 
 void Engine::lighting(Light::Type lightType)
 {
-    // Todo: Shadow mapping for point lights.
+    DepthMap* depthMap = nullptr;
+    if (lightType == Light::DIRECTIONAL) {
+        depthMap = &depthMapDir;
+    } else {
+        depthMap = &depthMapPoint;
+    }
+
     for (auto& light : lights[lightType]) {
         bool shadowingEnabled = light->getComponent<Light>()->isShadowingEnabled();
-        if (lightType == Light::DIRECTIONAL && shadowingEnabled) {
-            depthMap.bind(light->getPosition(), light->getForward());
-            for (auto& renderObjs : renderObjects) {                
-                for (auto& renderObj : renderObjs.second) {
-                    // Todo: frustum culling.
-                    if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
-                        // Todo: recalculating model matrix is slow
-                        glUniformMatrix4fv(LIGHT_SPACE_MODEL_LOCATION, 1, GL_FALSE, glm::value_ptr(renderObj->getModelMatrix()));
-                        Material* mat = renderObj->getComponent<Material>();
-                        mat->setEnabled(false);
-                        renderObj->render();
-                        mat->setEnabled(true);
-                    }
+        if (!shadowingEnabled) {
+            continue;
+        }
+
+        depthMap->bind(light->getPosition(), light->getForward());
+        for (auto& renderObjs : renderObjects) {
+            for (auto& renderObj : renderObjs.second) {
+                // Todo: frustum culling.
+                if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
+                    Material* mat = renderObj->getComponent<Material>();
+                    mat->setEnabled(false);
+                    renderObj->render();
+                    mat->setEnabled(true);
                 }
             }
-            fb->bind();
         }
+
+        fb->bind();
+
         for (auto& renderObjs : renderObjects) {
-            glUseProgram(manager.getShader(renderObjs.first, lightType));
+            GLuint shaderProgram = manager.getShader(renderObjs.first, lightType);
+            glUseProgram(shaderProgram);
             light->prepareLight();
 
-            if (lightType == Light::DIRECTIONAL && shadowingEnabled) depthMap.activate();
+            if (shadowingEnabled) {
+                depthMap->activate();
+            }
 
             for (auto& renderObj : renderObjs.second) {
                 if (objectsInFrustum.find(renderObj->getId()) == objectsInFrustum.end()) {
                     continue;
+                }
+                // Todo: Move this. Temporal (lol) solution.
+                if (lightType == Light::POINT) {
+                    glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
                 }
                 renderObj->render();
             }

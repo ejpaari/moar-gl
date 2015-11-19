@@ -17,6 +17,7 @@ layout (std140) uniform LightBlock {
     vec3 lightForward;
 };
 
+// Todo: rename .c to .glsl
 #moar::include "../moar-gl/shaders/shadow.c"
 
 void main()

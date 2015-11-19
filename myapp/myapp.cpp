@@ -1,5 +1,5 @@
 #include "myapp.h"
-#include "../engine/globals.h"
+#include "../engine/common/globals.h"
 #include "../engine/renderer.h"
 #include "../engine/material.h"
 
@@ -40,10 +40,31 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
-    moar::Object* plane = createRenderObject("diffuse", "plane.3ds", "white.png");
-    plane->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
-    plane->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-    plane->setName("plane");    
+    moar::Object* planeBot = createRenderObject("diffuse", "plane.3ds", "white.png");
+    planeBot->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
+    planeBot->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
+    planeBot->setName("plane");
+
+    moar::Object* planeR = createRenderObject("diffuse", "plane.3ds", "white.png");
+    planeR->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
+    planeR->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
+    planeR->rotate(glm::vec3(0.0f, 0.0f, 1.0f), 1.57f);
+
+    moar::Object* planeL = createRenderObject("diffuse", "plane.3ds", "white.png");
+    planeL->setPosition(glm::vec3(-5.0f, 0.0f, 0.0f));
+    planeL->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
+    planeL->rotate(glm::vec3(0.0f, 0.0f, 1.0f), 1.57f);
+
+    moar::Object* planeF = createRenderObject("diffuse", "plane.3ds", "white.png");
+    planeF->setPosition(glm::vec3(0.0f, 0.0f, -5.0f));
+    planeF->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
+    planeF->rotate(glm::vec3(1.0f, 0.0f, 0.0f), 1.57f);
+
+    moar::Object* planeB = createRenderObject("diffuse", "plane.3ds", "white.png");
+    planeB->setPosition(glm::vec3(0.0f, 0.0f, 5.0f));
+    planeB->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
+    planeB->rotate(glm::vec3(1.0f, 0.0f, 0.0f), 1.57f);
+
 
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
     monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
@@ -62,14 +83,14 @@ void MyApp::start()
     mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
     light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
-    light1->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
-    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 4.0f));
-    light2->setPosition(glm::vec3(0.0f, -1.5f, 0.0f));
+    light1->setPosition(glm::vec3(0.0f, 1.5f, -3.0f));
+//    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 5.0f));
+//    light2->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
 //    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
 //    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
-    dirLight->setPosition(glm::vec3(0.0f, 3.0f, -10.0f));
-    dirLight->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
+//    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
+//    dirLight->setPosition(glm::vec3(0.0f, 3.0f, -10.0f));
+//    dirLight->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
 //    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
 //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
 //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
@@ -122,11 +143,11 @@ void MyApp::update(double time, double deltaTime)
         fpsCounter = 0;
     }
 
-    monkey1->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
+    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
     monkey2->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
 
-    light1->move(glm::vec3(0.0f, sin(time) * 0.1f, 0.0f));
-    light2->move(glm::vec3(0.0f, cos(time) * 0.1f, 0.0f));
+    light1->move(glm::vec3(0.0f, sin(time) * 0.01f, 0.0f));
+//    light2->move(glm::vec3(0.0f, cos(time) * 0.01f, 0.0f));
 
 //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }
@@ -179,6 +200,8 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     std::string modelName = type == moar::Light::POINT ? "sphere.3ds" : "cylinder.3ds";
     moar::Model* model = engine->getResourceManager()->getModel(modelName);
     renderer->setModel(model);
+    renderer->setShadowCaster(false);
+    renderer->setShadowReceiver(false);
 
     std::shared_ptr<moar::Object> light(new moar::Object());
     light->addComponent(lightComponent);

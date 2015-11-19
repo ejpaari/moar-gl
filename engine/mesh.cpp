@@ -1,5 +1,5 @@
 #include "mesh.h"
-#include "globals.h"
+#include "common/globals.h"
 
 namespace moar
 {

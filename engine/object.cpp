@@ -1,5 +1,5 @@
 #include "object.h"
-#include "globals.h"
+#include "common/globals.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/transform.hpp>

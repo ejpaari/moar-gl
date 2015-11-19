@@ -12,7 +12,7 @@ const float Camera::ROTATION_LIMIT = 85.0f * boost::math::constants::degree<doub
 
 Camera::Camera() :
     FOV(45.0f),
-    ratio(4.0f / 3.0f),
+    ratio(4.0f / 3.0f), // Todo: this should be calculated from screen parameters
     nearClipDistance(0.1f),
     farClipDistance(100.0f),
     viewMatrix(new glm::mat4(glm::lookAt(position, forward, up))),
@@ -56,6 +56,11 @@ const glm::mat4* Camera::getViewMatrixPointer() const
 const glm::mat4* Camera::getProjectionMatrixPointer() const
 {
     return projectionMatrix.get();
+}
+
+float Camera::getFarClipDistance() const
+{
+    return farClipDistance;
 }
 
 bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const

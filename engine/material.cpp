@@ -1,5 +1,5 @@
 #include "material.h"
-#include "globals.h"
+#include "common/globals.h"
 
 #include <iostream>
 

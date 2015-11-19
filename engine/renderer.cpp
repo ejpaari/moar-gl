@@ -1,6 +1,6 @@
 #include "renderer.h"
 #include "object.h"
-#include "globals.h"
+#include "common/globals.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>

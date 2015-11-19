@@ -1,5 +1,5 @@
-#ifndef APPLICATION
-#define APPLICATION
+#ifndef APPLICATION_H
+#define APPLICATION_H
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -36,4 +36,4 @@ private:
 
 } // moar
 
-#endif // APPLICATION
+#endif // APPLICATION_H

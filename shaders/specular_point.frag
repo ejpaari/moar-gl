@@ -10,7 +10,9 @@ layout(location = 0) out vec4 outColor;
 
 layout (location = 11) uniform float specularity;
 layout (location = 20) uniform sampler2D diffuseTex;
+layout (location = 23) uniform samplerCube depthTex;
 layout (location = 42) uniform int receiveShadows;
+layout (location = 43) uniform float farPlane;
 
 layout (std140) uniform LightBlock {
     vec4 lightColor;

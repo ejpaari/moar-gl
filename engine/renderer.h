@@ -1,5 +1,5 @@
-#ifndef RENDEROBJECT_H
-#define RENDEROBJECT_H
+#ifndef RENDERER_H
+#define RENDERER_H
 
 #include "component.h"
 #include "model.h"
@@ -41,4 +41,4 @@ private:
 
 } // moar
 
-#endif // RENDEROBJECT_H
+#endif // RENDERER_H
