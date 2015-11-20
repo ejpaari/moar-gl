@@ -430,19 +430,19 @@ void Engine::lighting(Light::Type lightType)
 
     for (auto& light : lights[lightType]) {
         bool shadowingEnabled = light->getComponent<Light>()->isShadowingEnabled();
-        if (!shadowingEnabled) {
-            continue;
-        }
+        light->prepareLight();
+        if (shadowingEnabled) {
 
-        depthMap->bind(light->getPosition(), light->getForward());
-        for (auto& renderObjs : renderObjects) {
-            for (auto& renderObj : renderObjs.second) {
-                // Todo: frustum culling.
-                if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
-                    Material* mat = renderObj->getComponent<Material>();
-                    mat->setEnabled(false);
-                    renderObj->render();
-                    mat->setEnabled(true);
+            depthMap->bind(light->getPosition(), light->getForward());
+            for (auto& renderObjs : renderObjects) {
+                for (auto& renderObj : renderObjs.second) {
+                    // Todo: frustum culling.
+                    if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
+                        Material* mat = renderObj->getComponent<Material>();
+                        mat->setEnabled(false);
+                        renderObj->render();
+                        mat->setEnabled(true);
+                    }
                 }
             }
         }
@@ -452,9 +452,9 @@ void Engine::lighting(Light::Type lightType)
         for (auto& renderObjs : renderObjects) {
             GLuint shaderProgram = manager.getShader(renderObjs.first, lightType);
             glUseProgram(shaderProgram);
-            light->prepareLight();
 
             if (shadowingEnabled) {
+                // Todo: this is not enough, previous / undefined depthmap still remains!
                 depthMap->activate();
             }
 

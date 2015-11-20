@@ -19,9 +19,9 @@ public:
     DepthMapPoint& operator=(const DepthMapPoint&) = delete;
     DepthMapPoint& operator=(DepthMapPoint&&) = delete;
 
-    bool init(GLuint shader);
-    void bind(const glm::vec3& lightPos, const glm::vec3& lightDir = glm::vec3(0.0f, 0.0f, 0.0f));
-    void activate();
+    virtual bool init(GLuint shader);
+    virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir = glm::vec3(0.0f, 0.0f, 0.0f));
+    virtual void activate();
 
 private:
     GLuint depthCubeTexture;

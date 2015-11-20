@@ -84,8 +84,9 @@ void MyApp::start()
 
     light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
     light1->setPosition(glm::vec3(0.0f, 1.5f, -3.0f));
-//    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 5.0f));
-//    light2->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
+    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 5.0f));
+    light2->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
+//    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
 //    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
 //    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 //    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
