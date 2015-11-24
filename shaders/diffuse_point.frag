@@ -28,7 +28,9 @@ void main()
     float diff = clamp(dot(n,l), 0, 1);
 
     float lightDistance = length(lightPos - vertexPos_World);
-    float shadow = receiveShadows != 0 ? calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane) : 1.0;
+    float shadow = receiveShadows != 0 ? 
+          calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane) : 
+          1.0;
 
     outColor = shadow * 
                vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * 

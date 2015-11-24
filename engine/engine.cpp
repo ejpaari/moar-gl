@@ -431,9 +431,10 @@ void Engine::lighting(Light::Type lightType)
     for (auto& light : lights[lightType]) {
         bool shadowingEnabled = light->getComponent<Light>()->isShadowingEnabled();
         light->prepareLight();
-        if (shadowingEnabled) {
 
-            depthMap->bind(light->getPosition(), light->getForward());
+
+        depthMap->bind(light->getPosition(), light->getForward());
+        if (shadowingEnabled) {
             for (auto& renderObjs : renderObjects) {
                 for (auto& renderObj : renderObjs.second) {
                     // Todo: frustum culling.
@@ -450,14 +451,8 @@ void Engine::lighting(Light::Type lightType)
         fb->bind();
 
         for (auto& renderObjs : renderObjects) {
-            GLuint shaderProgram = manager.getShader(renderObjs.first, lightType);
-            glUseProgram(shaderProgram);
-
-            if (shadowingEnabled) {
-                // Todo: this is not enough, previous / undefined depthmap still remains!
-                depthMap->activate();
-            }
-
+            glUseProgram(manager.getShader(renderObjs.first, lightType));
+            depthMap->activate();
             for (auto& renderObj : renderObjs.second) {
                 if (objectsInFrustum.find(renderObj->getId()) == objectsInFrustum.end()) {
                     continue;

@@ -20,7 +20,7 @@ public:
     static const float ROTATION_LIMIT;
 
     // Todo: this should be inherited from component
-    explicit Camera();
+    explicit Camera(float fov = 45.0f, float ratio = 4.0f / 3.0f, float nearClip = 0.1f, float farClip = 100.0f);
     virtual ~Camera();
     Camera(const Camera&) = delete;
     Camera(Camera&&) = delete;

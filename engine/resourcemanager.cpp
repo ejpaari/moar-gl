@@ -51,29 +51,14 @@ bool ResourceManager::loadShaders(const std::string& path)
                 if (found == shadersByName.end()) {
                     std::unique_ptr<Shader> shader(new Shader());
 
-                    // Todo: Create function for attaching a shader.
-                    std::string vertexShader = shaderPath + vertex;
-                    bool isGood;                    
-                    isGood = shader->attachShader(GL_VERTEX_SHADER, vertexShader.c_str());
-                    if (!isGood) {
-                        std::cerr << "WARNING: Failed to attach vertex shader: " << vertexShader << std::endl;
-                        return false;
-                    }
-
-                    std::string fragmentShader = shaderPath + fragment;
-                    isGood = shader->attachShader(GL_FRAGMENT_SHADER, fragmentShader.c_str());
-                    if (!isGood) {
-                        std::cerr << "WARNING: Failed to attach fragment shader: " << fragmentShader << std::endl;
-                        return false;
-                    }
-
+                    bool shadersAttached = shader->attachShader(GL_VERTEX_SHADER, std::string(shaderPath + vertex).c_str());
+                    shadersAttached = shadersAttached && shader->attachShader(GL_FRAGMENT_SHADER, std::string(shaderPath + fragment).c_str());
                     if (!geometry.empty()) {
-                        std::string geometryShader = shaderPath + geometry;
-                        isGood = shader->attachShader(GL_GEOMETRY_SHADER, geometryShader.c_str());
-                        if (!isGood) {
-                            std::cerr << "WARNING: Failed to attach geometry shader: " << geometryShader << std::endl;
-                            return false;
-                        }
+                        shadersAttached = shadersAttached && shader->attachShader(GL_GEOMETRY_SHADER, std::string(shaderPath + geometry).c_str());
+                    }
+
+                    if (!shadersAttached) {
+                        return false;
                     }
 
                     if (!shader->linkProgram()) {

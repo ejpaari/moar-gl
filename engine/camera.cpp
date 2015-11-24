@@ -10,11 +10,11 @@ namespace moar
 
 const float Camera::ROTATION_LIMIT = 85.0f * boost::math::constants::degree<double>();
 
-Camera::Camera() :
-    FOV(45.0f),
-    ratio(4.0f / 3.0f), // Todo: this should be calculated from screen parameters
-    nearClipDistance(0.1f),
-    farClipDistance(100.0f),
+Camera::Camera(float fov, float ratio, float nearClip, float farClip) :
+    FOV(fov),
+    ratio(ratio),
+    nearClipDistance(nearClip),
+    farClipDistance(farClip),
     viewMatrix(new glm::mat4(glm::lookAt(position, forward, up))),
     projectionMatrix(new glm::mat4(glm::perspective(FOV, ratio, nearClipDistance, farClipDistance)))
 {

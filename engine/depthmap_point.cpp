@@ -10,7 +10,7 @@ namespace moar
 {
 
 DepthMapPoint::DepthMapPoint() :
-    projectionMatrix(glm::perspective(glm::radians(90.0f), 1.0f, nearClipDistance, farClipDistance)) // Todo: calculated ratio from screen width & height
+    projectionMatrix(glm::perspective(glm::radians(90.0f), 1.0f, nearClipDistance, farClipDistance))
 {
 }
 

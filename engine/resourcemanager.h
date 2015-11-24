@@ -40,7 +40,6 @@ public:
     GLuint getCubeTexture(std::vector<std::string> textureNames);
 
 private:
-
     using ShaderKey = std::pair<std::string, Light::Type>;
 
     struct ShaderKeyHash

@@ -27,6 +27,7 @@ bool Shader::attachShader(GLenum shaderType, const char *filename)
     GLuint shader = glCreateShader(shaderType);
     if (!shader || !compileShader(shader, filename)) {
         glDeleteShader(shader);
+        std::cerr << "WARNING: Failed to attach shader " << filename << std::endl;
         return false;
     }
 
