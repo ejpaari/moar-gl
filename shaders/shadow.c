@@ -1,3 +1,5 @@
+// Todo: Rename to shadow_dir.glsl.
+
 float calcShadow(sampler2D depthTex, vec4 pos_Light)
 {
   vec3 projCoords = pos_Light.xyz / pos_Light.w;

@@ -15,6 +15,7 @@ const std::string Shader::INCLUDE_DIRECTIVE = "#moar::include";
 Shader::Shader()
 {
     program = glCreateProgram();
+    uniforms.reset();
 }
 
 Shader::~Shader()
@@ -34,6 +35,55 @@ bool Shader::attachShader(GLenum shaderType, const char *filename)
     shaders.push_back(shader);
     glAttachShader(program, shader);
     return true;
+}
+
+bool Shader::linkProgram()
+{
+    glLinkProgram(program);
+
+    GLint isLinked = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+    if (isLinked == GL_FALSE)
+    {
+        GLint maxLength = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+        std::vector<GLchar> infoLog(maxLength);
+        glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+        std::copy(infoLog.begin(), infoLog.end(), std::ostream_iterator<GLchar>(std::cerr, ""));
+
+        glDeleteProgram(program);;
+    }
+
+    GLuint lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
+    if (lightBlockIndex != GL_INVALID_INDEX) {
+        glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
+    }
+
+    GLuint transformationBlockIndex = glGetUniformBlockIndex(program, TRANSFORMATION_BLOCK_NAME);
+    if (transformationBlockIndex != GL_INVALID_INDEX) {
+        glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);
+    }
+
+    if (!readUniformLocations()) {
+        return false;
+    }
+
+    for (GLuint shader : shaders) {
+        glDetachShader(program, shader);
+        glDeleteShader(shader);
+    }
+
+    return isLinked;
+}
+
+GLuint Shader::getProgram()
+{
+    return program;
+}
+
+bool Shader::hasUniform(GLuint location) const
+{
+    return uniforms[location];
 }
 
 bool Shader::compileShader(GLuint shader, const char* filename)
@@ -93,44 +143,27 @@ bool Shader::compileShader(GLuint shader, const char* filename)
     return true;
 }
 
-bool Shader::linkProgram()
+bool Shader::readUniformLocations()
 {
-    glLinkProgram(program);
+    GLint numActiveUniforms = 0;
+    glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numActiveUniforms);
 
-    GLint isLinked = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
-    if (isLinked == GL_FALSE)
+    std::vector<GLenum> properties(1, GL_LOCATION);
+    std::vector<GLint> values(1, -1);
+    for (int index = 0; index < numActiveUniforms; ++index)
     {
-        GLint maxLength = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-        std::vector<GLchar> infoLog(maxLength);
-        glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-        std::copy(infoLog.begin(), infoLog.end(), std::ostream_iterator<GLchar>(std::cerr, ""));
-
-        glDeleteProgram(program);;
+        glGetProgramResourceiv(program, GL_UNIFORM, index, properties.size(), &properties[0], values.size(), NULL, &values[0]);
+        GLint uniform = values[0];
+        if (uniform  != -1) {
+            if (uniform  < 0 || uniform >= MAX_LOCATION) {
+                std::cerr << "ERROR: Uniforma locations do not match" << std::endl;
+                return false;
+            }
+            uniforms.set(uniform);
+        }
     }
-
-    GLuint lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
-    if (lightBlockIndex != GL_INVALID_INDEX) {
-        glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
-    }
-
-    GLuint transformationBlockIndex = glGetUniformBlockIndex(program, TRANSFORMATION_BLOCK_NAME);
-    if (transformationBlockIndex != GL_INVALID_INDEX) {
-        glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);
-    }
-
-    for (GLuint shader : shaders) {
-        glDetachShader(program, shader);
-        glDeleteShader(shader);
-    }
-
-    return isLinked;
+    return true;
 }
 
-GLuint Shader::getProgram()
-{
-    return program;
-}
 
 } // moar

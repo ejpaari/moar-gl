@@ -2,6 +2,7 @@
 #define RENDERSETTINGS_H
 
 #include "resourcemanager.h"
+#include "shader.h"
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -28,10 +29,10 @@ public:
 
     glm::vec4 clearColor;
 
-    GLuint skyboxShader;
+    Shader* skyboxShader;
     std::vector<std::string> skyboxTextures;    
 
-    GLuint ambientShader;
+    Shader* ambientShader;
     glm::vec3 ambientColor;
 
     int windowWidth;

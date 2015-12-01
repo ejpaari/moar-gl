@@ -17,7 +17,7 @@ public:
     DepthMap& operator=(const DepthMap&) = delete;
     DepthMap& operator=(DepthMap&&) = delete;
 
-    virtual bool init(GLuint shader) = 0;
+    virtual bool init() = 0;
     virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir) = 0;
     virtual void activate() = 0;
 

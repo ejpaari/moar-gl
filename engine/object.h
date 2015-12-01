@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include "component.h"
+#include "shader.h"
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
@@ -32,7 +33,7 @@ public:
 
     void executeCustomComponents();
     void prepareLight();
-    void render();
+    void render(const Shader* shader);
 
     virtual void move(const glm::vec3& translation);
     virtual void rotate(const glm::vec3& axis, float amount);

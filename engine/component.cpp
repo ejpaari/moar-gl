@@ -3,6 +3,8 @@
 namespace moar
 {
 
+const Shader* Component::shader = nullptr;
+
 Component::Component() :
     parent(nullptr),
     enabled(true)
@@ -11,6 +13,11 @@ Component::Component() :
 
 Component::~Component()
 {
+}
+
+void Component::setShader(const Shader* shader)
+{
+    Component::shader = shader;
 }
 
 void Component::setParent(Object* parentObject)

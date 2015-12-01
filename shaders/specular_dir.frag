@@ -30,7 +30,7 @@ void main()
     vec3 r = reflect(-l,n);
     float spec = clamp(dot(e,r), 0, 1);
 
-        float shadow = receiveShadows != 0 ? calcShadow(depthTex, pos_Light) : 1.0;
+    float shadow = receiveShadows != 0 ? calcShadow(depthTex, pos_Light) : 1.0;
 
     vec4 diffuseColor = texture(diffuseTex, texCoord);
     float power = lightColor.w;

@@ -44,22 +44,26 @@ public:
     virtual void execute() final;
 
     void setShaderType(const std::string& shaderType);
-    void setShader(GLuint shader);
     void setTexture(GLuint texture, TextureType type, GLenum target);
-    void setUniform(const std::string& name, std::function<void()> func);
+    // Todo: Duplicate location info.
+    void setUniform(const std::string& name, std::function<void()> func, GLuint location);
 
     virtual std::string getName() final;
     virtual Component::Type getType() final;
     std::string getShaderType() const;
-    GLuint getShader() const;
 
 private:
+    struct CustomUniform
+    {
+        GLuint location;
+        std::function<void()> func;
+    };
+
     const TextureInfo* getTextureInfo(TextureType type);
 
     std::string shaderType;
-    GLuint shader;
     std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
-    std::unordered_map<std::string, std::function<void()>> uniforms;
+    std::unordered_map<std::string, CustomUniform> uniforms;
 };
 
 } // moar

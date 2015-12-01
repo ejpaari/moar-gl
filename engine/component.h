@@ -1,6 +1,8 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+#include "shader.h"
+
 #include <string>
 
 namespace moar
@@ -29,6 +31,7 @@ public:
 
     virtual void execute() = 0;
 
+    static void setShader(const Shader* shader);
     void setParent(Object* parentObject);
     void setEnabled(bool enabled);
 
@@ -37,6 +40,8 @@ public:
     bool isEnabled() const;
 
 protected:
+    static const Shader* shader;
+
     Object* parent;
     bool enabled;
 };

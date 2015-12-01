@@ -74,6 +74,7 @@ private:
     Framebuffer fb1;
     Framebuffer fb2;
     Framebuffer* fb;
+    Shader* shader;
     Postprocess passthrough;
 
     double time;

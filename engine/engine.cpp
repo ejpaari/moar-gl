@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "renderer.h"
 #include "material.h"
+#include "shader.h"
 #include "common/globals.h"
 
 #define GLM_FORCE_RADIANS
@@ -116,6 +117,7 @@ namespace moar
 Engine::Engine() :
     window(nullptr),
     fb(nullptr),
+    shader(nullptr),
     time(0.0)
 {    
 }
@@ -263,14 +265,14 @@ bool Engine::init(const std::string& settingsFile)
 
     depthMapDir.setWidth(renderSettings.windowWidth);
     depthMapDir.setHeight(renderSettings.windowHeight);
-    if (!depthMapDir.init(manager.getShader("depthmap_dir"))) {
+    if (!depthMapDir.init()) {
         return false;
     }
 
     int size = std::max(renderSettings.windowWidth, renderSettings.windowHeight);
     depthMapPoint.setWidth(size);
     depthMapPoint.setHeight(size);
-    if (!depthMapPoint.init(manager.getShader("depthmap_point"))) {
+    if (!depthMapPoint.init()) {
         return false;
     }
 
@@ -282,7 +284,7 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    passthrough = Postprocess("passthrough", manager.getShader("passthrough"), 0);
+    passthrough = Postprocess("passthrough", manager.getShader("passthrough")->getProgram(), 0);
 
     lights.resize(Light::Type::NUM_TYPES);
 
@@ -370,15 +372,15 @@ void Engine::render()
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glDisable(GL_BLEND);
-    glUseProgram(renderSettings.ambientShader);
+    shader = renderSettings.ambientShader;
+    glUseProgram(renderSettings.ambientShader->getProgram());
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
     for (auto& renderObjs : renderObjects) {
         for (auto& renderObj : renderObjs.second) {
             if (!objectInsideFrustum(renderObj, camera.get())) {
                 continue;
             }
-            // Todo: Currently all textures/uniforms are uploaded though not needed for ambient pass.
-            renderObj->render();
+            renderObj->render(shader);
             objectsInFrustum.insert(renderObj->getId());
         }
     }
@@ -387,16 +389,19 @@ void Engine::render()
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
 
+    // Lighting.
     lighting(Light::DIRECTIONAL);
     lighting(Light::POINT);
 
+    // Skybox.
     if (skybox) {
         glDisable(GL_BLEND);
         glCullFace(GL_FRONT);
         glDepthFunc(GL_LEQUAL);
-        glUseProgram(renderSettings.skyboxShader);
+        shader = renderSettings.skyboxShader;
+        glUseProgram(shader->getProgram());
         skybox->setPosition(camera->getPosition());
-        skybox->render();
+        skybox->render(shader);
     }
 
     // Post-process ping-pong    
@@ -421,28 +426,25 @@ void Engine::render()
 
 void Engine::lighting(Light::Type lightType)
 {
-    DepthMap* depthMap = nullptr;
+    DepthMap* depthMap = nullptr;        
     if (lightType == Light::DIRECTIONAL) {
-        depthMap = &depthMapDir;
+        depthMap = &depthMapDir;        
     } else {
         depthMap = &depthMapPoint;
     }
 
     for (auto& light : lights[lightType]) {
+        shader = manager.getShader("depthmap", lightType);
+        glUseProgram(shader->getProgram());
         bool shadowingEnabled = light->getComponent<Light>()->isShadowingEnabled();
         light->prepareLight();
-
-
         depthMap->bind(light->getPosition(), light->getForward());
         if (shadowingEnabled) {
             for (auto& renderObjs : renderObjects) {
                 for (auto& renderObj : renderObjs.second) {
                     // Todo: frustum culling.
                     if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
-                        Material* mat = renderObj->getComponent<Material>();
-                        mat->setEnabled(false);
-                        renderObj->render();
-                        mat->setEnabled(true);
+                        renderObj->render(shader);
                     }
                 }
             }
@@ -451,17 +453,17 @@ void Engine::lighting(Light::Type lightType)
         fb->bind();
 
         for (auto& renderObjs : renderObjects) {
-            glUseProgram(manager.getShader(renderObjs.first, lightType));
+            shader = manager.getShader(renderObjs.first, lightType);
+            glUseProgram(shader->getProgram());
+            if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
+                glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
+            }
             depthMap->activate();
             for (auto& renderObj : renderObjs.second) {
                 if (objectsInFrustum.find(renderObj->getId()) == objectsInFrustum.end()) {
                     continue;
                 }
-                // Todo: Move this. Temporal (lol) solution.
-                if (lightType == Light::POINT) {
-                    glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-                }
-                renderObj->render();
+                renderObj->render(shader);
             }
         }
     }
@@ -492,7 +494,6 @@ bool Engine::createSkybox()
     }
     GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);
     std::shared_ptr<Material> material(new Material());
-    material->setShader(renderSettings.skyboxShader);
     material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);
 
     std::shared_ptr<Renderer> renderer(new Renderer());

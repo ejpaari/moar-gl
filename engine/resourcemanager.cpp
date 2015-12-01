@@ -66,15 +66,14 @@ bool ResourceManager::loadShaders(const std::string& path)
                         return false;
                     }
                     std::cout << "Created shader: " << line << std::endl;
-                    GLuint shaderProgram = shader->getProgram();
-                    shadersByName.insert(std::make_pair(line, shaderProgram));
+                    shadersByName.insert(std::make_pair(line, shader.get()));
 
                     if (fragment.find("_point") != std::string::npos) {
                         ShaderKey key = std::make_pair(vertex.substr(0, vertex.find("_")), Light::POINT);
-                        shadersByType.insert(std::make_pair(key, shaderProgram));
+                        shadersByType.insert(std::make_pair(key, shader.get()));
                     } else if (fragment.find("_dir") != std::string::npos) {
                         ShaderKey key = std::make_pair(vertex.substr(0, vertex.find("_")), Light::DIRECTIONAL);
-                        shadersByType.insert(std::make_pair(key, shaderProgram));
+                        shadersByType.insert(std::make_pair(key, shader.get()));
                     }
                     shaders.push_back(std::move(shader));
 
@@ -99,7 +98,7 @@ bool ResourceManager::loadShaders(const std::string& path)
     return true;
 }
 
-GLuint ResourceManager::getShader(const std::string& name)
+Shader* ResourceManager::getShader(const std::string& name)
 {
     auto found = shadersByName.find(name);
     if (found != shadersByName.end()) {
@@ -110,7 +109,7 @@ GLuint ResourceManager::getShader(const std::string& name)
     }
 }
 
-GLuint ResourceManager::getShader(const std::string& shader, const Light::Type light)
+Shader* ResourceManager::getShader(const std::string& shader, const Light::Type light)
 {
     auto found = shadersByType.find(std::make_pair(shader, light));
     if (found != shadersByType.end()) {

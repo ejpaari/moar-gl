@@ -20,13 +20,11 @@ DepthMapPoint::~DepthMapPoint()
     glDeleteTextures(1, &depthCubeTexture);
 }
 
-bool DepthMapPoint::init(GLuint shader)
+bool DepthMapPoint::init()
 {
     if (width == 0 || height == 0) {
         std::cerr << "ERROR: Shadow map width or height not initilized." << std::endl;
     }
-
-    this->shader = shader;
 
     glGenTextures(1, &depthCubeTexture);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeTexture);
@@ -48,7 +46,6 @@ void DepthMapPoint::bind(const glm::vec3& lightPos, const glm::vec3& /*lightDir*
     glViewport(0, 0, width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClear(GL_DEPTH_BUFFER_BIT);
-    glUseProgram(shader);
 
     lightSpaces[0] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     lightSpaces[1] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));

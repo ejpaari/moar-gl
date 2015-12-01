@@ -19,7 +19,7 @@ public:
     DepthMapPoint& operator=(const DepthMapPoint&) = delete;
     DepthMapPoint& operator=(DepthMapPoint&&) = delete;
 
-    virtual bool init(GLuint shader);
+    virtual bool init();
     virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir = glm::vec3(0.0f, 0.0f, 0.0f));
     virtual void activate();
 

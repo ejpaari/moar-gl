@@ -55,10 +55,10 @@ void MyApp::start()
     planeL->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
     planeL->rotate(glm::vec3(0.0f, 0.0f, 1.0f), 1.57f);
 
-    moar::Object* planeF = createRenderObject("diffuse", "plane.3ds", "white.png");
-    planeF->setPosition(glm::vec3(0.0f, 0.0f, -5.0f));
-    planeF->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-    planeF->rotate(glm::vec3(1.0f, 0.0f, 0.0f), 1.57f);
+//    moar::Object* planeF = createRenderObject("diffuse", "plane.3ds", "white.png");
+//    planeF->setPosition(glm::vec3(0.0f, 0.0f, -5.0f));
+//    planeF->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
+//    planeF->rotate(glm::vec3(1.0f, 0.0f, 0.0f), 1.57f);
 
     moar::Object* planeB = createRenderObject("diffuse", "plane.3ds", "white.png");
     planeB->setPosition(glm::vec3(0.0f, 0.0f, 5.0f));
@@ -74,7 +74,7 @@ void MyApp::start()
     monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
     monkey2->setName("specular_monkey");
     moar::Material* mat = monkey2->getComponent<moar::Material>();
-    mat->setUniform("specularity", std::bind(glUniform1f, moar::SPECULAR_LOCATION, 50.0f));
+    mat->setUniform("specularity", std::bind(glUniform1f, moar::SPECULAR_LOCATION, 50.0f), moar::SPECULAR_LOCATION);
 
     icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
     icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
@@ -86,12 +86,12 @@ void MyApp::start()
     light1->setPosition(glm::vec3(0.0f, 1.5f, -3.0f));
     light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 5.0f));
     light2->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
-    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
+//    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
 //    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
 //    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-//    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
-//    dirLight->setPosition(glm::vec3(0.0f, 3.0f, -10.0f));
-//    dirLight->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
+    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 1.2f), moar::Light::DIRECTIONAL);
+    dirLight->setPosition(glm::vec3(0.0f, 3.0f, -10.0f));
+    dirLight->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
 //    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset"), 1);
 //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
 //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert"), 1);
@@ -148,7 +148,7 @@ void MyApp::update(double time, double deltaTime)
     monkey2->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
 
     light1->move(glm::vec3(0.0f, sin(time) * 0.01f, 0.0f));
-//    light2->move(glm::vec3(0.0f, cos(time) * 0.01f, 0.0f));
+    light2->move(glm::vec3(0.0f, cos(time) * 0.01f, 0.0f));
 
 //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }
@@ -172,7 +172,9 @@ moar::Object* MyApp::createRenderObject(const std::string& shader, const std::st
     material->setShaderType(shader);
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
     if (shader == "diffuse") {
-        material->setUniform("solidColor", std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, 1.0f, 1.0f, 1.0f));
+        material->setUniform("solidColor",
+                             std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, 1.0f, 1.0f, 1.0f),
+                             moar::SOLID_COLOR_LOCATION);
     }
 
     std::shared_ptr<moar::Renderer> renderer(new moar::Renderer());
@@ -195,7 +197,9 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     material->setShaderType("diffuse");
     GLuint texture = engine->getResourceManager()->getTexture("white.png");
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
-    material->setUniform("solidColor", std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, color.x, color.y, color.z));
+    material->setUniform("solidColor",
+                         std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, color.x, color.y, color.z),
+                         moar::SOLID_COLOR_LOCATION);
 
     std::shared_ptr<moar::Renderer> renderer(new moar::Renderer());
     std::string modelName = type == moar::Light::POINT ? "sphere.3ds" : "cylinder.3ds";

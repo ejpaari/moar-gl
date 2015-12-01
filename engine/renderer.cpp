@@ -22,7 +22,7 @@ Renderer::~Renderer()
 
 void Renderer::execute()
 {
-    if (shadowReceiver) {
+    if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
         glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
     }
     model->render();

@@ -7,6 +7,8 @@ namespace moar
 {
 
 RenderSettings::RenderSettings() :
+    skyboxShader(nullptr),
+    ambientShader(nullptr),
     windowWidth(800),
     windowHeight(600),
     loaded(false)

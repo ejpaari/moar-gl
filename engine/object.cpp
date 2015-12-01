@@ -59,8 +59,9 @@ void Object::prepareLight()
     }
 }
 
-void Object::render()
+void Object::render(const Shader* shader)
 {
+    Component::setShader(shader);
     if (material->isEnabled()) {
         material->execute();
     }

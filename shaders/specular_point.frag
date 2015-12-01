@@ -22,6 +22,7 @@ layout (std140) uniform LightBlock {
 
 void main()
 {    
+// Todo: Shadows.
     vec3 n = normalize(normal_Cam);
     vec3 l = normalize(lightDir_Cam);
     float diff = clamp(dot(n,l), 0, 1);

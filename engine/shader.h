@@ -1,9 +1,13 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "common/globals.h"
+
 #include <GL/glew.h>
+
 #include <vector>
 #include <string>
+#include <bitset>
 
 namespace moar
 {
@@ -22,14 +26,17 @@ public:
     bool linkProgram();
 
     GLuint getProgram();
+    bool hasUniform(GLuint location) const;
 
 private:
     bool compileShader(GLuint shader, const char* filename);
+    bool readUniformLocations();
 
     static const std::string INCLUDE_DIRECTIVE;
 
     GLuint program;    
     std::vector<GLuint> shaders;
+    std::bitset<MAX_LOCATION> uniforms;
 };
 
 } // moar

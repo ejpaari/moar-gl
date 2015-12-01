@@ -14,8 +14,7 @@ const Material::TextureInfo Material::textureInfos[] =
 };
 
 Material::Material() :
-    shaderType(""),
-    shader(0)
+    shaderType("")
 {
 }
 
@@ -26,26 +25,23 @@ Material::~Material()
 void Material::execute()
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
-        glActiveTexture(std::get<1>(textures[i])->unit);
-        glBindTexture(std::get<2>(textures[i]), std::get<0>(textures[i]));
-        glUniform1i(std::get<1>(textures[i])->location, std::get<1>(textures[i])->value);
+        if (shader->hasUniform(std::get<1>(textures[i])->location)) {
+            glActiveTexture(std::get<1>(textures[i])->unit);
+            glBindTexture(std::get<2>(textures[i]), std::get<0>(textures[i]));
+            glUniform1i(std::get<1>(textures[i])->location, std::get<1>(textures[i])->value);
+        }
     }
 
     for (auto iter = uniforms.begin(); iter != uniforms.end(); ++iter) {
-        iter->second();
+        if (shader->hasUniform(iter->second.location)) {
+            iter->second.func();
+        }
     }
 }
 
 void Material::setShaderType(const std::string& shaderType)
 {
     this->shaderType = shaderType;
-    shader = 0;
-}
-
-void Material::setShader(GLuint shader)
-{
-    this->shader = shader;
-    shaderType = "";
 }
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)
@@ -61,9 +57,12 @@ void Material::setTexture(GLuint texture, TextureType type, GLenum target)
     textures.push_back(std::make_tuple(texture, getTextureInfo(type), target));
 }
 
-void Material::setUniform(const std::string& name, std::function<void ()> func)
+void Material::setUniform(const std::string& name, std::function<void ()> func, GLuint location)
 {
-    uniforms[name] = func;
+    CustomUniform uniform;
+    uniform.func = func;
+    uniform.location = location;
+    uniforms[name] = uniform;
 }
 
 std::string Material::getName()
@@ -91,11 +90,6 @@ const Material::TextureInfo* Material::getTextureInfo(TextureType type)
 std::string Material::getShaderType() const
 {
     return shaderType;
-}
-
-GLuint Material::getShader() const
-{
-    return shader;
 }
 
 } // moar

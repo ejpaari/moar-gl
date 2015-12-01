@@ -35,6 +35,8 @@ extern const GLuint FAR_CLIP_DISTANCE_LOCATION;
 extern const GLuint LIGHT_SPACE_PROJ_LOCATION;
 extern const GLuint LIGHT_SPACE_VP_LOCATION;
 
+const GLint MAX_LOCATION = 64;
+
 extern bool DEBUG;
 
 extern unsigned int DRAW_COUNT;
