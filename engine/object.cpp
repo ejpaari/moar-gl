@@ -44,13 +44,6 @@ Object::~Object()
 {
 }
 
-void Object::executeCustomComponents()
-{
-    for (unsigned int i = 0; i < customComponents.size(); ++i) {
-        customComponents[i]->execute();
-    }
-}
-
 void Object::prepareLight()
 {
     if (light->isEnabled()) {
@@ -193,14 +186,6 @@ void Object::addComponent(std::shared_ptr<Component> comp)
         break;
     case Component::LIGHT:
         light = comp.get();
-        break;
-    case Component::CUSTOM:
-        for (auto& custom : customComponents) {
-            if (custom->getName() == comp->getName()) {
-                custom = comp.get();
-                return;
-            }
-        }
         break;
     default:
         return;

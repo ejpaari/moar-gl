@@ -46,7 +46,6 @@ public:
     void addObject(std::shared_ptr<Object> object);
 
 private:
-    void executeCustomComponents();
     void render();
     void lighting(Light::Type lightType);
     void printInfo(int windowWidth, int windowHeight);

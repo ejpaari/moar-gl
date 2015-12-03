@@ -303,7 +303,6 @@ void Engine::execute()
         app->handleInput(window);
         app->update(glfwGetTime(), glfwGetTime() - time);
         time = glfwGetTime();
-        executeCustomComponents();
         render();
         gui.render();
 
@@ -350,13 +349,6 @@ void Engine::addObject(std::shared_ptr<Object> object)
     }
     if (object->hasComponent("Light")) {
         lights[object->getComponent<Light>()->getLightType()].push_back(object.get());
-    }
-}
-
-void Engine::executeCustomComponents()
-{    
-    for (unsigned int i = 0; i < allObjects.size(); ++i) {
-        allObjects[i]->executeCustomComponents();
     }
 }
 

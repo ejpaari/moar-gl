@@ -31,7 +31,6 @@ public:
     Object& operator=(const Object&) = delete;
     Object& operator=(Object&&) = delete;
 
-    void executeCustomComponents();
     void prepareLight();
     void render(const Shader* shader);
 
@@ -73,7 +72,6 @@ protected:
     Component* material;
     Component* renderer;
     Component* light;
-    std::vector<Component*> customComponents;
     std::vector<std::shared_ptr<Component>> allComponents;    
 
     GLuint transformationBlockBuffer;

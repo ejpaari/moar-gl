@@ -18,8 +18,7 @@ public:
         RENDERER,
         MATERIAL,
         LIGHT,
-        CAMERA,
-        CUSTOM
+        CAMERA
     };
 
     Component();
