@@ -3,6 +3,9 @@
 
 #include "component.h"
 #include "shader.h"
+#include "renderer.h"
+#include "material.h"
+#include "light.h"
 
 #include <glm/glm.hpp>
 #include <GL/glew.h>
@@ -10,6 +13,7 @@
 #include <vector>
 #include <typeinfo>
 #include <string>
+#include <iostream>
 
 namespace moar
 {
@@ -31,6 +35,7 @@ public:
     Object& operator=(const Object&) = delete;
     Object& operator=(Object&&) = delete;
 
+    // Todo: Improve interface, user should not have access to render etc.
     void prepareLight();
     void render(const Shader* shader);
 
@@ -52,8 +57,10 @@ public:
     glm::vec3 getLeft() const;
     std::string getName() const;
 
-    void addComponent(std::shared_ptr<Component> comp);
     bool hasComponent(const std::string& name) const;
+
+    template<typename T>
+    T* addComponent();
 
     template<typename T>
     T* getComponent() const;
@@ -78,6 +85,39 @@ protected:
 
     std::string name;
 };
+
+template<typename T>
+T* Object::addComponent()
+{
+    T* component = getComponent<T>();
+    if (component != nullptr) {
+        return component;
+    }
+
+    std::shared_ptr<Component> comp;
+    if (typeid(T) == typeid(Renderer)) {
+        comp.reset(new Renderer);
+        renderer = comp.get();
+    }
+    if (typeid(T) == typeid(Light)) {
+        comp.reset(new Light);
+        light = comp.get();
+    }
+    if (typeid(T) == typeid(Material)) {
+        comp.reset(new Material);
+        material = comp.get();
+    }
+
+    allComponents.push_back(comp);
+    component = dynamic_cast<T*>(comp.get());
+    if (component != nullptr) {
+        component->setParent(this);
+        return component;
+    } else {
+        std::cerr << "ERROR: Component casting failed when adding a component" << std::endl;
+        return nullptr;
+    }
+}
 
 template<typename T>
 T* Object::getComponent() const

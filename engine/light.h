@@ -21,7 +21,7 @@ public:
         // Todo: Spotlight.
     };
 
-    explicit Light(Type type);
+    explicit Light();
     virtual ~Light();
     Light(const Light&) = delete;
     Light(Light&&) = delete;
@@ -30,6 +30,7 @@ public:
 
     virtual void execute() final;
 
+    void setType(Type type);
     void setColor(const glm::vec4& color);
     void setShadowingEnabled(bool enabled);
 

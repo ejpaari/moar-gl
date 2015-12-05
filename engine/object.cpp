@@ -162,36 +162,6 @@ std::string Object::getName() const
     return name;
 }
 
-void Object::addComponent(std::shared_ptr<Component> comp)
-{
-    comp->setParent(this);
-    bool componentExists = false;
-    for (unsigned int i = 0; i < allComponents.size(); ++i) {
-        if (allComponents[i]->getName() == comp->getName()) {
-            allComponents[i] = comp;
-            componentExists = true;
-        }
-    }
-
-    if (!componentExists) {
-        allComponents.push_back(comp);
-    }
-
-    switch (comp->getType()) {
-    case Component::RENDERER:
-        renderer = comp.get();
-        break;
-    case Component::MATERIAL:
-        material = comp.get();
-        break;
-    case Component::LIGHT:
-        light = comp.get();
-        break;
-    default:
-        return;
-    }
-}
-
 bool Object::hasComponent(const std::string& name) const
 {
     for (unsigned int i = 0; i < allComponents.size(); ++i) {

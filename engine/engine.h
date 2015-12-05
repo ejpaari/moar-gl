@@ -43,7 +43,9 @@ public:
     Input* getInput();
     RenderSettings* getRenderSettings();
 
-    void addObject(std::shared_ptr<Object> object);
+    // Todo: This should happen inside engine and not requiring user action.
+    void addObject(Object* object);
+    Object* createObject();
 
 private:
     void render();

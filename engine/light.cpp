@@ -9,8 +9,8 @@
 namespace moar
 {
 
-Light::Light(Type type) :
-    type(type),
+Light::Light() :
+    type(POINT),
     color(1.0f, 1.0f, 1.0f, 10.0f),
     shadowingEnabled(true)
 {
@@ -36,6 +36,11 @@ void Light::execute()
     offset += 16;
     glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(parent->getForward()), glm::value_ptr(parent->getForward()));
     glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
+}
+
+void Light::setType(Light::Type type)
+{
+    this->type = type;
 }
 
 void Light::setShadowingEnabled(bool enabled)
