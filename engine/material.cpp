@@ -42,6 +42,7 @@ void Material::execute()
 void Material::setShaderType(const std::string& shaderType)
 {
     this->shaderType = shaderType;
+    updateRequired = true;
 }
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)

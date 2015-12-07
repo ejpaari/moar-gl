@@ -20,6 +20,8 @@ namespace moar
 
 class Object
 {
+    friend class Engine;
+
 public:
     static const glm::vec3 FORWARD;
     static const glm::vec3 UP;
@@ -66,6 +68,9 @@ public:
     T* getComponent() const;
 
 protected:
+    static bool componentUpdateRequired();
+    static void resetComponentUpdate();
+
     static unsigned int idCounter;
 
     unsigned int id;

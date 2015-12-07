@@ -182,13 +182,13 @@ moar::Object* MyApp::createRenderObject(const std::string& shader, const std::st
                              moar::SOLID_COLOR_LOCATION);
     }
 
-    engine->addObject(renderObj);
     return renderObj;
 }
 
 moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
 {
     moar::Object* light = engine->createObject();
+    light->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
     moar::Light* lightComponent = light->addComponent<moar::Light>();
     lightComponent->setColor(color);
     lightComponent->setType(type);
@@ -208,7 +208,5 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     renderer->setShadowCaster(false);
     renderer->setShadowReceiver(false);
 
-    light->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
-    engine->addObject(light);
     return light;
 }

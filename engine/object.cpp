@@ -172,4 +172,14 @@ bool Object::hasComponent(const std::string& name) const
     return false;
 }
 
+bool Object::componentUpdateRequired()
+{
+    return Component::updateRequired;
+}
+
+void Object::resetComponentUpdate()
+{
+    Component::updateRequired = false;
+}
+
 } // moar

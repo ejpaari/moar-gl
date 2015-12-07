@@ -41,6 +41,7 @@ void Light::execute()
 void Light::setType(Light::Type type)
 {
     this->type = type;
+    updateRequired = true;
 }
 
 void Light::setShadowingEnabled(bool enabled)

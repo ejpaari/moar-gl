@@ -43,13 +43,12 @@ public:
     Input* getInput();
     RenderSettings* getRenderSettings();
 
-    // Todo: This should happen inside engine and not requiring user action.
-    void addObject(Object* object);
     Object* createObject();
 
 private:
     void render();
     void lighting(Light::Type lightType);
+    void updateObjectContainers();
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
     bool objectInsideFrustum(const Object* obj, const Camera* cam) const;

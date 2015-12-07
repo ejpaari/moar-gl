@@ -12,6 +12,8 @@ class Object;
 
 class Component
 {
+    friend class Object;
+
 public:
     enum Type
     {
@@ -40,6 +42,7 @@ public:
 
 protected:
     static const Shader* shader;
+    static bool updateRequired;
 
     Object* parent;
     bool enabled;

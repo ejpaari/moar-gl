@@ -31,6 +31,7 @@ void Renderer::execute()
 void Renderer::setModel(Model* model)
 {
     this->model = model;
+    updateRequired = true;
 }
 
 void Renderer::setShadowCaster(bool caster)

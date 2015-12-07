@@ -4,20 +4,24 @@ namespace moar
 {
 
 const Shader* Component::shader = nullptr;
+bool Component::updateRequired = false;
 
 Component::Component() :
     parent(nullptr),
     enabled(true)
 {
+    updateRequired = true;
 }
 
 Component::~Component()
 {
+    updateRequired = true;
 }
 
 void Component::setShader(const Shader* shader)
 {
     Component::shader = shader;
+    updateRequired = true;
 }
 
 void Component::setParent(Object* parentObject)

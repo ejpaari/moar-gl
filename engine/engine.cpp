@@ -301,8 +301,9 @@ void Engine::execute()
         input.setCursorPosition(x, y);
 
         app->handleInput(window);
-        app->update(glfwGetTime(), glfwGetTime() - time);
+        app->update(glfwGetTime(), glfwGetTime() - time);        
         time = glfwGetTime();
+        updateObjectContainers();
         render();
         gui.render();
 
@@ -337,17 +338,6 @@ Input* Engine::getInput()
 RenderSettings* Engine::getRenderSettings()
 {
     return &renderSettings;
-}
-
-void Engine::addObject(Object* object)
-{
-    if (object->hasComponent("Renderer")) {
-        std::string type = object->getComponent<Material>()->getShaderType();
-        renderObjects[type].push_back(object);
-    }
-    if (object->hasComponent("Light")) {
-        lights[object->getComponent<Light>()->getLightType()].push_back(object);
-    }
 }
 
 Object* Engine::createObject()
@@ -464,6 +454,40 @@ void Engine::lighting(Light::Type lightType)
             }
         }
     }
+}
+
+void Engine::updateObjectContainers()
+{
+    if (!Object::componentUpdateRequired()) {
+        return;
+    }
+
+    for (const auto& obj : allObjects) {
+        if (obj->hasComponent("Renderer")) {
+            std::string type = obj->getComponent<Material>()->getShaderType();
+            std::vector<Object*>& objs = renderObjects[type];
+            if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
+                renderObjects[type].push_back(obj.get());
+            }
+        }
+        if (obj->hasComponent("Light")) {
+            Light::Type type = obj->getComponent<Light>()->getLightType();
+            std::vector<Object*>& objs = lights[type];
+            if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
+                lights[type].push_back(obj.get());
+            }
+        }
+    }
+    for (auto& objs : lights) {
+        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent("Light"); }),
+                objs.end());
+    }
+    for (auto& renderObjs : renderObjects) {
+        std::vector<Object*>& objs = renderObjs.second;
+        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent("Renderer"); }),
+                objs.end());
+    }
+    Object::resetComponentUpdate();
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)
