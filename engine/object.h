@@ -37,10 +37,6 @@ public:
     Object& operator=(const Object&) = delete;
     Object& operator=(Object&&) = delete;
 
-    // Todo: Improve interface, user should not have access to render etc.
-    void prepareLight();
-    void render(const Shader* shader);
-
     virtual void move(const glm::vec3& translation);
     virtual void rotate(const glm::vec3& axis, float amount);
 
@@ -68,27 +64,31 @@ public:
     T* getComponent() const;
 
 protected:
-    static bool componentUpdateRequired();
-    static void resetComponentUpdate();
-
     static unsigned int idCounter;
 
     unsigned int id;
-    glm::vec3 position;
-    glm::vec3 rotation;
-    glm::vec3 scale;
-    glm::vec3 forward;
-    glm::vec3 up;
-    glm::vec3 left;    
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 forward = FORWARD;
+    glm::vec3 up = UP;
+    glm::vec3 left = LEFT;
 
-    Component* material;
-    Component* renderer;
-    Component* light;
+    Component* material = nullptr;
+    Component* renderer = nullptr;
+    Component* light = nullptr;
     std::vector<std::shared_ptr<Component>> allComponents;    
 
     GLuint transformationBlockBuffer;
 
     std::string name;
+
+private:
+    static bool componentUpdateRequired();
+    static void resetComponentUpdate();
+
+    void prepareLight();
+    void render(const Shader* shader);
 };
 
 template<typename T>

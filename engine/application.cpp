@@ -4,9 +4,7 @@
 namespace moar
 {
 
-Application::Application() :
-    engine(nullptr),
-    running(true)
+Application::Application()
 {
 }
 

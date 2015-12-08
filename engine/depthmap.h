@@ -27,13 +27,13 @@ public:
 protected:
     bool createFramebuffer(GLuint& framebuffer, GLuint& texture, bool cube);
 
-    int width;
-    int height;
-    float nearClipDistance;
-    float farClipDistance;
+    int width = 0;
+    int height = 0;
+    float nearClipDistance = 0.1f;
+    float farClipDistance = 100.0f;
 
-    GLuint shader;
-    GLuint framebuffer;
+    GLuint shader = 0;
+    GLuint framebuffer = 0;
 };
 
 } // moar

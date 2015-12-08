@@ -37,7 +37,7 @@ private:
     GLuint normalBuffer;
     GLuint tangentBuffer;
     GLuint texBuffer;
-    unsigned int numIndices;    
+    unsigned int numIndices = 0;
 };
 
 template<typename T>

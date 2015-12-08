@@ -9,8 +9,7 @@
 namespace moar
 {
 
-Model::Model() :
-    boundingRadius(0.0f)
+Model::Model()
 {
 }
 

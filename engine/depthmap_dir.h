@@ -3,6 +3,8 @@
 
 #include "depthmap.h"
 
+#define GLM_FORCE_RADIANS
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 
@@ -23,10 +25,12 @@ public:
     virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir);
     virtual void activate();
 
+    // Todo: CSM.
+
 private:
     GLuint depthTexture;
-    glm::vec4 frustum;
-    glm::mat4 projectionMatrix;
+    glm::vec4 frustum = glm::vec4(-10.0f, 10.0f, -10.0f, 10.0f);
+    glm::mat4 projectionMatrix = glm::ortho(frustum.x, frustum.y, frustum.z, frustum.w, nearClipDistance, farClipDistance);
     glm::mat4 lightSpaceMatrix;
 };
 

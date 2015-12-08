@@ -12,7 +12,6 @@ namespace moar
 class Light : public Component
 {
 public:
-
     enum Type
     {
         POINT = 0,
@@ -41,9 +40,9 @@ public:
 
 private:
     GLuint lightBlockBuffer;
-    Type type;
-    glm::vec4 color;
-    bool shadowingEnabled;
+    Type type = POINT;
+    glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 10.0f);
+    bool shadowingEnabled = true;
 };
 
 } // moar

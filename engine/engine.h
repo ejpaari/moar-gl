@@ -12,6 +12,7 @@
 #include "framebuffer.h"
 #include "depthmap_dir.h"
 #include "depthmap_point.h"
+#include "shader.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -55,7 +56,7 @@ private:
 
     std::shared_ptr<Application> app;
 
-    GLFWwindow* window;
+    GLFWwindow* window = nullptr;
     ResourceManager manager;
     GUI gui;
     Input input;
@@ -73,11 +74,11 @@ private:
     DepthMapPoint depthMapPoint;
     Framebuffer fb1;
     Framebuffer fb2;
-    Framebuffer* fb;
-    Shader* shader;
+    Framebuffer* fb = nullptr;
+    Shader* shader = nullptr;
     Postprocess passthrough;
 
-    double time;
+    double time = 0.0;
 };
 
 } // moar

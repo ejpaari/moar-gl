@@ -5,12 +5,7 @@
 namespace moar
 {
 
-DepthMap::DepthMap() :
-    width(0),
-    height(0),
-    nearClipDistance(0.1f),
-    farClipDistance(100.0f),
-    shader(0)
+DepthMap::DepthMap()
 {
 }
 
@@ -32,9 +27,8 @@ bool DepthMap::createFramebuffer(GLuint& framebuffer, GLuint& texture, bool cube
 {
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    cube
-            ? glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture, 0)
-            : glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
+    cube ? glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture, 0)
+         : glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 

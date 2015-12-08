@@ -13,8 +13,7 @@ const Material::TextureInfo Material::textureInfos[] =
     {Material::TextureType::DISPLACEMENT, "DisplacementTex", GL_TEXTURE3, 3, DISPLACEMENT_TEX_LOCATION},
 };
 
-Material::Material() :
-    shaderType("")
+Material::Material()
 {
 }
 

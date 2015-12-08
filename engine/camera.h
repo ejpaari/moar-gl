@@ -8,7 +8,7 @@
 
 #include <glm/glm.hpp>
 #include <memory>
-#include <deque>
+#include <list>
 #include <string>
 
 namespace moar
@@ -17,11 +17,8 @@ namespace moar
 class Camera : public Object
 {
 public:
-    static const float ROTATION_LIMIT;
-
     // Todo: this should be inherited from component
     explicit Camera(float fov = 45.0f, float ratio = 4.0f / 3.0f, float nearClip = 0.1f, float farClip = 100.0f);
-    virtual ~Camera();
     Camera(const Camera&) = delete;
     Camera(Camera&&) = delete;
     Camera& operator=(const Camera&) = delete;
@@ -41,10 +38,9 @@ public:
 
     Postprocess* addPostprocess(const std::string& name, GLuint shader, int priority);
     void removePostprocess(const std::string& name);
-    const std::deque<Postprocess>& getPostprocesses() const;
+    const std::list<Postprocess>& getPostprocesses() const;
 
 private:
-
     enum Side
     {
         TOP = 0,
@@ -55,6 +51,8 @@ private:
         BACK = 5,
         SIZE = 6
     };
+
+    static const float ROTATION_LIMIT;
 
     void calculateViewMatrix();
     void calculateFrustum();
@@ -70,7 +68,7 @@ private:
     std::unique_ptr<glm::mat4> viewMatrix;
     std::unique_ptr<glm::mat4> projectionMatrix;
 
-    std::deque<Postprocess> postprocs;
+    std::list<Postprocess> postprocs;
 };
 
 } // moar

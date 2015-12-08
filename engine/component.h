@@ -30,10 +30,6 @@ public:
     Component& operator=(const Component&) = delete;
     Component& operator=(Component&&) = delete;
 
-    virtual void execute() = 0;
-
-    static void setShader(const Shader* shader);
-    void setParent(Object* parentObject);
     void setEnabled(bool enabled);
 
     virtual std::string getName() = 0;
@@ -44,8 +40,15 @@ protected:
     static const Shader* shader;
     static bool updateRequired;
 
+    virtual void execute() = 0;
+
+    void setParent(Object* parentObject);
+
     Object* parent;
     bool enabled;
+
+private:
+    static void setShader(const Shader* shader);
 };
 
 } // moar

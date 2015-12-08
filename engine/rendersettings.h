@@ -18,7 +18,6 @@ class RenderSettings
 {
 public:
     explicit RenderSettings();
-    ~RenderSettings();
     RenderSettings(const RenderSettings&) = delete;
     RenderSettings(RenderSettings&&) = delete;
     RenderSettings& operator=(const RenderSettings&) = delete;
@@ -27,19 +26,19 @@ public:
     bool loadSettings(const boost::property_tree::ptree& pt, ResourceManager& manager);
     bool isLoaded() const;
 
-    glm::vec4 clearColor;
+    glm::vec4 clearColor = glm::vec4(0.0f, 0.2f, 0.0f, 1.0f);
 
-    Shader* skyboxShader;
+    Shader* skyboxShader = nullptr;
     std::vector<std::string> skyboxTextures;    
 
-    Shader* ambientShader;
-    glm::vec3 ambientColor;
+    Shader* ambientShader = nullptr;
+    glm::vec3 ambientColor = glm::vec3(0.1f, 0.1f, 0.1f);
 
-    int windowWidth;
-    int windowHeight;
+    int windowWidth = 800;
+    int windowHeight = 600;
 
 private:
-    bool loaded;
+    bool loaded = false;
 };
 
 } // moar

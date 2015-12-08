@@ -1,18 +1,12 @@
 #include "renderer.h"
-#include "object.h"
 #include "common/globals.h"
 
-#define GLM_FORCE_RADIANS
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 
 namespace moar
 {
 
-Renderer::Renderer() :
-    model(nullptr),
-    shadowCaster(true),
-    shadowReceiver(true)
+Renderer::Renderer()
 {
 }
 

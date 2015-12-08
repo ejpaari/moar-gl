@@ -21,10 +21,6 @@ Camera::Camera(float fov, float ratio, float nearClip, float farClip) :
     calculateFrustum();
 }
 
-Camera::~Camera()
-{
-}
-
 void Camera::setPosition(const glm::vec3& pos)
 {
     Object::setPosition(pos);
@@ -117,7 +113,7 @@ void Camera::removePostprocess(const std::string& name)
     }
 }
 
-const std::deque<Postprocess>& Camera::getPostprocesses() const
+const std::list<Postprocess>& Camera::getPostprocesses() const
 {
     return postprocs;
 }

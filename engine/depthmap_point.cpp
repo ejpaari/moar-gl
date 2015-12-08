@@ -1,16 +1,13 @@
 #include "depthmap_point.h"
 #include "common/globals.h"
 
-#define GLM_FORCE_RADIANS
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 namespace moar
 {
 
-DepthMapPoint::DepthMapPoint() :
-    projectionMatrix(glm::perspective(glm::radians(90.0f), 1.0f, nearClipDistance, farClipDistance))
+DepthMapPoint::DepthMapPoint()
 {
 }
 

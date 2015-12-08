@@ -4,8 +4,8 @@
 namespace moar
 {
 
-Mesh::Mesh() :
-    numIndices(0) {
+Mesh::Mesh()
+{
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 }

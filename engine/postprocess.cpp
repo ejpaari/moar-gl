@@ -5,10 +5,7 @@
 namespace moar
 {
 
-Postprocess::Postprocess() :
-    name(""),
-    shader(0),
-    priority(0)
+Postprocess::Postprocess()
 {
 }
 

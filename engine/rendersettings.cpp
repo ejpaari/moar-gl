@@ -6,17 +6,8 @@
 namespace moar
 {
 
-RenderSettings::RenderSettings() :
-    skyboxShader(nullptr),
-    ambientShader(nullptr),
-    windowWidth(800),
-    windowHeight(600),
-    loaded(false)
+RenderSettings::RenderSettings()
 {    
-}
-
-RenderSettings::~RenderSettings()
-{
 }
 
 bool RenderSettings::loadSettings(const boost::property_tree::ptree& pt, ResourceManager& manager)

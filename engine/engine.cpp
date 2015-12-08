@@ -1,7 +1,6 @@
 #include "engine.h"
 #include "renderer.h"
 #include "material.h"
-#include "shader.h"
 #include "common/globals.h"
 
 #define GLM_FORCE_RADIANS
@@ -114,12 +113,8 @@ void glfwErrorCallback(int error, const char* description )
 namespace moar
 {
 
-Engine::Engine() :
-    window(nullptr),
-    fb(nullptr),
-    shader(nullptr),
-    time(0.0)
-{    
+Engine::Engine()
+{
 }
 
 Engine::~Engine()
@@ -393,15 +388,17 @@ void Engine::render()
 
     // Post-process ping-pong    
     GLuint renderedTex = fb->getRenderedTexture();
-    const std::deque<Postprocess>& postprocs = camera->getPostprocesses();
-    for (unsigned int i = 0; i < postprocs.size(); ++i) {
+    const std::list<Postprocess>& postprocs = camera->getPostprocesses();
+    int i = 0;
+    for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
         fb = i % 2 == 0 ? &fb2 : &fb1;
         fb->setPreviousFrame(renderedTex);
         fb->bind();
-        postprocs[i].bind();
+        iter->bind();
         fb->activate();
         glDrawArrays(GL_TRIANGLES, 0, 6);
         renderedTex = fb->getRenderedTexture();
+        ++i;
     }
     passthrough.bind();
     fb = postprocs.size() % 2 == 0 ? &fb1 : &fb2;

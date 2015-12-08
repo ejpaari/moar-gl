@@ -21,19 +21,10 @@ const glm::mat4* Object::view = nullptr;
 unsigned int Object::idCounter = 1;
 
 Object::Object() :
-    id(idCounter),
-    position(0.0f, 0.0f, 0.0f),
-    rotation(0.0f, 0.0f, 0.0f),
-    scale(1.0f, 1.0f, 1.0f),
-    forward(FORWARD),
-    up(UP),
-    left(LEFT),
-    material(nullptr),
-    renderer(nullptr),
-    light(nullptr),
-    name("")
-{    
+    id(idCounter)
+{
     ++idCounter;
+    // Todo: Don't create unneeded buffers.
     glGenBuffers(1, &transformationBlockBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLsizeiptr bufferSize = 4 * sizeof(*projection);

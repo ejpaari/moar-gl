@@ -37,7 +37,7 @@ private:
     glm::vec3 boundingBoxMax;
     glm::vec3 boundingBoxMin;
     glm::vec3 centerPoint;
-    float boundingRadius;
+    float boundingRadius = 0.0f;
 };
 
 } // moar

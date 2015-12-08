@@ -28,10 +28,10 @@ public:
     bool isRunning() const;
 
 protected:
-    Engine* engine;
+    Engine* engine = nullptr;
 
 private:    
-    bool running;    
+    bool running = true;
 };
 
 } // moar

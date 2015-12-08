@@ -165,5 +165,4 @@ bool Shader::readUniformLocations()
     return true;
 }
 
-
 } // moar

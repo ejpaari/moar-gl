@@ -7,7 +7,7 @@ namespace moar
 class Input
 {
 public:
-    Input();
+    explicit Input();
     Input(const Input&) = delete;
     Input(Input&&) = delete;
     Input& operator=(const Input&) = delete;
@@ -22,12 +22,12 @@ public:
     float getMovementSpeed() const;
 
 private:
-    double x;
-    double y;
-    double deltaX;
-    double deltaY;
-    double sensitivity;
-    float movementSpeed;
+    double x = 0.0;
+    double y = 0.0;
+    double deltaX = 0.0;
+    double deltaY = 0.0;
+    double sensitivity = 1.0;
+    float movementSpeed = 1.0;
 };
 
 } // moar

@@ -26,8 +26,8 @@ public:
 
 private:
     std::string name;
-    GLuint shader;
-    int priority;
+    GLuint shader = 0;
+    int priority = 0;
     std::unordered_map<std::string, std::function<void()>> uniforms;
 };
 

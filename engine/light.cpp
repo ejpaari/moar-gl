@@ -9,10 +9,7 @@
 namespace moar
 {
 
-Light::Light() :
-    type(POINT),
-    color(1.0f, 1.0f, 1.0f, 10.0f),
-    shadowingEnabled(true)
+Light::Light()
 {
     glGenBuffers(1, &lightBlockBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);

@@ -1,19 +1,14 @@
 #include "depthmap_dir.h"
 #include "common/globals.h"
 
-#define GLM_FORCE_RADIANS
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 namespace moar
 {
 
-DepthMapDirectional::DepthMapDirectional() :
-    // Todo: Proper frustum calculation / CSM.
-    frustum(-10.0f, 10.0f, -10.0f, 10.0f),
-    projectionMatrix(glm::ortho(frustum.x, frustum.y, frustum.z, frustum.w, nearClipDistance, farClipDistance))
-{    
+DepthMapDirectional::DepthMapDirectional()
+{
 }
 
 DepthMapDirectional::~DepthMapDirectional()

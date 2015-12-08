@@ -3,6 +3,8 @@
 
 #include "depthmap.h"
 
+#define GLM_FORCE_RADIANS
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 
@@ -25,7 +27,7 @@ public:
 
 private:
     GLuint depthCubeTexture;
-    glm::mat4 projectionMatrix;
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, nearClipDistance, farClipDistance);
     glm::mat4 lightSpaces[6];
 };
 

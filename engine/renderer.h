@@ -4,7 +4,6 @@
 #include "component.h"
 #include "model.h"
 
-#include <glm/glm.hpp>
 #include <string>
 
 namespace moar
@@ -13,7 +12,6 @@ namespace moar
 class Renderer : public Component
 {
 public:
-
     explicit Renderer();
     virtual ~Renderer();
     Renderer(const Renderer&) = delete;
@@ -34,9 +32,9 @@ public:
     virtual Component::Type getType() final;
 
 private:
-    Model* model;
-    bool shadowCaster;
-    bool shadowReceiver;
+    Model* model = nullptr;
+    bool shadowCaster = true;
+    bool shadowReceiver = true;
 };
 
 } // moar

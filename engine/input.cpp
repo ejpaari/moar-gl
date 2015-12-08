@@ -3,13 +3,7 @@
 namespace moar
 {
 
-Input::Input() :
-    x(0.0),
-    y(0.0),
-    deltaX(0.0),
-    deltaY(0.0),
-    sensitivity(1.0),
-    movementSpeed(1.0)
+Input::Input()
 {
 }
 
