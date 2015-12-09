@@ -9,12 +9,18 @@
 namespace moar
 {
 
+GLuint Light::lightBlockBuffer = 0;
+bool Light::bufferCreated = false;
+
 Light::Light()
 {
-    glGenBuffers(1, &lightBlockBuffer);
-    glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
-    GLsizeiptr bufferSize = 16 + 16 + 16;
-    glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
+    if (!bufferCreated) {
+        glGenBuffers(1, &lightBlockBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
+        GLsizeiptr bufferSize = 16 + 16 + 16;
+        glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
+        bufferCreated = true;
+    }
 }
 
 Light::~Light()

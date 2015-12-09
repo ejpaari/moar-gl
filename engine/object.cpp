@@ -19,16 +19,20 @@ const glm::mat4* Object::projection = nullptr;
 const glm::mat4* Object::view = nullptr;
 
 unsigned int Object::idCounter = 1;
+GLuint Object::transformationBlockBuffer = 0;
+bool Object::bufferCreated = false;
 
 Object::Object() :
     id(idCounter)
 {
     ++idCounter;
-    // Todo: Don't create unneeded buffers.
-    glGenBuffers(1, &transformationBlockBuffer);
-    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
-    GLsizeiptr bufferSize = 4 * sizeof(*projection);
-    glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
+    if (!bufferCreated) {
+        glGenBuffers(1, &transformationBlockBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+        GLsizeiptr bufferSize = 4 * sizeof(*projection);
+        glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
+        bufferCreated = true;
+    }
 }
 
 Object::~Object()

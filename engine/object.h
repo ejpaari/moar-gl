@@ -64,9 +64,6 @@ public:
     T* getComponent() const;
 
 protected:
-    static unsigned int idCounter;
-
-    unsigned int id;
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -74,21 +71,24 @@ protected:
     glm::vec3 up = UP;
     glm::vec3 left = LEFT;
 
-    Component* material = nullptr;
-    Component* renderer = nullptr;
-    Component* light = nullptr;
-    std::vector<std::shared_ptr<Component>> allComponents;    
-
-    GLuint transformationBlockBuffer;
-
-    std::string name;
-
 private:
     static bool componentUpdateRequired();
     static void resetComponentUpdate();
 
     void prepareLight();
     void render(const Shader* shader);
+
+    static unsigned int idCounter;
+    static GLuint transformationBlockBuffer;
+    static bool bufferCreated;
+
+    unsigned int id;
+    std::string name;
+
+    Component* material = nullptr;
+    Component* renderer = nullptr;
+    Component* light = nullptr;
+    std::vector<std::shared_ptr<Component>> allComponents;
 };
 
 template<typename T>

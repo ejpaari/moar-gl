@@ -39,7 +39,9 @@ public:
     bool isShadowingEnabled() const;
 
 private:
-    GLuint lightBlockBuffer;
+    static GLuint lightBlockBuffer;
+    static bool bufferCreated;
+
     Type type = POINT;
     glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 10.0f);
     bool shadowingEnabled = true;
