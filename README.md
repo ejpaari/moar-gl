@@ -1,5 +1,7 @@
 # moar-gl
 
+C++11
+
 GLEW 7.0
 
 SOIL 2007-07-26
