@@ -69,6 +69,14 @@ void Object::render(const Shader* shader)
     }
 }
 
+void Object::updateModelMatrix()
+{
+    modelMatrix =
+            glm::translate(position) *
+            glm::yawPitchRoll(rotation.y, rotation.x, rotation.z) *
+            glm::scale(scale);
+}
+
 void Object::move(const glm::vec3& translation)
 {
     position += translation;
@@ -121,10 +129,6 @@ glm::vec3 Object::getScale() const
 
 glm::mat4x4 Object::getModelMatrix() const
 {
-    glm::mat4x4 modelMatrix =
-            glm::translate(position) *
-            glm::yawPitchRoll(rotation.y, rotation.x, rotation.z) *
-            glm::scale(scale);
     return modelMatrix;
 }
 

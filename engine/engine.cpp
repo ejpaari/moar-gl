@@ -299,6 +299,7 @@ void Engine::execute()
         app->update(glfwGetTime(), glfwGetTime() - time);        
         time = glfwGetTime();
         updateObjectContainers();
+        updateModelMatrices();
         render();
         gui.render();
 
@@ -485,6 +486,14 @@ void Engine::updateObjectContainers()
                 objs.end());
     }
     Object::resetComponentUpdate();
+}
+
+void Engine::updateModelMatrices()
+{
+    for (const std::shared_ptr<Object>& obj : allObjects) {
+        obj->updateModelMatrix();
+    }
+    skybox->updateModelMatrix();
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)

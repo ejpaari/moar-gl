@@ -21,6 +21,10 @@ Camera::Camera(float fov, float ratio, float nearClip, float farClip) :
     calculateFrustum();
 }
 
+Camera::~Camera()
+{
+}
+
 void Camera::setPosition(const glm::vec3& pos)
 {
     Object::setPosition(pos);

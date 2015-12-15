@@ -50,6 +50,7 @@ private:
     void render();
     void lighting(Light::Type lightType);
     void updateObjectContainers();
+    void updateModelMatrices();
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
     bool objectInsideFrustum(const Object* obj, const Camera* cam) const;

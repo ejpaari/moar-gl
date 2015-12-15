@@ -48,8 +48,7 @@ public:
     unsigned int getId() const;
     glm::vec3 getPosition() const;
     glm::vec3 getRotation() const;
-    glm::vec3 getScale() const;
-    glm::mat4x4 getModelMatrix() const;
+    glm::vec3 getScale() const;    
     glm::vec3 getForward() const;
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
@@ -77,6 +76,8 @@ private:
 
     void prepareLight();
     void render(const Shader* shader);
+    void updateModelMatrix();
+    glm::mat4x4 getModelMatrix() const;
 
     static unsigned int idCounter;
     static GLuint transformationBlockBuffer;
@@ -84,6 +85,8 @@ private:
 
     unsigned int id;
     std::string name;
+
+    glm::mat4x4 modelMatrix;
 
     Component* material = nullptr;
     Component* renderer = nullptr;
