@@ -140,9 +140,6 @@ bool Engine::init(const std::string& settingsFile)
     boost::property_tree::ptree pt;
     try {
         boost::property_tree::ini_parser::read_ini(settingsFile, pt);
-        if (pt.get<int>("OpenGL.debug")) {
-            DEBUG = true;
-        }
     } catch (std::exception& e) {
         std::cerr << "ERROR: Could not load setting file; " << settingsFile << std::endl;
         std::cerr << e.what() << std::endl;
@@ -154,10 +151,10 @@ bool Engine::init(const std::string& settingsFile)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, pt.get<int>("OpenGL.major"));
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);        
-        if (DEBUG) {
-            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-        }
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+#ifdef DEBUG
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
     } catch (boost::property_tree::ptree_error& e) {
         std::cerr << "ERRROR: Could not load OpenGL version info from the .ini-file" << std::endl;
         std::cerr << e.what() << std::endl;
@@ -200,14 +197,15 @@ bool Engine::init(const std::string& settingsFile)
         fprintf(stderr, "ERROR: %s\n", glewGetErrorString(err));
         return false;
     }
-
-    if (DEBUG && glDebugMessageCallback) {
+#ifdef DEBUG
+    if (glDebugMessageCallback) {
         glEnable(GL_DEBUG_OUTPUT);        
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         GLuint unusedIds = 0;
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, GL_TRUE);
         glDebugMessageCallback(debugCallbackFunction, nullptr);
     }
+#endif
 
     printInfo(windowWidth, windowHeight);
 
@@ -282,6 +280,10 @@ bool Engine::init(const std::string& settingsFile)
     passthrough = Postprocess("passthrough", manager.getShader("passthrough")->getProgram(), 0);
 
     lights.resize(Light::Type::NUM_TYPES);
+
+#ifdef DEBUG
+    std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
+#endif
 
     return true;
 }

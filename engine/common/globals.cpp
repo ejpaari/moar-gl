@@ -32,7 +32,5 @@ const GLuint FAR_CLIP_DISTANCE_LOCATION = 43;
 const GLuint LIGHT_SPACE_PROJ_LOCATION = 50;
 const GLuint LIGHT_SPACE_VP_LOCATION = 51;
 
-bool DEBUG = false;
-
 unsigned int DRAW_COUNT = 0;
 } // moar

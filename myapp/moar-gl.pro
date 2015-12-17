@@ -10,6 +10,7 @@ TARGET = moar-gl
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG += c++11
+DEFINES += DEBUG
 
 TEMPLATE = app
 
