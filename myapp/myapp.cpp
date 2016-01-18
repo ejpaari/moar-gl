@@ -37,61 +37,38 @@ MyApp::~MyApp()
 void MyApp::start()
 {
     camera = engine->getCamera();
+    camera->setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
-    moar::Object* planeBot = createRenderObject("diffuse", "plane.3ds", "white.png");
-    planeBot->setPosition(glm::vec3(0.0f, -1.0f, 0.0f));
-    planeBot->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-    planeBot->setName("plane");
-
-    moar::Object* planeR = createRenderObject("diffuse", "plane.3ds", "white.png");
-    planeR->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
-    planeR->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-    planeR->rotate(glm::vec3(0.0f, 0.0f, 1.0f), 1.57f);
-
-    moar::Object* planeL = createRenderObject("diffuse", "plane.3ds", "white.png");
-    planeL->setPosition(glm::vec3(-5.0f, 0.0f, 0.0f));
-    planeL->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-    planeL->rotate(glm::vec3(0.0f, 0.0f, 1.0f), 1.57f);
-
-//    moar::Object* planeF = createRenderObject("diffuse", "plane.3ds", "white.png");
-//    planeF->setPosition(glm::vec3(0.0f, 0.0f, -5.0f));
-//    planeF->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-//    planeF->rotate(glm::vec3(1.0f, 0.0f, 0.0f), 1.57f);
-
-    moar::Object* planeB = createRenderObject("diffuse", "plane.3ds", "white.png");
-    planeB->setPosition(glm::vec3(0.0f, 0.0f, 5.0f));
-    planeB->setScale(glm::vec3(10.0f, 1.0f, 10.0f));
-    planeB->rotate(glm::vec3(1.0f, 0.0f, 0.0f), 1.57f);
-
+    createRenderObject("diffuse", "sponza.3ds", "white.png");
 
     monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
-    monkey1->setPosition(glm::vec3(0.0f, 0.0f, -3.0f));
+    monkey1->setPosition(glm::vec3(0.0f, 2.0f, -3.0f));
     monkey1->setName("diffuse_monkey");
 
     monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
-    monkey2->setPosition(glm::vec3(3.0f, 0.0f, 0.0f));
+    monkey2->setPosition(glm::vec3(3.0f, 2.0f, 0.0f));
     monkey2->setName("specular_monkey");
     moar::Material* mat = monkey2->getComponent<moar::Material>();
     mat->setUniform("specularity", std::bind(glUniform1f, moar::SPECULAR_LOCATION, 50.0f), moar::SPECULAR_LOCATION);
 
     icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
-    icosphere->setPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
+    icosphere->setPosition(glm::vec3(-3.0f, 2.0f, 0.0f));
     icosphere->setName("icosphere");
     mat = icosphere->getComponent<moar::Material>();
     mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
-    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 3.0f));
-    light1->setPosition(glm::vec3(0.0f, 1.5f, -3.0f));
-    light2 = createLight(glm::vec4(1.0f, 0.0f, 0.0f, 8.0f));
-    light2->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
+    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 5.0f));
+    light1->setPosition(glm::vec3(3.0f, 3.5f, 0.0f));
+    light2 = createLight(glm::vec4(1.0f, 1.0f, 0.0f, 7.0f));
+    light2->setPosition(glm::vec3(-2.0f, 3.5f, 0.0f));
 //    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
 //    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
 //    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.8f), moar::Light::DIRECTIONAL);
-    dirLight->setPosition(glm::vec3(0.0f, 1.8f, -5.0f));
-    dirLight->setRotation(glm::vec3(-0.7f, 3.14f, 0.0f));
+    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.1f), moar::Light::DIRECTIONAL);
+    dirLight->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+    dirLight->setRotation(glm::vec3(-1.0f, 0.0f, 0.0f));
 //    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
 //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
 //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
@@ -125,7 +102,7 @@ void MyApp::handleInput(GLFWwindow *window)
         camera->move(-camera->getLeft() * input->getMovementSpeed());
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        camera->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+        camera->setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
         camera->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 
