@@ -11,3 +11,5 @@ GLM
 Boost 1.57.0
 
 GLFW & Assimp as submodules
+
+Sponza model from http://hdri.cgtechniques.com/~sponza/files/ by Marko Dabrovic
