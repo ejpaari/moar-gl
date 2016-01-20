@@ -13,13 +13,10 @@ MyApp::MyApp() :
     renderSettings(nullptr),
     offset(nullptr),
     bar(nullptr),
-    monkey1(nullptr),
-    monkey2(nullptr),
-    monkey3(nullptr),
+    monkey(nullptr),
     icosphere(nullptr),
     light1(nullptr),
     light2(nullptr),
-    light3(nullptr),
     dirLight(nullptr),
     rotationAxis(0.0f, 1.0f, 0.0f),
     rotationSpeed(0.5f),
@@ -37,41 +34,36 @@ MyApp::~MyApp()
 void MyApp::start()
 {
     camera = engine->getCamera();
-    camera->setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+    resetCamera();
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
-    createRenderObject("diffuse", "sponza.3ds", "white.png");
+    moar::Object* sponza = createRenderObject("diffuse", "sponza.3ds", "white.png");
+    sponza->setScale(glm::vec3(3.0f, 3.0f, 3.0f));
 
-    monkey1 = createRenderObject("diffuse", "monkey.3ds", "checker.png");
-    monkey1->setPosition(glm::vec3(0.0f, 2.0f, -3.0f));
-    monkey1->setName("diffuse_monkey");
+    //    monkey = createRenderObject("specular", "monkey.3ds", "checker.png");
+    //    monkey->setPosition(glm::vec3(3.0f, 0.1f, 0.0f));
+    //    monkey->setName("specular_monkey");
+    //    moar::Material* mat = monkey->getComponent<moar::Material>();
+    //    mat->setUniform("specularity", std::bind(glUniform1f, moar::SPECULAR_LOCATION, 50.0f), moar::SPECULAR_LOCATION);
 
-    monkey2 = createRenderObject("specular", "monkey.3ds", "checker.png");
-    monkey2->setPosition(glm::vec3(3.0f, 2.0f, 0.0f));
-    monkey2->setName("specular_monkey");
-    moar::Material* mat = monkey2->getComponent<moar::Material>();
-    mat->setUniform("specularity", std::bind(glUniform1f, moar::SPECULAR_LOCATION, 50.0f), moar::SPECULAR_LOCATION);
+    //    icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
+    //    icosphere->setPosition(glm::vec3(-3.0f, 2.0f, 0.0f));
+    //    icosphere->setName("icosphere");
+    //    mat = icosphere->getComponent<moar::Material>();
+    //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
-    icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
-    icosphere->setPosition(glm::vec3(-3.0f, 2.0f, 0.0f));
-    icosphere->setName("icosphere");
-    mat = icosphere->getComponent<moar::Material>();
-    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
-
-    light1 = createLight(glm::vec4(0.0f, 1.0f, 0.0f, 5.0f));
-    light1->setPosition(glm::vec3(3.0f, 3.5f, 0.0f));
-    light2 = createLight(glm::vec4(1.0f, 1.0f, 0.0f, 7.0f));
-    light2->setPosition(glm::vec3(-2.0f, 3.5f, 0.0f));
-//    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
-//    light3 = createLight(glm::vec4(0.0f, 0.0f, 1.0f, 5.0f));
-//    light3->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.1f), moar::Light::DIRECTIONAL);
-    dirLight->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
-    dirLight->setRotation(glm::vec3(-1.0f, 0.0f, 0.0f));
-//    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
-//    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-//    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
+    light1 = createLight(glm::vec4(0.8f, 1.0f, 0.8f, 1.0f));
+    light1->setPosition(glm::vec3(1.0f, 1.5f, 0.0f));
+    light2 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
+    light2->setPosition(glm::vec3(-1.0f, 1.5f, 0.0f));
+    //    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
+    //    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.1f), moar::Light::DIRECTIONAL);
+    //    dirLight->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+    //    dirLight->setRotation(glm::vec3(-1.0f, 0.0f, 0.0f));
+    //    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
+    //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
+    //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 
     initGUI();
 }
@@ -102,8 +94,7 @@ void MyApp::handleInput(GLFWwindow *window)
         camera->move(-camera->getLeft() * input->getMovementSpeed());
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        camera->setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
-        camera->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+        resetCamera();
     }
 
     camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());
@@ -121,13 +112,13 @@ void MyApp::update(double time, double deltaTime)
         fpsCounter = 0;
     }
 
-    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
-    monkey2->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
+    //    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+    //    monkey2->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
 
     light1->move(glm::vec3(0.0f, sin(time) * 0.01f, 0.0f));
-    light2->move(glm::vec3(0.0f, cos(time) * 0.03f, 0.0f));
+    light2->move(glm::vec3(0.0f, cos(time) * 0.02f, 0.0f));
 
-//    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
+    //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }
 
 void MyApp::initGUI()
@@ -186,4 +177,10 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     renderer->setShadowReceiver(false);
 
     return light;
+}
+
+void MyApp::resetCamera()
+{
+    camera->setPosition(glm::vec3(0.0f, 0.5f, 0.5f));
+    camera->setRotation(glm::vec3(0.0f, 0.9f, 0.0f));
 }

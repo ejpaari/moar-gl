@@ -27,6 +27,7 @@ private:
     void initGUI();
     moar::Object* createRenderObject(const std::string& shader, const std::string& modelName, const std::string& textureName);
     moar::Object* createLight(const glm::vec4& color, moar::Light::Type type = moar::Light::POINT);
+    void resetCamera();
 
     moar::Camera* camera;
     moar::Input* input;
@@ -34,14 +35,11 @@ private:
     moar::Postprocess* offset;
     TwBar* bar;
 
-    moar::Object* monkey1;
-    moar::Object* monkey2;
-    moar::Object* monkey3;
+    moar::Object* monkey;
     moar::Object* icosphere;
 
     moar::Object* light1;
     moar::Object* light2;
-    moar::Object* light3;
     moar::Object* dirLight;
 
     glm::vec3 rotationAxis;
