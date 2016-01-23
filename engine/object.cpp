@@ -39,44 +39,6 @@ Object::~Object()
 {
 }
 
-void Object::prepareLight()
-{
-    if (light->isEnabled()) {
-        assert(light != nullptr);
-        light->execute();
-    }
-}
-
-void Object::render(const Shader* shader)
-{
-    Component::setShader(shader);
-    if (material->isEnabled()) {
-        material->execute();
-    }
-
-    if (renderer->isEnabled()) {
-        glm::mat4x4 model = getModelMatrix();
-        glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
-        GLintptr matrixSize = sizeof(model);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(model));
-        glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
-        glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * model));
-        glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * model));
-        glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
-
-        assert(renderer != nullptr);
-        renderer->execute();
-    }
-}
-
-void Object::updateModelMatrix()
-{
-    modelMatrix =
-            glm::translate(position) *
-            glm::yawPitchRoll(rotation.y, rotation.x, rotation.z) *
-            glm::scale(scale);
-}
-
 void Object::move(const glm::vec3& translation)
 {
     position += translation;
@@ -127,11 +89,6 @@ glm::vec3 Object::getScale() const
     return scale;
 }
 
-glm::mat4x4 Object::getModelMatrix() const
-{
-    return modelMatrix;
-}
-
 glm::vec3 Object::getForward() const
 {
     glm::vec4 v =
@@ -161,24 +118,45 @@ std::string Object::getName() const
     return name;
 }
 
-bool Object::hasComponent(const std::string& name) const
+void Object::prepareLight()
 {
-    for (unsigned int i = 0; i < allComponents.size(); ++i) {
-        if (allComponents[i]->getName() == name) {
-            return true;
-        }
+    if (light) {
+        light->execute(position, forward);
     }
-    return false;
 }
 
-bool Object::componentUpdateRequired()
+void Object::render(const Shader* shader)
 {
-    return Component::updateRequired;
+    if (material) {
+        material->execute(shader);
+    }
+
+    if (renderer) {
+        glm::mat4x4 model = getModelMatrix();
+        glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+        GLintptr matrixSize = sizeof(model);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(model));
+        glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
+        glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * model));
+        glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * model));
+        glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
+
+        assert(renderer != nullptr);
+        renderer->execute(shader);
+    }
 }
 
-void Object::resetComponentUpdate()
+void Object::updateModelMatrix()
 {
-    Component::updateRequired = false;
+    modelMatrix =
+            glm::translate(position) *
+            glm::yawPitchRoll(rotation.y, rotation.x, rotation.z) *
+            glm::scale(scale);
+}
+
+glm::mat4x4 Object::getModelMatrix() const
+{
+    return modelMatrix;
 }
 
 } // moar

@@ -1,7 +1,6 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "component.h"
 #include "shader.h"
 #include "renderer.h"
 #include "material.h"
@@ -54,13 +53,14 @@ public:
     glm::vec3 getLeft() const;
     std::string getName() const;
 
-    bool hasComponent(const std::string& name) const;
-
     template<typename T>
     T* addComponent();
 
     template<typename T>
     T* getComponent() const;
+
+    template<typename T>
+    bool hasComponent() const;
 
 protected:
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -71,9 +71,6 @@ protected:
     glm::vec3 left = LEFT;
 
 private:
-    static bool componentUpdateRequired();
-    static void resetComponentUpdate();
-
     void prepareLight();
     void render(const Shader* shader);
     void updateModelMatrix();
@@ -88,54 +85,54 @@ private:
 
     glm::mat4x4 modelMatrix;
 
-    Component* material = nullptr;
-    Component* renderer = nullptr;
-    Component* light = nullptr;
-    std::vector<std::shared_ptr<Component>> allComponents;
+    std::unique_ptr<Light> light = nullptr;
+    std::unique_ptr<Renderer> renderer = nullptr;
+    std::unique_ptr<Material> material = nullptr;
 };
+
+// Maybe template spezialization would be better?
 
 template<typename T>
 T* Object::addComponent()
 {
-    T* component = getComponent<T>();
-    if (component != nullptr) {
-        return component;
-    }
-
-    std::shared_ptr<Component> comp;
-    if (typeid(T) == typeid(Renderer)) {
-        comp.reset(new Renderer);
-        renderer = comp.get();
-    }
+    COMPONENT_CHANGED = true;
     if (typeid(T) == typeid(Light)) {
-        comp.reset(new Light);
-        light = comp.get();
+        light.reset(new Light);
+        return reinterpret_cast<T*>(light.get());
+    }
+    if (typeid(T) == typeid(Renderer)) {
+        renderer.reset(new Renderer);
+        return reinterpret_cast<T*>(renderer.get());
     }
     if (typeid(T) == typeid(Material)) {
-        comp.reset(new Material);
-        material = comp.get();
+        material.reset(new Material);
+        return reinterpret_cast<T*>(material.get());
     }
 
-    allComponents.push_back(comp);
-    component = dynamic_cast<T*>(comp.get());
-    if (component != nullptr) {
-        component->setParent(this);
-        return component;
-    } else {
-        std::cerr << "ERROR: Component casting failed when adding a component" << std::endl;
-        return nullptr;
-    }
+    std::cerr << "ERROR: Could not add a component\n";
+    return nullptr;
 }
 
 template<typename T>
 T* Object::getComponent() const
 {
-    for (unsigned int i = 0; i < allComponents.size(); ++i) {
-        if (typeid(*allComponents[i].get()) == typeid(T)) {
-            return dynamic_cast<T*>(allComponents[i].get());
-        }
+    if (typeid(T) == typeid(Light)) {
+        return reinterpret_cast<T*>(light.get());
     }
+    if (typeid(T) == typeid(Renderer)) {
+        return reinterpret_cast<T*>(renderer.get());
+    }
+    if (typeid(T) == typeid(Material)) {
+        return reinterpret_cast<T*>(material.get());
+    }
+
     return nullptr;
+}
+
+template<typename T>
+bool Object::hasComponent() const
+{
+    return getComponent<T>() != nullptr;
 }
 
 } // moar

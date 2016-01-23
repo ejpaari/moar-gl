@@ -458,19 +458,20 @@ void Engine::lighting(Light::Type lightType)
 
 void Engine::updateObjectContainers()
 {
-    if (!Object::componentUpdateRequired()) {
+    // Todo: This global is a bit nasty.
+    if (!COMPONENT_CHANGED) {
         return;
     }
 
     for (const auto& obj : allObjects) {
-        if (obj->hasComponent("Renderer")) {
+        if (obj->hasComponent<Renderer>()) {
             std::string type = obj->getComponent<Material>()->getShaderType();
             std::vector<Object*>& objs = renderObjects[type];
             if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
                 renderObjects[type].push_back(obj.get());
             }
         }
-        if (obj->hasComponent("Light")) {
+        if (obj->hasComponent<Light>()) {
             Light::Type type = obj->getComponent<Light>()->getLightType();
             std::vector<Object*>& objs = lights[type];
             if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
@@ -479,15 +480,15 @@ void Engine::updateObjectContainers()
         }
     }
     for (auto& objs : lights) {
-        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent("Light"); }),
+        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent<Light>(); }),
                 objs.end());
     }
     for (auto& renderObjs : renderObjects) {
         std::vector<Object*>& objs = renderObjs.second;
-        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent("Renderer"); }),
+        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent<Renderer>(); }),
                 objs.end());
     }
-    Object::resetComponentUpdate();
+    COMPONENT_CHANGED = false;
 }
 
 void Engine::updateModelMatrices()

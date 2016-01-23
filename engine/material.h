@@ -1,7 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "component.h"
+#include "shader.h"
 
 #include <GL/glew.h>
 #include <string>
@@ -13,7 +13,7 @@
 namespace moar
 {
 
-class Material : public Component
+class Material
 {
 public:
     enum TextureType
@@ -35,21 +35,19 @@ public:
     static const TextureInfo textureInfos[];
 
     Material();
-    virtual ~Material();
+    ~Material();
     Material(const Material&) = delete;
     Material(Material&&) = delete;
     Material& operator=(const Material&) = delete;
     Material& operator=(Material&&) = delete;
 
-    virtual void execute() final;
+    void execute(const Shader* shader);
 
     void setShaderType(const std::string& shaderType);
     void setTexture(GLuint texture, TextureType type, GLenum target);
     // Todo: Duplicate location info.
     void setUniform(const std::string& name, std::function<void()> func, GLuint location);
 
-    virtual std::string getName() final;
-    virtual Component::Type getType() final;
     std::string getShaderType() const;
 
 private:

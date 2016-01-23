@@ -33,4 +33,5 @@ const GLuint LIGHT_SPACE_PROJ_LOCATION = 50;
 const GLuint LIGHT_SPACE_VP_LOCATION = 51;
 
 unsigned int DRAW_COUNT = 0;
+bool COMPONENT_CHANGED = false;
 } // moar

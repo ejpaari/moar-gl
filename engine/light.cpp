@@ -28,23 +28,23 @@ Light::~Light()
     glDeleteBuffers(1, &lightBlockBuffer);
 }
 
-void Light::execute()
+void Light::execute(const glm::vec3& position, const glm::vec3& forward)
 {
+    // Todo: sizeof is called each time! Call it once and store the value.
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
     GLintptr offset = 0;
     glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(color), glm::value_ptr(color));
     offset += 16;
-    glm::vec3 pos = parent->getPosition();
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(pos), glm::value_ptr(pos));
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(position), glm::value_ptr(position));
     offset += 16;
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(parent->getForward()), glm::value_ptr(parent->getForward()));
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(forward), glm::value_ptr(forward));
     glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
 }
 
 void Light::setType(Light::Type type)
 {
     this->type = type;
-    updateRequired = true;
+    COMPONENT_CHANGED = true;
 }
 
 void Light::setShadowingEnabled(bool enabled)
@@ -65,16 +65,6 @@ bool Light::isShadowingEnabled() const
 Light::Type Light::getLightType() const
 {
     return type;
-}
-
-std::string Light::getName()
-{
-    return "Light";
-}
-
-Component::Type Light::getType()
-{
-    return Component::Type::LIGHT;
 }
 
 } // moar

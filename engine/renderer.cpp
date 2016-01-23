@@ -14,7 +14,7 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::execute()
+void Renderer::execute(const Shader* shader)
 {
     if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
         glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
@@ -25,7 +25,7 @@ void Renderer::execute()
 void Renderer::setModel(Model* model)
 {
     this->model = model;
-    updateRequired = true;
+    COMPONENT_CHANGED = true;
 }
 
 void Renderer::setShadowCaster(bool caster)
@@ -46,16 +46,6 @@ Model* Renderer::getModel()
 bool Renderer::isShadowCaster() const
 {
     return shadowCaster;
-}
-
-std::string Renderer::getName()
-{
-    return "Renderer";
-}
-
-Component::Type Renderer::getType()
-{
-    return Component::Type::RENDERER;
 }
 
 } // moar

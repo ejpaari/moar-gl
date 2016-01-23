@@ -21,7 +21,7 @@ Material::~Material()
 {
 }
 
-void Material::execute()
+void Material::execute(const Shader* shader)
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
         if (shader->hasUniform(std::get<1>(textures[i])->location)) {
@@ -41,7 +41,7 @@ void Material::execute()
 void Material::setShaderType(const std::string& shaderType)
 {
     this->shaderType = shaderType;
-    updateRequired = true;
+    COMPONENT_CHANGED = true;
 }
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)
@@ -63,16 +63,6 @@ void Material::setUniform(const std::string& name, std::function<void ()> func, 
     uniform.func = func;
     uniform.location = location;
     uniforms[name] = uniform;
-}
-
-std::string Material::getName()
-{
-    return "Material";
-}
-
-Component::Type Material::getType()
-{
-    return Component::Type::MATERIAL;
 }
 
 const Material::TextureInfo* Material::getTextureInfo(TextureType type)
