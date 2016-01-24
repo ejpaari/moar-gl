@@ -30,7 +30,6 @@ SOURCES += \
     ../engine/input.cpp \
     ../engine/resourcemanager.cpp \
     ../engine/texture.cpp \
-    ../engine/renderer.cpp \
     ../engine/material.cpp \
     ../engine/gui.cpp \
     ../engine/light.cpp \
@@ -55,7 +54,6 @@ HEADERS += \
     ../engine/input.h \
     ../engine/resourcemanager.h \
     ../engine/texture.h \
-    ../engine/renderer.h \
     ../engine/material.h \
     ../engine/gui.h \
     ../engine/light.h \

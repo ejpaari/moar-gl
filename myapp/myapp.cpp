@@ -1,6 +1,6 @@
 #include "myapp.h"
 #include "../engine/common/globals.h"
-#include "../engine/renderer.h"
+#include "../engine/model.h"
 #include "../engine/material.h"
 
 #include <boost/math/constants/constants.hpp>
@@ -133,9 +133,8 @@ void MyApp::initGUI()
 moar::Object* MyApp::createRenderObject(const std::string& shader, const std::string& modelName, const std::string& textureName)
 {
     moar::Object* renderObj= engine->createObject();
-    moar::Renderer* renderer = renderObj->addComponent<moar::Renderer>();
     moar::Model* model = engine->getResourceManager()->getModel(modelName);
-    renderer->setModel(model);
+    renderObj->setModel(model);
 
     moar::Material* material = renderObj->addComponent<moar::Material>();
     GLuint texture = 0;
@@ -169,12 +168,11 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
                          std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, color.x, color.y, color.z),
                          moar::SOLID_COLOR_LOCATION);
 
-    moar::Renderer* renderer = light->addComponent<moar::Renderer>();
     std::string modelName = type == moar::Light::POINT ? "sphere.3ds" : "cylinder.3ds";
     moar::Model* model = engine->getResourceManager()->getModel(modelName);
-    renderer->setModel(model);
-    renderer->setShadowCaster(false);
-    renderer->setShadowReceiver(false);
+    light->setModel(model);
+    light->setShadowCaster(false);
+    light->setShadowReceiver(false);
 
     return light;
 }

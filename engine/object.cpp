@@ -118,6 +118,32 @@ std::string Object::getName() const
     return name;
 }
 
+void Object::setShadowCaster(bool caster)
+{
+    shadowCaster = caster;
+}
+
+void Object::setShadowReceiver(bool receiver)
+{
+    shadowReceiver = receiver;
+}
+
+bool Object::isShadowCaster() const
+{
+    return shadowCaster;
+}
+
+void Object::setModel(const Model* model)
+{
+    this->model = model;
+    COMPONENT_CHANGED = true;
+}
+
+const Model* Object::getModel() const
+{
+    return model;
+}
+
 void Object::prepareLight()
 {
     if (light) {
@@ -131,18 +157,19 @@ void Object::render(const Shader* shader)
         material->execute(shader);
     }
 
-    if (renderer) {
-        glm::mat4x4 model = getModelMatrix();
+    if (model != nullptr) {
         glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
-        GLintptr matrixSize = sizeof(model);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(model));
+        GLintptr matrixSize = sizeof(modelMatrix);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(modelMatrix));
         glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
-        glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * model));
-        glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * model));
+        glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * modelMatrix));
+        glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * modelMatrix));
         glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
 
-        assert(renderer != nullptr);
-        renderer->execute(shader);
+        if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
+            glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
+        }
+        model->render();
     }
 }
 

@@ -1,5 +1,5 @@
 #include "engine.h"
-#include "renderer.h"
+#include "model.h"
 #include "material.h"
 #include "common/globals.h"
 
@@ -430,7 +430,7 @@ void Engine::lighting(Light::Type lightType)
             for (auto& renderObjs : renderObjects) {
                 for (auto& renderObj : renderObjs.second) {
                     // Todo: frustum culling.
-                    if (renderObj->getComponent<Renderer>()->isShadowCaster()) {
+                    if (renderObj->isShadowCaster()) {
                         renderObj->render(shader);
                     }
                 }
@@ -464,7 +464,7 @@ void Engine::updateObjectContainers()
     }
 
     for (const auto& obj : allObjects) {
-        if (obj->hasComponent<Renderer>()) {
+        if (obj->getModel() != nullptr) {
             std::string type = obj->getComponent<Material>()->getShaderType();
             std::vector<Object*>& objs = renderObjects[type];
             if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
@@ -485,7 +485,7 @@ void Engine::updateObjectContainers()
     }
     for (auto& renderObjs : renderObjects) {
         std::vector<Object*>& objs = renderObjs.second;
-        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent<Renderer>(); }),
+        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return obj->getModel() == nullptr; }),
                 objs.end());
     }
     COMPONENT_CHANGED = false;
@@ -529,18 +529,17 @@ bool Engine::createSkybox()
     GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);
     material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);
 
-    Renderer* renderer = skybox->addComponent<Renderer>();
     Model* model = getResourceManager()->getModel("cube.3ds");
-    renderer->setModel(model);
-    renderer->setShadowCaster(false);
-    renderer->setShadowReceiver(false);
+    skybox->setModel(model);
+    skybox->setShadowCaster(false);
+    skybox->setShadowReceiver(false);
 
     return true;
 }
 
 bool Engine::objectInsideFrustum(const Object* obj, const Camera* cam) const
 {
-    Model* model = obj->getComponent<Renderer>()->getModel();
+    const Model* model = obj->getModel();
     glm::vec3 point = model->getCenterPoint();
     point = glm::vec3((*Object::view) * obj->getModelMatrix() * glm::vec4(point.x, point.y, point.z, 1.0f));
     glm::vec3 scale = obj->getScale();

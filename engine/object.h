@@ -2,7 +2,7 @@
 #define OBJECT_H
 
 #include "shader.h"
-#include "renderer.h"
+#include "model.h"
 #include "material.h"
 #include "light.h"
 
@@ -53,6 +53,14 @@ public:
     glm::vec3 getLeft() const;
     std::string getName() const;
 
+    void setShadowCaster(bool caster);
+    void setShadowReceiver(bool receiver);
+    bool isShadowCaster() const;
+
+    // Todo: Is this kind of an interface good? Think about component / model.
+    void setModel(const Model* model);
+    const Model* getModel() const;
+
     template<typename T>
     T* addComponent();
 
@@ -83,14 +91,17 @@ private:
     unsigned int id;
     std::string name;
 
+    bool shadowCaster = true;
+    bool shadowReceiver = true;
+
     glm::mat4x4 modelMatrix;
 
     std::unique_ptr<Light> light = nullptr;
-    std::unique_ptr<Renderer> renderer = nullptr;
+    const Model* model = nullptr;
     std::unique_ptr<Material> material = nullptr;
 };
 
-// Maybe template spezialization would be better?
+// Todo: Maybe template specialization would be better? Or remove these completely?
 
 template<typename T>
 T* Object::addComponent()
@@ -99,10 +110,6 @@ T* Object::addComponent()
     if (typeid(T) == typeid(Light)) {
         light.reset(new Light);
         return reinterpret_cast<T*>(light.get());
-    }
-    if (typeid(T) == typeid(Renderer)) {
-        renderer.reset(new Renderer);
-        return reinterpret_cast<T*>(renderer.get());
     }
     if (typeid(T) == typeid(Material)) {
         material.reset(new Material);
@@ -118,9 +125,6 @@ T* Object::getComponent() const
 {
     if (typeid(T) == typeid(Light)) {
         return reinterpret_cast<T*>(light.get());
-    }
-    if (typeid(T) == typeid(Renderer)) {
-        return reinterpret_cast<T*>(renderer.get());
     }
     if (typeid(T) == typeid(Material)) {
         return reinterpret_cast<T*>(material.get());
