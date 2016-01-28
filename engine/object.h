@@ -61,6 +61,10 @@ public:
     void setModel(const Model* model);
     const Model* getModel() const;
 
+    // Todo: Temporary, should be moved to Mesh-class.
+    void setMaterial(Material* material);
+    Material* getMaterial() const;
+
     template<typename T>
     T* addComponent();
 
@@ -98,7 +102,7 @@ private:
 
     std::unique_ptr<Light> light = nullptr;
     const Model* model = nullptr;
-    std::unique_ptr<Material> material = nullptr;
+    Material* material = nullptr;
 };
 
 // Todo: Maybe template specialization would be better? Or remove these completely?
@@ -111,10 +115,6 @@ T* Object::addComponent()
         light.reset(new Light);
         return reinterpret_cast<T*>(light.get());
     }
-    if (typeid(T) == typeid(Material)) {
-        material.reset(new Material);
-        return reinterpret_cast<T*>(material.get());
-    }
 
     std::cerr << "ERROR: Could not add a component\n";
     return nullptr;
@@ -125,9 +125,6 @@ T* Object::getComponent() const
 {
     if (typeid(T) == typeid(Light)) {
         return reinterpret_cast<T*>(light.get());
-    }
-    if (typeid(T) == typeid(Material)) {
-        return reinterpret_cast<T*>(material.get());
     }
 
     return nullptr;

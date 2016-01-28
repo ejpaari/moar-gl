@@ -94,6 +94,13 @@ bool ResourceManager::loadShaders(const std::string& path)
     return true;
 }
 
+Material* ResourceManager::createMaterial()
+{
+    std::unique_ptr<Material> material(new Material());
+    auto iter = materials.insert(std::make_pair(material->getId(), std::move(material)));
+    return iter.second ? iter.first->second.get() : nullptr;
+}
+
 Shader* ResourceManager::getShader(const std::string& name)
 {
     auto found = shadersByName.find(name);
@@ -105,7 +112,7 @@ Shader* ResourceManager::getShader(const std::string& name)
     }
 }
 
-Shader* ResourceManager::getShader(const std::string& shader, const Light::Type light)
+const Shader* ResourceManager::getShader(const std::string& shader, const Light::Type light)
 {
     auto found = shadersByType.find(std::make_pair(shader, light));
     if (found != shadersByType.end()) {
@@ -116,7 +123,7 @@ Shader* ResourceManager::getShader(const std::string& shader, const Light::Type 
     }
 }
 
-Model* ResourceManager::getModel(const std::string& modelName)
+const Model* ResourceManager::getModel(const std::string& modelName)
 {
     auto found = models.find(modelName);
     if (found == models.end()) {
@@ -128,11 +135,7 @@ Model* ResourceManager::getModel(const std::string& modelName)
             return nullptr;
         }
         auto iter = models.insert(std::make_pair(modelName, std::move(model)));
-        if (iter.second) {
-            return iter.first->second.get();
-        } else {
-            return nullptr;
-        }
+        return iter.second ? iter.first->second.get() : nullptr;
     } else {
         return found->second.get();
     }
@@ -168,13 +171,24 @@ GLuint ResourceManager::getCubeTexture(std::vector<std::string> textureNames)
         std::unique_ptr<Texture> texture(new Texture());
         bool isGood = texture->load(textureNames);
         if (!isGood) {
-            std::cerr << "WARNING: Failed to load one or more cube textures" << std::endl;
+            std::cerr << "WARNING: Failed to load one or more cube textures\n";
             return 0;
         }
         auto iter = cubeTextures.insert(std::make_pair(textureKey, std::move(texture)));
         return iter.first->second->getID();
     } else {
         return found->second->getID();
+    }
+}
+
+Material* ResourceManager::getMaterial(int id)
+{
+    auto found = materials.find(id);
+    if (found != materials.end()) {
+        return found->second.get();
+    } else {
+        std::cerr << "ERROR: Could not find material with id " << id << "\n";
+        return 0;
     }
 }
 

@@ -18,7 +18,7 @@ const glm::vec3 Object::LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
 const glm::mat4* Object::projection = nullptr;
 const glm::mat4* Object::view = nullptr;
 
-unsigned int Object::idCounter = 1;
+unsigned int Object::idCounter = 0;
 GLuint Object::transformationBlockBuffer = 0;
 bool Object::bufferCreated = false;
 
@@ -142,6 +142,16 @@ void Object::setModel(const Model* model)
 const Model* Object::getModel() const
 {
     return model;
+}
+
+void Object::setMaterial(Material* material)
+{
+    this->material = material;
+}
+
+Material*Object::getMaterial() const
+{
+    return material;
 }
 
 void Object::prepareLight()

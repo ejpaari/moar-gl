@@ -133,10 +133,11 @@ void MyApp::initGUI()
 moar::Object* MyApp::createRenderObject(const std::string& shader, const std::string& modelName, const std::string& textureName)
 {
     moar::Object* renderObj= engine->createObject();
-    moar::Model* model = engine->getResourceManager()->getModel(modelName);
+    const moar::Model* model = engine->getResourceManager()->getModel(modelName);
     renderObj->setModel(model);
 
-    moar::Material* material = renderObj->addComponent<moar::Material>();
+    moar::Material* material = engine->getResourceManager()->createMaterial();
+    renderObj->setMaterial(material);
     GLuint texture = 0;
     if (!textureName.empty()) {
         texture = engine->getResourceManager()->getTexture(textureName);
@@ -160,7 +161,8 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     lightComponent->setColor(color);
     lightComponent->setType(type);
 
-    moar::Material* material = light->addComponent<moar::Material>();
+    moar::Material* material = engine->getResourceManager()->createMaterial();
+    light->setMaterial(material);
     material->setShaderType("diffuse");
     GLuint texture = engine->getResourceManager()->getTexture("white.png");
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
@@ -169,7 +171,7 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
                          moar::SOLID_COLOR_LOCATION);
 
     std::string modelName = type == moar::Light::POINT ? "sphere.3ds" : "cylinder.3ds";
-    moar::Model* model = engine->getResourceManager()->getModel(modelName);
+    const moar::Model* model = engine->getResourceManager()->getModel(modelName);
     light->setModel(model);
     light->setShadowCaster(false);
     light->setShadowReceiver(false);

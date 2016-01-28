@@ -25,7 +25,7 @@ public:
     bool attachShader(GLenum shaderType, const char *filename);
     bool linkProgram();
 
-    GLuint getProgram();
+    GLuint getProgram() const;
     bool hasUniform(GLuint location) const;
 
 private:

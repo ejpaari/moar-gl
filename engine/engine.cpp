@@ -464,8 +464,8 @@ void Engine::updateObjectContainers()
     }
 
     for (const auto& obj : allObjects) {
-        if (obj->getModel() != nullptr) {
-            std::string type = obj->getComponent<Material>()->getShaderType();
+        if (obj->getModel() != nullptr && obj->getMaterial() != nullptr) {
+            std::string type = obj->getMaterial()->getShaderType();
             std::vector<Object*>& objs = renderObjects[type];
             if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
                 renderObjects[type].push_back(obj.get());
@@ -485,7 +485,7 @@ void Engine::updateObjectContainers()
     }
     for (auto& renderObjs : renderObjects) {
         std::vector<Object*>& objs = renderObjs.second;
-        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return obj->getModel() == nullptr; }),
+        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return (obj->getModel() == nullptr || obj->getMaterial() == nullptr);}),
                 objs.end());
     }
     COMPONENT_CHANGED = false;
@@ -524,12 +524,13 @@ bool Engine::createSkybox()
     }
 
     skybox.reset(new Object());
-    Material* material = skybox->addComponent<Material>();
+    Material* material = manager.createMaterial();
+    skybox->setMaterial(material);
 
     GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);
     material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);
 
-    Model* model = getResourceManager()->getModel("cube.3ds");
+    const Model* model = getResourceManager()->getModel("cube.3ds");
     skybox->setModel(model);
     skybox->setShadowCaster(false);
     skybox->setShadowReceiver(false);

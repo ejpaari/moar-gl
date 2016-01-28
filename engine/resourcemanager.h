@@ -5,6 +5,7 @@
 #include "light.h"
 #include "model.h"
 #include "texture.h"
+#include "material.h"
 
 #include <GL/glew.h>
 #include <string>
@@ -31,11 +32,14 @@ public:
     void setTexturePath(const std::string& path);
     bool loadShaders(const std::string& path);
 
+    Material* createMaterial();
+
     Shader* getShader(const std::string& name);
-    Shader* getShader(const std::string& shader, const Light::Type light);
-    Model* getModel(const std::string& modelName);
+    const Shader* getShader(const std::string& shader, const Light::Type light);
+    const Model* getModel(const std::string& modelName);
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
+    Material* getMaterial(int id);
 
 private:
     using ShaderKey = std::pair<std::string, Light::Type>;
@@ -57,6 +61,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<Model>> models;
     std::unordered_map<std::string, std::unique_ptr<Texture>> textures;
     std::unordered_map<std::string, std::unique_ptr<Texture>> cubeTextures;
+    std::unordered_map<int, std::unique_ptr<Material>> materials;
 };
 
 } // moar

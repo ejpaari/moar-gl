@@ -76,7 +76,7 @@ private:
     Framebuffer fb1;
     Framebuffer fb2;
     Framebuffer* fb = nullptr;
-    Shader* shader = nullptr;
+    const Shader* shader = nullptr;
     Postprocess passthrough;
 
     double time = 0.0;

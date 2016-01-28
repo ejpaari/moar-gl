@@ -6,6 +6,8 @@
 namespace moar
 {
 
+int Material::idCounter = 0;
+
 const Material::TextureInfo Material::textureInfos[] =
 {
     {Material::TextureType::DIFFUSE, "DiffuseTex", GL_TEXTURE1, 1, DIFFUSE_TEX_LOCATION},
@@ -15,6 +17,7 @@ const Material::TextureInfo Material::textureInfos[] =
 
 Material::Material()
 {
+    id = ++idCounter;
 }
 
 Material::~Material()
@@ -80,6 +83,11 @@ const Material::TextureInfo* Material::getTextureInfo(TextureType type)
 std::string Material::getShaderType() const
 {
     return shaderType;
+}
+
+int Material::getId() const
+{
+    return id;
 }
 
 } // moar

@@ -76,7 +76,7 @@ bool Shader::linkProgram()
     return isLinked;
 }
 
-GLuint Shader::getProgram()
+GLuint Shader::getProgram() const
 {
     return program;
 }

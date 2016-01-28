@@ -49,6 +49,7 @@ public:
     void setUniform(const std::string& name, std::function<void()> func, GLuint location);
 
     std::string getShaderType() const;
+    int getId() const;
 
 private:
     struct CustomUniform
@@ -59,9 +60,13 @@ private:
 
     const TextureInfo* getTextureInfo(TextureType type);
 
+    static int idCounter;
+
     std::string shaderType;
     std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
     std::unordered_map<std::string, CustomUniform> uniforms;
+
+    int id;
 };
 
 } // moar
