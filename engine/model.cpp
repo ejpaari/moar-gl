@@ -96,13 +96,6 @@ bool Model::loadModel(const std::string& file)
     }
 }
 
-void Model::render() const
-{
-    for (unsigned int i = 0; i < meshes.size(); ++i) {
-        meshes[i]->render();
-    }
-}
-
 glm::vec3 Model::getCenterPoint() const
 {
     return centerPoint;
@@ -111,6 +104,11 @@ glm::vec3 Model::getCenterPoint() const
 float Model::getBoundingRadius() const
 {
     return boundingRadius;
+}
+
+const std::vector<std::unique_ptr<Mesh> >& Model::getMeshes() const
+{
+    return meshes;
 }
 
 void Model::checkBoundingBoxLimits(const glm::vec3& vert)

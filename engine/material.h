@@ -41,6 +41,7 @@ public:
     Material& operator=(const Material&) = delete;
     Material& operator=(Material&&) = delete;
 
+    // Todo: Better function name.
     void execute(const Shader* shader);
 
     void setShaderType(const std::string& shaderType);

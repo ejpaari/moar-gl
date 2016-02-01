@@ -63,10 +63,13 @@ private:
     Input input;
     RenderSettings renderSettings;
 
-    std::shared_ptr<Camera> camera;
-    std::map<std::string, std::vector<Object*>> renderObjects;
+    using MaterialId = int;
+    using ShaderType = std::string;
+    using MeshMap = std::map<MaterialId, std::vector<Object::MeshObject>>;
+    std::map<ShaderType, MeshMap> renderMeshes;
     std::vector<std::vector<Object*>> lights;
     std::vector<std::shared_ptr<Object>> allObjects;
+    std::shared_ptr<Camera> camera;
 
     std::shared_ptr<Object> skybox;
     std::unordered_set<unsigned int> objectsInFrustum;

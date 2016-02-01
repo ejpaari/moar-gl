@@ -281,6 +281,15 @@ bool Engine::init(const std::string& settingsFile)
 
     lights.resize(Light::Type::NUM_TYPES);
 
+    Material* material = manager.createMaterial();
+    Object::setMeshDefaultMaterial(material);
+    GLuint texture = manager.getTexture("white.png");
+    material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+    material->setShaderType("diffuse");
+    material->setUniform("solidColor",
+                         std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, 1.0f, 1.0f, 1.0f),
+                         moar::SOLID_COLOR_LOCATION);
+
 #ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
 #endif
@@ -360,13 +369,16 @@ void Engine::render()
     shader = renderSettings.ambientShader;
     glUseProgram(renderSettings.ambientShader->getProgram());
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
-    for (auto& renderObjs : renderObjects) {
-        for (auto& renderObj : renderObjs.second) {
-            if (!objectInsideFrustum(renderObj, camera.get())) {
-                continue;
+    for (auto& shaderMeshMap : renderMeshes) {
+        for (auto& meshMap : shaderMeshMap .second) {
+            for (auto& meshObject : meshMap.second) {
+                if (!objectInsideFrustum(meshObject.parent, camera.get())) {
+                    continue;
+                }
+                meshObject.parent->setObjectUniforms(shader);
+                meshObject.mesh->render();
+                objectsInFrustum.insert(meshObject.parent->getId());
             }
-            renderObj->render(shader);
-            objectsInFrustum.insert(renderObj->getId());
         }
     }
 
@@ -378,15 +390,20 @@ void Engine::render()
     lighting(Light::DIRECTIONAL);
     lighting(Light::POINT);
 
+    glDisable(GL_BLEND);
+    glDepthFunc(GL_LEQUAL);
+
     // Skybox.
     if (skybox) {
-        glDisable(GL_BLEND);
         glCullFace(GL_FRONT);
-        glDepthFunc(GL_LEQUAL);
         shader = renderSettings.skyboxShader;
         glUseProgram(shader->getProgram());
         skybox->setPosition(camera->getPosition());
-        skybox->render(shader);
+        skybox->setObjectUniforms(shader);
+        for (auto& meshObject : skybox->getMeshObjects()) {
+            meshObject.material->execute(shader);
+            meshObject.mesh->render();
+        }
     }
 
     // Post-process ping-pong    
@@ -427,11 +444,14 @@ void Engine::lighting(Light::Type lightType)
         light->prepareLight();
         depthMap->bind(light->getPosition(), light->getForward());
         if (shadowingEnabled) {
-            for (auto& renderObjs : renderObjects) {
-                for (auto& renderObj : renderObjs.second) {
-                    // Todo: frustum culling.
-                    if (renderObj->isShadowCaster()) {
-                        renderObj->render(shader);
+            for (auto& shaderMeshMap : renderMeshes) {
+                for (auto& meshMap : shaderMeshMap.second) {
+                    for (auto& meshObject : meshMap.second) {
+                        // Todo: frustum culling.
+                        if (meshObject.parent->isShadowCaster()) {
+                            meshObject.parent->setObjectUniforms(shader);
+                            meshObject.mesh->render();
+                        }
                     }
                 }
             }
@@ -439,18 +459,22 @@ void Engine::lighting(Light::Type lightType)
 
         fb->bind();
 
-        for (auto& renderObjs : renderObjects) {
-            shader = manager.getShader(renderObjs.first, lightType);
+        for (auto& shaderMeshMap : renderMeshes) {
+            shader = manager.getShader(shaderMeshMap.first, lightType);
             glUseProgram(shader->getProgram());
             if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
                 glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
             }
             depthMap->activate();
-            for (auto& renderObj : renderObjs.second) {
-                if (objectsInFrustum.find(renderObj->getId()) == objectsInFrustum.end()) {
-                    continue;
+            for (auto& meshMap : shaderMeshMap.second) {
+                manager.getMaterial(meshMap.first)->execute(shader);
+                for (auto& meshObject : meshMap.second) {
+                    if (objectsInFrustum.find(meshObject.parent->getId()) == objectsInFrustum.end()) {
+                        continue;
+                    }
+                    meshObject.parent->setObjectUniforms(shader);
+                    meshObject.mesh->render();
                 }
-                renderObj->render(shader);
             }
         }
     }
@@ -463,12 +487,15 @@ void Engine::updateObjectContainers()
         return;
     }
 
-    for (const auto& obj : allObjects) {
-        if (obj->getModel() != nullptr && obj->getMaterial() != nullptr) {
-            std::string type = obj->getMaterial()->getShaderType();
-            std::vector<Object*>& objs = renderObjects[type];
-            if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
-                renderObjects[type].push_back(obj.get());
+    for (const auto obj : allObjects) {
+        for (auto& meshObject : obj->getMeshObjects()) {
+            if (meshObject.material != nullptr) {
+                ShaderType shaderType = meshObject.material->getShaderType();
+                MaterialId materialId = meshObject.material->getId();
+                std::vector<Object::MeshObject>& meshes = renderMeshes[shaderType][materialId];
+                if (std::find(meshes.begin(), meshes.end(), meshObject) == meshes.end()) {
+                    meshes.push_back(meshObject);
+                }
             }
         }
         if (obj->hasComponent<Light>()) {
@@ -483,10 +510,13 @@ void Engine::updateObjectContainers()
         objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent<Light>(); }),
                 objs.end());
     }
-    for (auto& renderObjs : renderObjects) {
-        std::vector<Object*>& objs = renderObjs.second;
-        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return (obj->getModel() == nullptr || obj->getMaterial() == nullptr);}),
-                objs.end());
+
+    for (auto& shaderMeshMap : renderMeshes) {
+        for (auto& meshMap : shaderMeshMap.second) {
+            std::vector<Object::MeshObject>& meshes = meshMap.second;
+            meshes.erase(std::remove_if(meshes.begin(), meshes.end(), [](Object::MeshObject mo){ return mo.material == nullptr; }),
+                    meshes.end());
+        }
     }
     COMPONENT_CHANGED = false;
 }
@@ -524,14 +554,15 @@ bool Engine::createSkybox()
     }
 
     skybox.reset(new Object());
-    Material* material = manager.createMaterial();
-    skybox->setMaterial(material);
+    skybox->setModel(getResourceManager()->getModel("cube.3ds"));
 
+    Material* material = manager.createMaterial();
     GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);
     material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);
+    for (auto& meshObject : skybox->getMeshObjects()) {
+        meshObject.material = material;
+    }
 
-    const Model* model = getResourceManager()->getModel("cube.3ds");
-    skybox->setModel(model);
     skybox->setShadowCaster(false);
     skybox->setShadowReceiver(false);
 

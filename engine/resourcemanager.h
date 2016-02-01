@@ -40,6 +40,7 @@ public:
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
     Material* getMaterial(int id);
+    // Todo: Get materials by name.
 
 private:
     using ShaderKey = std::pair<std::string, Light::Type>;

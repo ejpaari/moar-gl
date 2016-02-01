@@ -24,10 +24,12 @@ public:
     Model& operator=(Model&&) = delete;
 
     bool loadModel(const std::string& file);
-    void render() const;
 
+    // Todo: Move to Mesh-class.
     glm::vec3 getCenterPoint() const;
     float getBoundingRadius() const;
+
+    const std::vector<std::unique_ptr<Mesh>>& getMeshes() const;
 
 private:
     void checkBoundingBoxLimits(const glm::vec3& vert);

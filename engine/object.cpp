@@ -21,6 +21,7 @@ const glm::mat4* Object::view = nullptr;
 unsigned int Object::idCounter = 0;
 GLuint Object::transformationBlockBuffer = 0;
 bool Object::bufferCreated = false;
+Material* Object::defaultMaterial = nullptr;
 
 Object::Object() :
     id(idCounter)
@@ -136,6 +137,13 @@ bool Object::isShadowCaster() const
 void Object::setModel(const Model* model)
 {
     this->model = model;
+    meshObjects.clear();
+    for (const auto& mesh : model->getMeshes()) {
+        // Todo: Mesh default material from the loaded model.
+        // Todo: Check that material is not null.
+        MeshObject mo = {mesh.get(), defaultMaterial, this};
+        meshObjects.push_back(mo);
+    }
     COMPONENT_CHANGED = true;
 }
 
@@ -144,14 +152,19 @@ const Model* Object::getModel() const
     return model;
 }
 
-void Object::setMaterial(Material* material)
+std::vector<Object::MeshObject>& Object::getMeshObjects()
 {
-    this->material = material;
+    return meshObjects;
 }
 
-Material*Object::getMaterial() const
+void Object::setMeshDefaultMaterial(Material* material)
 {
-    return material;
+    defaultMaterial = material;
+}
+
+Material* Object::getMeshDefaultMaterial()
+{
+    return defaultMaterial;
 }
 
 void Object::prepareLight()
@@ -161,12 +174,8 @@ void Object::prepareLight()
     }
 }
 
-void Object::render(const Shader* shader)
+void Object::setObjectUniforms(const Shader* shader)
 {
-    if (material) {
-        material->execute(shader);
-    }
-
     if (model != nullptr) {
         glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
         GLintptr matrixSize = sizeof(modelMatrix);
@@ -179,7 +188,6 @@ void Object::render(const Shader* shader)
         if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
             glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
         }
-        model->render();
     }
 }
 

@@ -22,6 +22,18 @@ class Object
     friend class Engine;
 
 public:
+
+    struct MeshObject
+    {
+        const Mesh* mesh;
+        Material* material;
+        Object* parent;
+
+        bool operator==(const MeshObject& rhs) {
+            return this->mesh == rhs.mesh && this->material == rhs.material && this->parent == rhs.parent;
+        }
+    };
+
     static const glm::vec3 FORWARD;
     static const glm::vec3 UP;
     static const glm::vec3 LEFT;
@@ -60,10 +72,10 @@ public:
     // Todo: Is this kind of an interface good? Think about component / model.
     void setModel(const Model* model);
     const Model* getModel() const;
+    std::vector<MeshObject>& getMeshObjects();
 
-    // Todo: Temporary, should be moved to Mesh-class.
-    void setMaterial(Material* material);
-    Material* getMaterial() const;
+    static void setMeshDefaultMaterial(Material* material);
+    static Material* getMeshDefaultMaterial();
 
     template<typename T>
     T* addComponent();
@@ -83,14 +95,17 @@ protected:
     glm::vec3 left = LEFT;
 
 private:
+    // Todo: Better function naming.
+    // Todo: Transformation component.
     void prepareLight();
-    void render(const Shader* shader);
+    void setObjectUniforms(const Shader* shader);
     void updateModelMatrix();
     glm::mat4x4 getModelMatrix() const;
 
     static unsigned int idCounter;
     static GLuint transformationBlockBuffer;
     static bool bufferCreated;
+    static Material* defaultMaterial;
 
     unsigned int id;
     std::string name;
@@ -102,7 +117,7 @@ private:
 
     std::unique_ptr<Light> light = nullptr;
     const Model* model = nullptr;
-    Material* material = nullptr;
+    std::vector<MeshObject> meshObjects;
 };
 
 // Todo: Maybe template specialization would be better? Or remove these completely?
