@@ -41,12 +41,10 @@ public:
     Material& operator=(const Material&) = delete;
     Material& operator=(Material&&) = delete;
 
-    // Todo: Better function name.
-    void execute(const Shader* shader);
+    void setMaterialUniforms(const Shader* shader);
 
     void setShaderType(const std::string& shaderType);
     void setTexture(GLuint texture, TextureType type, GLenum target);
-    // Todo: Duplicate location info.
     void setUniform(const std::string& name, std::function<void()> func, GLuint location);
 
     std::string getShaderType() const;

@@ -24,7 +24,7 @@ Material::~Material()
 {
 }
 
-void Material::execute(const Shader* shader)
+void Material::setMaterialUniforms(const Shader* shader)
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
         if (shader->hasUniform(std::get<1>(textures[i])->location)) {

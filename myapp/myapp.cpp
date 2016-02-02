@@ -18,8 +18,6 @@ MyApp::MyApp() :
     light1(nullptr),
     light2(nullptr),
     dirLight(nullptr),
-    rotationAxis(0.0f, 1.0f, 0.0f),
-    rotationSpeed(0.5f),
     fps(0),
     fpsCounter(0),
     drawCount(&moar::DRAW_COUNT),
@@ -113,7 +111,6 @@ void MyApp::update(double time, double deltaTime)
     }
 
     //    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
-    //    monkey2->rotate(rotationAxis, std::fabs(sin(time)) * rotationSpeed * boost::math::constants::degree<double>());
 
     light1->move(glm::vec3(0.0f, sin(time) * 0.01f, 0.0f));
     light2->move(glm::vec3(0.0f, cos(time) * 0.02f, 0.0f));
@@ -123,9 +120,7 @@ void MyApp::update(double time, double deltaTime)
 
 void MyApp::initGUI()
 {
-    bar = TwNewBar("TweakBar");
-    TwAddVarRW(bar, "axis", TW_TYPE_DIR3F, &rotationAxis, "");
-    TwAddVarRW(bar, "speed", TW_TYPE_FLOAT, &rotationSpeed, "");
+    bar = TwNewBar("GUI");
     TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
     TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
 }
@@ -133,7 +128,7 @@ void MyApp::initGUI()
 moar::Object* MyApp::createRenderObject(const std::string& /*shader*/, const std::string& modelName, const std::string& /*textureName*/)
 {
     moar::Object* renderObj= engine->createObject();
-    const moar::Model* model = engine->getResourceManager()->getModel(modelName);
+    moar::Model* model = engine->getResourceManager()->getModel(modelName);
     renderObj->setModel(model);
 
 //    moar::Material* material = engine->getResourceManager()->createMaterial();

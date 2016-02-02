@@ -65,11 +65,6 @@ void Object::setScale(const glm::vec3& scale)
     this->scale = scale;
 }
 
-void Object::setName(const std::string& name)
-{
-    this->name = name;
-}
-
 unsigned int Object::getId() const
 {
     return id;
@@ -114,11 +109,6 @@ glm::vec3 Object::getLeft() const
     return glm::vec3(v.x, v.y, v.z);
 }
 
-std::string Object::getName() const
-{
-    return name;
-}
-
 void Object::setShadowCaster(bool caster)
 {
     shadowCaster = caster;
@@ -134,7 +124,7 @@ bool Object::isShadowCaster() const
     return shadowCaster;
 }
 
-void Object::setModel(const Model* model)
+void Object::setModel(Model* model)
 {
     this->model = model;
     meshObjects.clear();
@@ -147,11 +137,6 @@ void Object::setModel(const Model* model)
     COMPONENT_CHANGED = true;
 }
 
-const Model* Object::getModel() const
-{
-    return model;
-}
-
 std::vector<Object::MeshObject>& Object::getMeshObjects()
 {
     return meshObjects;
@@ -162,11 +147,6 @@ void Object::setMeshDefaultMaterial(Material* material)
     defaultMaterial = material;
 }
 
-Material* Object::getMeshDefaultMaterial()
-{
-    return defaultMaterial;
-}
-
 void Object::prepareLight()
 {
     if (light) {
@@ -174,20 +154,19 @@ void Object::prepareLight()
     }
 }
 
-void Object::setObjectUniforms(const Shader* shader)
+void Object::setMatrixUniforms(const Shader* shader)
 {
-    if (model != nullptr) {
-        glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
-        GLintptr matrixSize = sizeof(modelMatrix);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(modelMatrix));
-        glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
-        glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * modelMatrix));
-        glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * modelMatrix));
-        glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+    GLintptr matrixSize = sizeof(modelMatrix);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(modelMatrix));
+    // Todo: It is unnecessary to update view-matrix each time.
+    glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
+    glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * modelMatrix));
+    glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * modelMatrix));
+    glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
 
-        if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
-            glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
-        }
+    if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
+        glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
     }
 }
 
@@ -202,6 +181,18 @@ void Object::updateModelMatrix()
 glm::mat4x4 Object::getModelMatrix() const
 {
     return modelMatrix;
+}
+
+template<>
+Model* Object::getComponent<Model>() const
+{
+    return model;
+}
+
+template<>
+Light* Object::getComponent<Light>() const
+{
+    return light.get();
 }
 
 } // moar

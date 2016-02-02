@@ -17,7 +17,6 @@ namespace moar
 class Camera : public Object
 {
 public:
-    // Todo: this should be inherited from component
     explicit Camera(float fov = 45.0f, float ratio = 4.0f / 3.0f, float nearClip = 0.1f, float farClip = 100.0f);
     virtual ~Camera();
     Camera(const Camera&) = delete;

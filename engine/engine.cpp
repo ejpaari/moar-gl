@@ -243,7 +243,6 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    // Todo: Multiple cameras.
     camera.reset(new Camera());
     Object::view = camera->getViewMatrixPointer();
     Object::projection = camera->getProjectionMatrixPointer();
@@ -372,10 +371,11 @@ void Engine::render()
     for (auto& shaderMeshMap : renderMeshes) {
         for (auto& meshMap : shaderMeshMap .second) {
             for (auto& meshObject : meshMap.second) {
+                // Todo: Frustum culling per mesh.
                 if (!objectInsideFrustum(meshObject.parent, camera.get())) {
                     continue;
                 }
-                meshObject.parent->setObjectUniforms(shader);
+                meshObject.parent->setMatrixUniforms(shader);
                 meshObject.mesh->render();
                 objectsInFrustum.insert(meshObject.parent->getId());
             }
@@ -399,9 +399,9 @@ void Engine::render()
         shader = renderSettings.skyboxShader;
         glUseProgram(shader->getProgram());
         skybox->setPosition(camera->getPosition());
-        skybox->setObjectUniforms(shader);
+        skybox->setMatrixUniforms(shader);
         for (auto& meshObject : skybox->getMeshObjects()) {
-            meshObject.material->execute(shader);
+            meshObject.material->setMaterialUniforms(shader);
             meshObject.mesh->render();
         }
     }
@@ -449,7 +449,7 @@ void Engine::lighting(Light::Type lightType)
                     for (auto& meshObject : meshMap.second) {
                         // Todo: frustum culling.
                         if (meshObject.parent->isShadowCaster()) {
-                            meshObject.parent->setObjectUniforms(shader);
+                            meshObject.parent->setMatrixUniforms(shader);
                             meshObject.mesh->render();
                         }
                     }
@@ -467,12 +467,12 @@ void Engine::lighting(Light::Type lightType)
             }
             depthMap->activate();
             for (auto& meshMap : shaderMeshMap.second) {
-                manager.getMaterial(meshMap.first)->execute(shader);
+                manager.getMaterial(meshMap.first)->setMaterialUniforms(shader);
                 for (auto& meshObject : meshMap.second) {
                     if (objectsInFrustum.find(meshObject.parent->getId()) == objectsInFrustum.end()) {
                         continue;
                     }
-                    meshObject.parent->setObjectUniforms(shader);
+                    meshObject.parent->setMatrixUniforms(shader);
                     meshObject.mesh->render();
                 }
             }
@@ -571,7 +571,7 @@ bool Engine::createSkybox()
 
 bool Engine::objectInsideFrustum(const Object* obj, const Camera* cam) const
 {
-    const Model* model = obj->getModel();
+    const Model* model = obj->getComponent<Model>();
     glm::vec3 point = model->getCenterPoint();
     point = glm::vec3((*Object::view) * obj->getModelMatrix() * glm::vec4(point.x, point.y, point.z, 1.0f));
     glm::vec3 scale = obj->getScale();

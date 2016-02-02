@@ -86,6 +86,7 @@ bool Model::loadModel(const std::string& file)
                 meshes[i]->setTextureCoordinates(texCoords);
             }
         }
+        // Todo: These should be calculated per mesh.
         calculateCenterPointAndRadius();
         std::cout << "Loaded model: " << file << std::endl;
         return true;

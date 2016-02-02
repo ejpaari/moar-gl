@@ -123,7 +123,7 @@ const Shader* ResourceManager::getShader(const std::string& shader, const Light:
     }
 }
 
-const Model* ResourceManager::getModel(const std::string& modelName)
+Model* ResourceManager::getModel(const std::string& modelName)
 {
     auto found = models.find(modelName);
     if (found == models.end()) {

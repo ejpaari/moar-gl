@@ -25,7 +25,7 @@ public:
 
     struct MeshObject
     {
-        const Mesh* mesh;
+        Mesh* mesh;
         Material* material;
         Object* parent;
 
@@ -54,7 +54,6 @@ public:
     virtual void setPosition(const glm::vec3& position);
     virtual void setRotation(const glm::vec3& rotation);
     virtual void setScale(const glm::vec3& scale);
-    void setName(const std::string& name);
 
     unsigned int getId() const;
     glm::vec3 getPosition() const;
@@ -63,19 +62,16 @@ public:
     glm::vec3 getForward() const;
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
-    std::string getName() const;
 
     void setShadowCaster(bool caster);
     void setShadowReceiver(bool receiver);
     bool isShadowCaster() const;
 
     // Todo: Is this kind of an interface good? Think about component / model.
-    void setModel(const Model* model);
-    const Model* getModel() const;
+    void setModel(Model* model);
     std::vector<MeshObject>& getMeshObjects();
 
     static void setMeshDefaultMaterial(Material* material);
-    static Material* getMeshDefaultMaterial();
 
     template<typename T>
     T* addComponent();
@@ -97,8 +93,8 @@ protected:
 private:
     // Todo: Better function naming.
     // Todo: Transformation component.
-    void prepareLight();
-    void setObjectUniforms(const Shader* shader);
+    void prepareLight(); // Todo: This function is unnecessary, getComponent<Light>()->prepare
+    void setMatrixUniforms(const Shader* shader);
     void updateModelMatrix();
     glm::mat4x4 getModelMatrix() const;
 
@@ -108,7 +104,6 @@ private:
     static Material* defaultMaterial;
 
     unsigned int id;
-    std::string name;
 
     bool shadowCaster = true;
     bool shadowReceiver = true;
@@ -116,11 +111,11 @@ private:
     glm::mat4x4 modelMatrix;
 
     std::unique_ptr<Light> light = nullptr;
-    const Model* model = nullptr;
+    Model* model = nullptr;
     std::vector<MeshObject> meshObjects;
 };
 
-// Todo: Maybe template specialization would be better? Or remove these completely?
+// Todo: Template specialization instead of reinterpret_cast.
 
 template<typename T>
 T* Object::addComponent()
@@ -138,10 +133,6 @@ T* Object::addComponent()
 template<typename T>
 T* Object::getComponent() const
 {
-    if (typeid(T) == typeid(Light)) {
-        return reinterpret_cast<T*>(light.get());
-    }
-
     return nullptr;
 }
 

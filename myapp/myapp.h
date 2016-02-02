@@ -42,8 +42,6 @@ private:
     moar::Object* light2;
     moar::Object* dirLight;
 
-    glm::vec3 rotationAxis;
-    float rotationSpeed;
     int fps;
     int fpsCounter;
     unsigned int* drawCount;
