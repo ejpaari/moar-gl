@@ -34,13 +34,12 @@ public:
 
     Material* createMaterial();
 
-    Shader* getShader(const std::string& name);
+    const Shader* getShader(const std::string& name);
     const Shader* getShader(const std::string& shader, const Light::Type light);
     Model* getModel(const std::string& modelName);
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
     Material* getMaterial(int id);
-    // Todo: Get materials by name.
 
 private:
     using ShaderKey = std::pair<std::string, Light::Type>;

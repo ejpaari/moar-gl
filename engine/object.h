@@ -22,7 +22,6 @@ class Object
     friend class Engine;
 
 public:
-
     struct MeshObject
     {
         Mesh* mesh;
@@ -40,6 +39,8 @@ public:
 
     static const glm::mat4* projection;
     static const glm::mat4* view;
+
+    static void setMeshDefaultMaterial(Material* material);
 
     explicit Object();
     virtual ~Object();
@@ -63,18 +64,17 @@ public:
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
 
+    std::vector<MeshObject>& getMeshObjects();
+
     void setShadowCaster(bool caster);
     void setShadowReceiver(bool receiver);
     bool isShadowCaster() const;
 
-    // Todo: Is this kind of an interface good? Think about component / model.
-    void setModel(Model* model);
-    std::vector<MeshObject>& getMeshObjects();
-
-    static void setMeshDefaultMaterial(Material* material);
-
     template<typename T>
     T* addComponent();
+
+    template<typename T>
+    T* addComponent(T* component);
 
     template<typename T>
     T* getComponent() const;
@@ -91,17 +91,15 @@ protected:
     glm::vec3 left = LEFT;
 
 private:
-    // Todo: Better function naming.
-    // Todo: Transformation component.
-    void prepareLight(); // Todo: This function is unnecessary, getComponent<Light>()->prepare
-    void setMatrixUniforms(const Shader* shader);
-    void updateModelMatrix();
-    glm::mat4x4 getModelMatrix() const;
-
     static unsigned int idCounter;
     static GLuint transformationBlockBuffer;
     static bool bufferCreated;
     static Material* defaultMaterial;
+
+    // Todo: Transformation component.
+    void setTransformationUniforms(const Shader* shader);
+    void updateModelMatrix();
+    glm::mat4x4 getModelMatrix() const;
 
     unsigned int id;
 
@@ -115,24 +113,24 @@ private:
     std::vector<MeshObject> meshObjects;
 };
 
-// Todo: Template specialization instead of reinterpret_cast.
-
 template<typename T>
 T* Object::addComponent()
 {
-    COMPONENT_CHANGED = true;
-    if (typeid(T) == typeid(Light)) {
-        light.reset(new Light);
-        return reinterpret_cast<T*>(light.get());
-    }
+    std::cerr << "WARNING: Could not add a component\n";
+    return nullptr;
+}
 
-    std::cerr << "ERROR: Could not add a component\n";
+template<typename T>
+T* Object::addComponent(T* /*component*/)
+{
+    std::cerr << "WARNING: Could not add a component\n";
     return nullptr;
 }
 
 template<typename T>
 T* Object::getComponent() const
 {
+    std::cerr << "WARNING: Could not get a component\n";
     return nullptr;
 }
 

@@ -9,6 +9,9 @@ namespace moar
 class Framebuffer
 {
 public:
+    static void setWidth(int width);
+    static void setHeight(int height);
+
     explicit Framebuffer();
     ~Framebuffer();
     Framebuffer(const Framebuffer&) = delete;
@@ -22,9 +25,6 @@ public:
 
     void setPreviousFrame(GLuint texture);
     GLuint getRenderedTexture() const;
-
-    static void setWidth(int width);
-    static void setHeight(int height);
 
 private:
     static int width;

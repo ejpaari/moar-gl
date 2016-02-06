@@ -23,16 +23,7 @@ public:
         DISPLACEMENT
     };
 
-    struct TextureInfo
-    {
-        TextureType type;
-        const GLchar* name;
-        int unit;
-        int value;
-        GLuint location;
-    };
 
-    static const TextureInfo textureInfos[];
 
     Material();
     ~Material();
@@ -57,12 +48,29 @@ private:
         std::function<void()> func;
     };
 
-    const TextureInfo* getTextureInfo(TextureType type);
+    struct TextureInfo
+    {
+        TextureType type;
+        const GLchar* name;
+        int unit;
+        int value;
+        GLuint location;
+    };
 
+    struct MaterialTexture
+    {
+        GLuint glId;
+        const TextureInfo* info;
+        GLenum target;
+    };
+
+    static const TextureInfo textureInfos[];
     static int idCounter;
 
+    const TextureInfo* getTextureInfo(TextureType type);
+
     std::string shaderType;
-    std::vector<std::tuple<GLuint, const TextureInfo*, GLenum>> textures;
+    std::vector<MaterialTexture> textures;
     std::unordered_map<std::string, CustomUniform> uniforms;
 
     int id;

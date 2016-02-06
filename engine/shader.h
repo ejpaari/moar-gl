@@ -29,10 +29,10 @@ public:
     bool hasUniform(GLuint location) const;
 
 private:
+    static const std::string INCLUDE_DIRECTIVE;
+
     bool compileShader(GLuint shader, const char* filename);
     bool readUniformLocations();
-
-    static const std::string INCLUDE_DIRECTIVE;
 
     GLuint program;    
     std::vector<GLuint> shaders;

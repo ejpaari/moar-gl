@@ -25,8 +25,7 @@ public:
     Light& operator=(const Light&) = delete;
     Light& operator=(Light&&) = delete;
 
-    // Todo: Better function name.
-    void execute(const glm::vec3& position, const glm::vec3& forward);
+    void setLightUniforms(const glm::vec3& position, const glm::vec3& forward);
 
     void setType(Type type);
     void setColor(const glm::vec4& color);

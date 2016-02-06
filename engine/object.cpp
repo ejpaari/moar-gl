@@ -124,19 +124,6 @@ bool Object::isShadowCaster() const
     return shadowCaster;
 }
 
-void Object::setModel(Model* model)
-{
-    this->model = model;
-    meshObjects.clear();
-    for (const auto& mesh : model->getMeshes()) {
-        // Todo: Mesh default material from the loaded model.
-        // Todo: Check that material is not null.
-        MeshObject mo = {mesh.get(), defaultMaterial, this};
-        meshObjects.push_back(mo);
-    }
-    COMPONENT_CHANGED = true;
-}
-
 std::vector<Object::MeshObject>& Object::getMeshObjects()
 {
     return meshObjects;
@@ -147,14 +134,7 @@ void Object::setMeshDefaultMaterial(Material* material)
     defaultMaterial = material;
 }
 
-void Object::prepareLight()
-{
-    if (light) {
-        light->execute(position, forward);
-    }
-}
-
-void Object::setMatrixUniforms(const Shader* shader)
+void Object::setTransformationUniforms(const Shader* shader)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLintptr matrixSize = sizeof(modelMatrix);
@@ -181,6 +161,29 @@ void Object::updateModelMatrix()
 glm::mat4x4 Object::getModelMatrix() const
 {
     return modelMatrix;
+}
+
+template<>
+Light* Object::addComponent<Light>()
+{
+    COMPONENT_CHANGED = true;
+    light.reset(new Light);
+    return light.get();
+}
+
+template<>
+Model* Object::addComponent<Model>(Model* model)
+{
+    COMPONENT_CHANGED = true;
+    this->model = model;
+    meshObjects.clear();
+    for (const auto& mesh : model->getMeshes()) {
+        // Todo: Mesh default material from the loaded model.
+        // Todo: Check that material is not null.
+        MeshObject mo = {mesh.get(), defaultMaterial, this};
+        meshObjects.push_back(mo);
+    }
+    return model;
 }
 
 template<>

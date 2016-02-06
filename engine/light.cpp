@@ -28,7 +28,7 @@ Light::~Light()
     glDeleteBuffers(1, &lightBlockBuffer);
 }
 
-void Light::execute(const glm::vec3& position, const glm::vec3& forward)
+void Light::setLightUniforms(const glm::vec3& position, const glm::vec3& forward)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
     GLintptr offset = 0;

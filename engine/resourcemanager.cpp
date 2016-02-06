@@ -101,7 +101,7 @@ Material* ResourceManager::createMaterial()
     return iter.second ? iter.first->second.get() : nullptr;
 }
 
-Shader* ResourceManager::getShader(const std::string& name)
+const Shader* ResourceManager::getShader(const std::string& name)
 {
     auto found = shadersByName.find(name);
     if (found != shadersByName.end()) {

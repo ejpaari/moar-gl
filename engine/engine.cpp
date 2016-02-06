@@ -375,7 +375,7 @@ void Engine::render()
                 if (!objectInsideFrustum(meshObject.parent, camera.get())) {
                     continue;
                 }
-                meshObject.parent->setMatrixUniforms(shader);
+                meshObject.parent->setTransformationUniforms(shader);
                 meshObject.mesh->render();
                 objectsInFrustum.insert(meshObject.parent->getId());
             }
@@ -399,7 +399,7 @@ void Engine::render()
         shader = renderSettings.skyboxShader;
         glUseProgram(shader->getProgram());
         skybox->setPosition(camera->getPosition());
-        skybox->setMatrixUniforms(shader);
+        skybox->setTransformationUniforms(shader);
         for (auto& meshObject : skybox->getMeshObjects()) {
             meshObject.material->setMaterialUniforms(shader);
             meshObject.mesh->render();
@@ -440,8 +440,9 @@ void Engine::lighting(Light::Type lightType)
     for (auto& light : lights[lightType]) {
         shader = manager.getShader("depthmap", lightType);
         glUseProgram(shader->getProgram());
-        bool shadowingEnabled = light->getComponent<Light>()->isShadowingEnabled();
-        light->prepareLight();
+        Light* lightComp = light->getComponent<Light>();
+        bool shadowingEnabled = lightComp->isShadowingEnabled();
+        lightComp->setLightUniforms(light->getPosition(), light->getForward());
         depthMap->bind(light->getPosition(), light->getForward());
         if (shadowingEnabled) {
             for (auto& shaderMeshMap : renderMeshes) {
@@ -449,7 +450,7 @@ void Engine::lighting(Light::Type lightType)
                     for (auto& meshObject : meshMap.second) {
                         // Todo: frustum culling.
                         if (meshObject.parent->isShadowCaster()) {
-                            meshObject.parent->setMatrixUniforms(shader);
+                            meshObject.parent->setTransformationUniforms(shader);
                             meshObject.mesh->render();
                         }
                     }
@@ -472,7 +473,7 @@ void Engine::lighting(Light::Type lightType)
                     if (objectsInFrustum.find(meshObject.parent->getId()) == objectsInFrustum.end()) {
                         continue;
                     }
-                    meshObject.parent->setMatrixUniforms(shader);
+                    meshObject.parent->setTransformationUniforms(shader);
                     meshObject.mesh->render();
                 }
             }
@@ -554,7 +555,7 @@ bool Engine::createSkybox()
     }
 
     skybox.reset(new Object());
-    skybox->setModel(getResourceManager()->getModel("cube.3ds"));
+    skybox->addComponent<Model>(getResourceManager()->getModel("cube.3ds"));
 
     Material* material = manager.createMaterial();
     GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);

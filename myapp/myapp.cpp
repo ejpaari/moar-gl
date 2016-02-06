@@ -129,7 +129,7 @@ moar::Object* MyApp::createRenderObject(const std::string& /*shader*/, const std
 {
     moar::Object* renderObj= engine->createObject();
     moar::Model* model = engine->getResourceManager()->getModel(modelName);
-    renderObj->setModel(model);
+    renderObj->addComponent<moar::Model>(model);
 
 //    moar::Material* material = engine->getResourceManager()->createMaterial();
 //    renderObj->setMeshMaterial(material);

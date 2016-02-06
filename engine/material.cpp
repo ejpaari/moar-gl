@@ -27,10 +27,10 @@ Material::~Material()
 void Material::setMaterialUniforms(const Shader* shader)
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
-        if (shader->hasUniform(std::get<1>(textures[i])->location)) {
-            glActiveTexture(std::get<1>(textures[i])->unit);
-            glBindTexture(std::get<2>(textures[i]), std::get<0>(textures[i]));
-            glUniform1i(std::get<1>(textures[i])->location, std::get<1>(textures[i])->value);
+        if (shader->hasUniform(textures[i].info->location)) {
+            glActiveTexture(textures[i].info->unit);
+            glBindTexture(textures[i].target, textures[i].glId);
+            glUniform1i(textures[i].info->location, textures[i].info->value);
         }
     }
 
@@ -43,21 +43,22 @@ void Material::setMaterialUniforms(const Shader* shader)
 
 void Material::setShaderType(const std::string& shaderType)
 {
-    this->shaderType = shaderType;
     COMPONENT_CHANGED = true;
+    this->shaderType = shaderType;    
 }
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
-        if (std::get<1>(textures[i])->type == type) {
-            std::get<0>(textures[i]) = texture;
-            std::get<2>(textures[i]) = target;
+        if (textures[i].info->type == type) {
+            textures[i].glId = texture;
+            textures[i].target = target;
             return;
         }
     }
 
-    textures.push_back(std::make_tuple(texture, getTextureInfo(type), target));
+    MaterialTexture materialTex = {texture, getTextureInfo(type), target};
+    textures.push_back(materialTex);
 }
 
 void Material::setUniform(const std::string& name, std::function<void ()> func, GLuint location)

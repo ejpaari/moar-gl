@@ -28,10 +28,10 @@ public:
 
     glm::vec4 clearColor = glm::vec4(0.0f, 0.2f, 0.0f, 1.0f);
 
-    Shader* skyboxShader = nullptr;
+    const Shader* skyboxShader = nullptr;
     std::vector<std::string> skyboxTextures;    
 
-    Shader* ambientShader = nullptr;
+    const Shader* ambientShader = nullptr;
     glm::vec3 ambientColor = glm::vec3(0.1f, 0.1f, 0.1f);
 
     int windowWidth = 800;
