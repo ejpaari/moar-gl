@@ -1,5 +1,5 @@
 #ifndef POSTPROCESS_H
-#define POSTPROCESSH
+#define POSTPROCESS_H
 
 #include <GL/glew.h>
 #include <string>

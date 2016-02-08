@@ -12,18 +12,16 @@
 namespace moar
 {
 
-class ResourceManager;
-
 class Model
 {
+    friend class ResourceManager;
+
 public:
     explicit Model();
     Model(const Model&) = delete;
     Model(Model&&) = delete;
     Model& operator=(const Model&) = delete;
     Model& operator=(Model&&) = delete;
-
-    bool loadModel(const std::string& file);
 
     // Todo: Move to Mesh-class.
     glm::vec3 getCenterPoint() const;
@@ -35,6 +33,9 @@ private:
     void checkBoundingBoxLimits(const glm::vec3& vert);
     void calculateCenterPointAndRadius();
 
+    void addMesh(std::unique_ptr<Mesh> mesh);
+
+    // Todo: Mesh without pointer.
     std::vector<std::unique_ptr<Mesh>> meshes;
     glm::vec3 boundingBoxMax;
     glm::vec3 boundingBoxMin;

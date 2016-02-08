@@ -98,3 +98,9 @@ unix:!macx: LIBS += -L/usr/lib/ -lAntTweakBar
 
 INCLUDEPATH += /usr/include/AntTweakBar
 DEPENDPATH += /usr/include/AntTweakBar
+
+# Boost
+#unix:!macx: LIBS += -L/usr/local/lib/boost/ -lboost_system -lboost_filesystem
+
+#INCLUDEPATH += /usr/local/include/boost/
+#DEPENDPATH += /usr/local/include/boost/

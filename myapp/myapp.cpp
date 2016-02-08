@@ -36,8 +36,9 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
 
-    moar::Object* sponza = createRenderObject("diffuse", "sponza.3ds", "white.png");
-    sponza->setScale(glm::vec3(3.0f, 3.0f, 3.0f));
+    moar::Object* sponza = createRenderObject("sponza.obj");
+    sponza->setScale(glm::vec3(0.005f, 0.005f, 0.005f));
+    //sponza->setScale(glm::vec3(3.0f, 3.0f, 3.0f));
 
     //    monkey = createRenderObject("specular", "monkey.3ds", "checker.png");
     //    monkey->setPosition(glm::vec3(3.0f, 0.1f, 0.0f));
@@ -51,10 +52,10 @@ void MyApp::start()
     //    mat = icosphere->getComponent<moar::Material>();
     //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
-    light1 = createLight(glm::vec4(0.8f, 1.0f, 0.8f, 1.0f));
-    light1->setPosition(glm::vec3(1.0f, 1.5f, 0.0f));
-    light2 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
-    light2->setPosition(glm::vec3(-1.0f, 1.5f, 0.0f));
+    light1 = createLight(glm::vec4(0.8f, 1.0f, 0.8f, 1.5f));
+    light1->setPosition(glm::vec3(1.0f, 2.5f, 0.0f));
+    light2 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.5f));
+    light2->setPosition(glm::vec3(-1.0f, 2.5f, 0.0f));
     //    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
     //    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.1f), moar::Light::DIRECTIONAL);
     //    dirLight->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
@@ -125,25 +126,11 @@ void MyApp::initGUI()
     TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
 }
 
-moar::Object* MyApp::createRenderObject(const std::string& /*shader*/, const std::string& modelName, const std::string& /*textureName*/)
+moar::Object* MyApp::createRenderObject(const std::string& modelName)
 {
     moar::Object* renderObj= engine->createObject();
     moar::Model* model = engine->getResourceManager()->getModel(modelName);
     renderObj->addComponent<moar::Model>(model);
-
-//    moar::Material* material = engine->getResourceManager()->createMaterial();
-//    renderObj->setMeshMaterial(material);
-//    GLuint texture = 0;
-//    if (!textureName.empty()) {
-//        texture = engine->getResourceManager()->getTexture(textureName);
-//    }
-//    material->setShaderType(shader);
-//    material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
-//    if (shader == "diffuse") {
-//        material->setUniform("solidColor",
-//                             std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, 1.0f, 1.0f, 1.0f),
-//                             moar::SOLID_COLOR_LOCATION);
-//    }
 
     return renderObj;
 }

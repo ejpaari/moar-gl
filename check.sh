@@ -5,7 +5,7 @@ CPPCHECK_DIR=myapp/
 
 echo "Running valgrind..."
 VALGRIND_FILE=valgrind.txt
-valgrind --leak-check=yes --leak-check=full ./$BUILD_DIR/moar-gl 2> $VALGRIND_FILE
+valgrind --leak-check=full ./$BUILD_DIR/moar-gl 2> $VALGRIND_FILE
 echo "valgrind complete"
 
 echo "Running cppcheck..."

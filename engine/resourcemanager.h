@@ -7,7 +7,12 @@
 #include "texture.h"
 #include "material.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <GL/glew.h>
+
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -52,9 +57,13 @@ private:
         }
     };
 
+    bool loadModel(Model* model, const std::string& file);
+    bool loadMaterial(aiMaterial* assimpMaterial, Material* material);
+
     std::string shaderPath;
     std::string modelPath;
     std::string texturePath;
+    // Todo: Unnecessary unique_ptrs?
     std::vector<std::unique_ptr<Shader>> shaders;
     std::unordered_map<ShaderKey, Shader*, ShaderKeyHash> shadersByType;
     std::unordered_map<std::string, Shader*> shadersByName;

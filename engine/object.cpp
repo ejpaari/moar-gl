@@ -178,9 +178,8 @@ Model* Object::addComponent<Model>(Model* model)
     this->model = model;
     meshObjects.clear();
     for (const auto& mesh : model->getMeshes()) {
-        // Todo: Mesh default material from the loaded model.
-        // Todo: Check that material is not null.
-        MeshObject mo = {mesh.get(), defaultMaterial, this};
+        Material* mat = mesh->getDefaultMaterial();
+        MeshObject mo = {mesh.get(), (mat == nullptr ? defaultMaterial : mat), this};
         meshObjects.push_back(mo);
     }
     return model;

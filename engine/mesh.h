@@ -1,6 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "material.h"
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <vector>
@@ -23,6 +25,9 @@ public:
     void setTextureCoordinates(const std::vector<glm::vec2>& coords);
     void setNormals(const std::vector<glm::vec3>& normals);
     void setTangents(const std::vector<glm::vec3>& tangents);
+    void setDefaultMaterial(Material* material);
+
+    Material* getDefaultMaterial() const;
 
     void render() const;
     // Todo: AOS vs. SOA for better cache
@@ -38,6 +43,8 @@ private:
     GLuint tangentBuffer;
     GLuint texBuffer;
     unsigned int numIndices = 0;
+
+    Material* material = nullptr;
 };
 
 template<typename T>

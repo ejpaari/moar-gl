@@ -23,7 +23,8 @@ bool Texture::load(const std::string& file)
 
     int width;
     int height;
-    unsigned char* image = SOIL_load_image(file.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+    int channels;
+    unsigned char* image = SOIL_load_image(file.c_str(), &width, &height, &channels, SOIL_LOAD_RGB);
 
     if (!image) {
         return false;

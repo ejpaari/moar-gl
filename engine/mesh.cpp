@@ -48,6 +48,16 @@ void Mesh::setTangents(const std::vector<glm::vec3>& tangents)
     setBufferData<glm::vec3>(tangentBuffer, tangents, TANGENT_LOCATION, 3);
 }
 
+void Mesh::setDefaultMaterial(Material* material)
+{
+    this->material = material;
+}
+
+Material*Mesh::getDefaultMaterial() const
+{
+    return material;
+}
+
 void Mesh::render() const
 {
     glBindVertexArray(VAO);

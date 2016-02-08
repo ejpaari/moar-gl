@@ -282,7 +282,7 @@ bool Engine::init(const std::string& settingsFile)
 
     Material* material = manager.createMaterial();
     Object::setMeshDefaultMaterial(material);
-    GLuint texture = manager.getTexture("white.png");
+    GLuint texture = manager.getTexture("brick.png");
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
     material->setShaderType("diffuse");
     material->setUniform("solidColor",
@@ -370,10 +370,11 @@ void Engine::render()
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
     for (auto& shaderMeshMap : renderMeshes) {
         for (auto& meshMap : shaderMeshMap .second) {
+            manager.getMaterial(meshMap.first)->setMaterialUniforms(shader);
             for (auto& meshObject : meshMap.second) {
                 // Todo: Frustum culling per mesh.
                 if (!objectInsideFrustum(meshObject.parent, camera.get())) {
-                    continue;
+                    //continue;
                 }
                 meshObject.parent->setTransformationUniforms(shader);
                 meshObject.mesh->render();
