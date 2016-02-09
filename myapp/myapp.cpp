@@ -37,8 +37,7 @@ void MyApp::start()
     renderSettings = engine->getRenderSettings();
 
     moar::Object* sponza = createRenderObject("sponza.obj");
-    sponza->setScale(glm::vec3(0.005f, 0.005f, 0.005f));
-    //sponza->setScale(glm::vec3(3.0f, 3.0f, 3.0f));
+    sponza->setScale(glm::vec3(0.004f, 0.004f, 0.004f));
 
     //    monkey = createRenderObject("specular", "monkey.3ds", "checker.png");
     //    monkey->setPosition(glm::vec3(3.0f, 0.1f, 0.0f));

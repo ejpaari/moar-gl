@@ -197,7 +197,7 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
     Assimp::Importer importer;
     unsigned int flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices  |
             aiProcess_GenSmoothNormals | aiProcess_GenUVCoords | aiProcess_CalcTangentSpace;
-    // Todo: This leaks memory!? Try tp update!
+    // This gives false memory leaks?
     const aiScene* assimpScene = importer.ReadFile(file, flags);
 
     if (assimpScene) {
