@@ -20,7 +20,7 @@ MyApp::MyApp() :
     dirLight(nullptr),
     fps(0),
     fpsCounter(0),
-    drawCount(&moar::DRAW_COUNT),
+    drawCount(&moar::G_DRAW_COUNT),
     timeCounter(0.0)
 {
 }

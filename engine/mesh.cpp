@@ -4,7 +4,10 @@
 namespace moar
 {
 
-Mesh::Mesh()
+unsigned int Mesh::idCounter = 0;
+
+Mesh::Mesh() :
+    id(++idCounter)
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -53,16 +56,50 @@ void Mesh::setDefaultMaterial(Material* material)
     this->material = material;
 }
 
-Material*Mesh::getDefaultMaterial() const
+Material* Mesh::getDefaultMaterial() const
 {
     return material;
+}
+
+unsigned int Mesh::getId() const
+{
+    return id;
+}
+
+glm::vec3 Mesh::getCenterPoint() const
+{
+    return centerPoint;
+}
+
+float Mesh::getBoundingRadius() const
+{
+    return boundingRadius;
 }
 
 void Mesh::render() const
 {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
-    ++DRAW_COUNT;
+    ++G_DRAW_COUNT;
+}
+
+void Mesh::checkBoundingBoxLimits(const glm::vec3& vert)
+{
+    boundingBoxMax.x = std::max(vert.x, boundingBoxMax.x);
+    boundingBoxMax.y = std::max(vert.y, boundingBoxMax.y);
+    boundingBoxMax.z = std::max(vert.z, boundingBoxMax.z);
+
+    boundingBoxMin.x = std::min(vert.x, boundingBoxMin.x);
+    boundingBoxMin.y = std::min(vert.y, boundingBoxMin.y);
+    boundingBoxMin.z = std::min(vert.z, boundingBoxMin.z);
+}
+
+void Mesh::calculateCenterPointAndRadius()
+{
+    centerPoint.x = (boundingBoxMax.x + boundingBoxMin.x) / 2.0f;
+    centerPoint.y = (boundingBoxMax.y + boundingBoxMin.y) / 2.0f;
+    centerPoint.z = (boundingBoxMax.z + boundingBoxMin.z) / 2.0f;
+    boundingRadius = std::max(glm::distance(centerPoint, boundingBoxMax), glm::distance(centerPoint, boundingBoxMax));
 }
 
 } // moar

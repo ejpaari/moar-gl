@@ -25,8 +25,6 @@ public:
     virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir);
     virtual void activate();
 
-    // Todo: CSM.
-
 private:
     GLuint depthTexture;
     glm::vec4 frustum = glm::vec4(-10.0f, 10.0f, -10.0f, 10.0f);

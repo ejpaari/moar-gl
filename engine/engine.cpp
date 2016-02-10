@@ -305,6 +305,7 @@ void Engine::execute()
         glfwGetCursorPos(window, &x, &y);
         input.setCursorPosition(x, y);
 
+        // Todo: Handle input is time dependent.
         app->handleInput(window);
         app->update(glfwGetTime(), glfwGetTime() - time);        
         time = glfwGetTime();
@@ -320,7 +321,7 @@ void Engine::execute()
             app->quit();
         }
 
-        DRAW_COUNT = 0;
+        G_DRAW_COUNT = 0;
     }
 
     gui.uninit();
@@ -372,13 +373,12 @@ void Engine::render()
         for (auto& meshMap : shaderMeshMap .second) {
             manager.getMaterial(meshMap.first)->setMaterialUniforms(shader);
             for (auto& meshObject : meshMap.second) {
-                // Todo: Frustum culling per mesh.
-                if (!objectInsideFrustum(meshObject.parent, camera.get())) {
-                    //continue;
+                if (!objectInsideFrustum(meshObject)) {
+                   continue;
                 }
                 meshObject.parent->setTransformationUniforms(shader);
                 meshObject.mesh->render();
-                objectsInFrustum.insert(meshObject.parent->getId());
+                objectsInFrustum.insert(meshObject.mesh->getId());
             }
         }
     }
@@ -449,7 +449,7 @@ void Engine::lighting(Light::Type lightType)
             for (auto& shaderMeshMap : renderMeshes) {
                 for (auto& meshMap : shaderMeshMap.second) {
                     for (auto& meshObject : meshMap.second) {
-                        // Todo: frustum culling.
+                        // Todo: Light culling? Limit number of lights?
                         if (meshObject.parent->isShadowCaster()) {
                             meshObject.parent->setTransformationUniforms(shader);
                             meshObject.mesh->render();
@@ -471,7 +471,7 @@ void Engine::lighting(Light::Type lightType)
             for (auto& meshMap : shaderMeshMap.second) {
                 manager.getMaterial(meshMap.first)->setMaterialUniforms(shader);
                 for (auto& meshObject : meshMap.second) {
-                    if (objectsInFrustum.find(meshObject.parent->getId()) == objectsInFrustum.end()) {
+                    if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
                         continue;
                     }
                     meshObject.parent->setTransformationUniforms(shader);
@@ -484,8 +484,7 @@ void Engine::lighting(Light::Type lightType)
 
 void Engine::updateObjectContainers()
 {
-    // Todo: This global is a bit nasty.
-    if (!COMPONENT_CHANGED) {
+    if (!G_COMPONENT_CHANGED) {
         return;
     }
 
@@ -520,7 +519,7 @@ void Engine::updateObjectContainers()
                     meshes.end());
         }
     }
-    COMPONENT_CHANGED = false;
+    G_COMPONENT_CHANGED = false;
 }
 
 void Engine::updateModelMatrices()
@@ -571,15 +570,14 @@ bool Engine::createSkybox()
     return true;
 }
 
-bool Engine::objectInsideFrustum(const Object* obj, const Camera* cam) const
+bool Engine::objectInsideFrustum(const Object::MeshObject& mo) const
 {
-    const Model* model = obj->getComponent<Model>();
-    glm::vec3 point = model->getCenterPoint();
-    point = glm::vec3((*Object::view) * obj->getModelMatrix() * glm::vec4(point.x, point.y, point.z, 1.0f));
-    glm::vec3 scale = obj->getScale();
+    glm::vec3 point = mo.mesh->getCenterPoint();
+    point = glm::vec3((*Object::view) * mo.parent->getModelMatrix() * glm::vec4(point.x, point.y, point.z, 1.0f));
+    glm::vec3 scale = mo.parent->getScale();
     float scaleMultiplier = std::max(std::max(scale.x, scale.y), scale.z);
-    float radius = model->getBoundingRadius() * scaleMultiplier ;
-    return cam->sphereInsideFrustum(point, radius);
+    float radius = mo.mesh->getBoundingRadius() * scaleMultiplier ;
+    return camera->sphereInsideFrustum(point, radius);
 }
 
 } // moar

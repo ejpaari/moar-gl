@@ -43,7 +43,7 @@ void Material::setMaterialUniforms(const Shader* shader)
 
 void Material::setShaderType(const std::string& shaderType)
 {
-    COMPONENT_CHANGED = true;
+    G_COMPONENT_CHANGED = true;
     this->shaderType = shaderType;    
 }
 

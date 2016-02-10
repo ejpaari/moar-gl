@@ -15,7 +15,6 @@ public:
         POINT = 0,
         DIRECTIONAL = 1,
         NUM_TYPES = 2
-        // Todo: Spotlight.
     };
 
     explicit Light();

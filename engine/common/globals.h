@@ -37,8 +37,8 @@ extern const GLuint LIGHT_SPACE_VP_LOCATION;
 
 const GLint MAX_LOCATION = 64;
 
-extern unsigned int DRAW_COUNT;
-extern bool COMPONENT_CHANGED;
+extern unsigned int G_DRAW_COUNT;
+extern bool G_COMPONENT_CHANGED;
 } // moar
 
 #endif // GLOBALS_H

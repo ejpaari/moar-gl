@@ -24,9 +24,8 @@ bool Object::bufferCreated = false;
 Material* Object::defaultMaterial = nullptr;
 
 Object::Object() :
-    id(idCounter)
-{
-    ++idCounter;
+    id(++idCounter)
+{    
     if (!bufferCreated) {
         glGenBuffers(1, &transformationBlockBuffer);
         glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
@@ -166,7 +165,7 @@ glm::mat4x4 Object::getModelMatrix() const
 template<>
 Light* Object::addComponent<Light>()
 {
-    COMPONENT_CHANGED = true;
+    G_COMPONENT_CHANGED = true;
     light.reset(new Light);
     return light.get();
 }
@@ -174,7 +173,7 @@ Light* Object::addComponent<Light>()
 template<>
 Model* Object::addComponent<Model>(Model* model)
 {
-    COMPONENT_CHANGED = true;
+    G_COMPONENT_CHANGED = true;
     this->model = model;
     meshObjects.clear();
     for (const auto& mesh : model->getMeshes()) {

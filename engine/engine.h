@@ -53,7 +53,7 @@ private:
     void updateModelMatrices();
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
-    bool objectInsideFrustum(const Object* obj, const Camera* cam) const;
+    bool objectInsideFrustum(const Object::MeshObject& mo) const;
 
     std::shared_ptr<Application> app;
 

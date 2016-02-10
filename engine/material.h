@@ -16,7 +16,6 @@ namespace moar
 class Material
 {
 public:
-    // Todo: Other texture types: specular, bump, emissive etc.
     enum TextureType
     {
         DIFFUSE,

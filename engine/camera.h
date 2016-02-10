@@ -33,7 +33,6 @@ public:
     const glm::mat4* getProjectionMatrixPointer() const;
     float getFarClipDistance() const;
 
-    // Todo: frustum culling for box.
     bool sphereInsideFrustum(const glm::vec3& point, float radius) const;
 
     Postprocess* addPostprocess(const std::string& name, GLuint shader, int priority);

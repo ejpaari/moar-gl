@@ -198,68 +198,78 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
     unsigned int flags = aiProcess_Triangulate | aiProcess_JoinIdenticalVertices  |
             aiProcess_GenSmoothNormals | aiProcess_GenUVCoords | aiProcess_CalcTangentSpace;
     // This gives false memory leaks?
-    const aiScene* assimpScene = importer.ReadFile(file, flags);
+    const aiScene* aScene = importer.ReadFile(file, flags);
 
-    if (assimpScene) {
-        if (assimpScene->mNumMeshes == 0) {
+    if (aScene) {
+        if (aScene->mNumMeshes == 0) {
             std::cerr << "WARNING: No mesh found in the model; " << file << std::endl;
             return false;
         }
 
-        for (unsigned int i = 0; i < assimpScene->mNumMeshes; ++i) {
-            const aiMesh* assimpMesh = assimpScene->mMeshes[i];
+        for (unsigned int i = 0; i < aScene->mNumMeshes; ++i) {
+            const aiMesh* aMesh = aScene->mMeshes[i];
             std::vector<glm::vec3> vertices;
             std::vector<glm::vec3> normals;
             std::vector<glm::vec3> tangents;
             std::vector<glm::vec2> texCoords;
             std::vector<unsigned int> indices;
+            std::unique_ptr<Mesh> mesh(new Mesh());
 
-            for (unsigned int j = 0; j < assimpMesh->mNumVertices; ++j) {
+            for (unsigned int j = 0; j < aMesh->mNumVertices; ++j) {
                 glm::vec3 v;
-                v.x = assimpMesh->mVertices[j].x;
-                v.y = assimpMesh->mVertices[j].y;
-                v.z = assimpMesh->mVertices[j].z;
+                v.x = aMesh->mVertices[j].x;
+                v.y = aMesh->mVertices[j].y;
+                v.z = aMesh->mVertices[j].z;
                 vertices.push_back(v);
-                //checkBoundingBoxLimits(v);
+                mesh->checkBoundingBoxLimits(v);
 
                 glm::vec3 n;
-                n.x = assimpMesh->mNormals[j].x;
-                n.y = assimpMesh->mNormals[j].y;
-                n.z = assimpMesh->mNormals[j].z;
+                n.x = aMesh->mNormals[j].x;
+                n.y = aMesh->mNormals[j].y;
+                n.z = aMesh->mNormals[j].z;
                 normals.push_back(n);
 
-                if (assimpMesh->HasTangentsAndBitangents()) {
+                if (aMesh->HasTangentsAndBitangents()) {
                     glm::vec3 tan;
-                    tan.x = assimpMesh->mTangents[j].x;
-                    tan.y = assimpMesh->mTangents[j].y;
-                    tan.z = assimpMesh->mTangents[j].z;
+                    tan.x = aMesh->mTangents[j].x;
+                    tan.y = aMesh->mTangents[j].y;
+                    tan.z = aMesh->mTangents[j].z;
                     tangents.push_back(tan);
                 }
 
-                if (assimpMesh->HasTextureCoords(0)) {
+                if (aMesh->HasTextureCoords(0)) {
                     glm::vec2 t;
-                    t.x = assimpMesh->mTextureCoords[0][j].x;
-                    t.y = assimpMesh->mTextureCoords[0][j].y;
+                    t.x = aMesh->mTextureCoords[0][j].x;
+                    t.y = aMesh->mTextureCoords[0][j].y;
                     texCoords.push_back(t);
                 }
             }
 
-            for (unsigned int j = 0; j < assimpMesh->mNumFaces; ++j) {
-                if (assimpMesh->mFaces[j].mNumIndices != 3) {
+            for (unsigned int j = 0; j < aMesh->mNumFaces; ++j) {
+                if (aMesh->mFaces[j].mNumIndices != 3) {
                     std::cerr << "WARNING: Unable to parse model indices; " << file << std::endl;
                     return false;
                 }
-                indices.push_back(assimpMesh->mFaces[j].mIndices[0]);
-                indices.push_back(assimpMesh->mFaces[j].mIndices[1]);
-                indices.push_back(assimpMesh->mFaces[j].mIndices[2]);
+                indices.push_back(aMesh->mFaces[j].mIndices[0]);
+                indices.push_back(aMesh->mFaces[j].mIndices[1]);
+                indices.push_back(aMesh->mFaces[j].mIndices[2]);
             }
 
-            std::unique_ptr<Mesh> mesh(new Mesh());
+            mesh->setVertices(vertices);
+            mesh->setIndices(indices);
+            mesh->setNormals(normals);            
+            if (aMesh->HasTangentsAndBitangents()) {
+                mesh->setTangents(tangents);
+            }
+            if (aMesh->HasTextureCoords(0)) {
+                mesh->setTextureCoordinates(texCoords);
+            }
+            mesh->calculateCenterPointAndRadius();
 
-            aiMaterial* assimpMaterial = assimpScene->mMaterials[assimpMesh->mMaterialIndex];
-            if (assimpMaterial) {
+            aiMaterial* aMaterial = aScene->mMaterials[aMesh->mMaterialIndex];
+            if (aMaterial) {
                 std::unique_ptr<Material> mat(new Material());
-                if (loadMaterial(assimpMaterial, mat.get())) {
+                if (loadMaterial(aMaterial, mat.get())) {
                     mesh->setDefaultMaterial(mat.get());
                     auto iter = materials.insert(std::make_pair(mat->getId(), std::move(mat)));
                     if (!iter.second) {
@@ -267,20 +277,8 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
                     }
                 }
             }
-
-            mesh->setVertices(vertices);
-            mesh->setIndices(indices);
-            mesh->setNormals(normals);
-            if (assimpMesh->HasTangentsAndBitangents()) {
-                mesh->setTangents(tangents);
-            }
-            if (assimpMesh->HasTextureCoords(0)) {
-                mesh->setTextureCoordinates(texCoords);
-            }
             model->addMesh(std::move(mesh));
         }
-        // Todo: These should be calculated per mesh.
-        //calculateCenterPointAndRadius();
         std::cout << "Loaded model: " << file << std::endl;
         return true;
     } else {
@@ -290,39 +288,29 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
     }
 }
 
-bool ResourceManager::loadMaterial(aiMaterial* assimpMaterial, Material* material)
+bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
 {
     std::string shaderType;
     aiTextureType textureType = aiTextureType_DIFFUSE;
-    // Todo: Add a function for texture loading.
-    for (unsigned int i = 0; i < assimpMaterial->GetTextureCount(textureType); ++i) {
+    // Todo: Support multiple textures.
+    for (unsigned int i = 0; i < aMaterial->GetTextureCount(textureType); ++i) {
         if (i > 0) {
-            // Todo: Support multiple textures.
             break;
         }
-        aiString texturePath;
-        assimpMaterial->GetTexture(textureType, i, &texturePath);
-        GLuint tex = getTexture(std::string(texturePath.C_Str()));
-        if (tex == 0) {
+        if (!loadTexture(aMaterial, textureType, i, material, Material::DIFFUSE)) {
             return false;
         }
-        material->setTexture(tex, Material::DIFFUSE, GL_TEXTURE_2D);
         shaderType ="diffuse";
     }
 
     textureType = aiTextureType_NORMALS;
-    for (unsigned int i = 0; i < assimpMaterial->GetTextureCount(textureType); ++i) {
+    for (unsigned int i = 0; i < aMaterial->GetTextureCount(textureType); ++i) {
         if (i > 0) {
-            // Todo: Support multiple textures.
             break;
         }
-        aiString texturePath;
-        assimpMaterial->GetTexture(textureType, i, &texturePath);
-        GLuint tex = getTexture(std::string(texturePath.C_Str()));
-        if (tex == 0) {
+        if (!loadTexture(aMaterial, textureType, i, material, Material::NORMAL)) {
             return false;
         }
-        material->setTexture(tex, Material::NORMAL, GL_TEXTURE_2D);
         shaderType ="normalmap";
     }
 
@@ -330,6 +318,18 @@ bool ResourceManager::loadMaterial(aiMaterial* assimpMaterial, Material* materia
         return false;
     }
     material->setShaderType(shaderType);
+    return true;
+}
+
+bool ResourceManager::loadTexture(aiMaterial* aMaterial, aiTextureType aType, unsigned int index, Material* material, Material::TextureType type)
+{
+    aiString path;
+    aMaterial->GetTexture(aType, index, &path);
+    GLuint tex = getTexture(std::string(path.C_Str()));
+    if (tex == 0) {
+        return false;
+    }
+    material->setTexture(tex, type, GL_TEXTURE_2D);
     return true;
 }
 

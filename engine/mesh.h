@@ -12,6 +12,8 @@ namespace moar
 
 class Mesh
 {
+    friend class ResourceManager;
+
 public:
     explicit Mesh();
     ~Mesh();
@@ -28,11 +30,18 @@ public:
     void setDefaultMaterial(Material* material);
 
     Material* getDefaultMaterial() const;
+    unsigned int getId() const;
+    glm::vec3 getCenterPoint() const;
+    float getBoundingRadius() const;
 
     void render() const;
-    // Todo: AOS vs. SOA for better cache
 
 private:
+    static unsigned int idCounter;
+
+    void checkBoundingBoxLimits(const glm::vec3& vert);
+    void calculateCenterPointAndRadius();
+
     template<typename T>
     void setBufferData(GLuint buffer, const std::vector<T>& data, int position, int size);
 
@@ -45,6 +54,12 @@ private:
     unsigned int numIndices = 0;
 
     Material* material = nullptr;
+    unsigned int id;
+
+    glm::vec3 boundingBoxMax;
+    glm::vec3 boundingBoxMin;
+    glm::vec3 centerPoint;
+    float boundingRadius = 0.0f;
 };
 
 template<typename T>

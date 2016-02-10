@@ -43,7 +43,7 @@ void Light::setLightUniforms(const glm::vec3& position, const glm::vec3& forward
 void Light::setType(Light::Type type)
 {
     this->type = type;
-    COMPONENT_CHANGED = true;
+    G_COMPONENT_CHANGED = true;
 }
 
 void Light::setShadowingEnabled(bool enabled)
