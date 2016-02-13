@@ -21,7 +21,7 @@ public:
 
     virtual void start() = 0;
     virtual void handleInput(GLFWwindow* window) = 0;
-    virtual void update(double time, double deltaTime) = 0;
+    virtual void update() = 0;
     virtual void quit();
 
     void setEngine(Engine* engine);

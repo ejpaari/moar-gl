@@ -305,10 +305,11 @@ void Engine::execute()
         glfwGetCursorPos(window, &x, &y);
         input.setCursorPosition(x, y);
 
-        // Todo: Handle input is time dependent.
+        time.update();
+
         app->handleInput(window);
-        app->update(glfwGetTime(), glfwGetTime() - time);        
-        time = glfwGetTime();
+        app->update();
+
         updateObjectContainers();
         updateModelMatrices();
         render();
@@ -345,6 +346,11 @@ Input* Engine::getInput()
 RenderSettings* Engine::getRenderSettings()
 {
     return &renderSettings;
+}
+
+Time*Engine::getTime()
+{
+    return &time;
 }
 
 Object* Engine::createObject()
@@ -449,7 +455,6 @@ void Engine::lighting(Light::Type lightType)
             for (auto& shaderMeshMap : renderMeshes) {
                 for (auto& meshMap : shaderMeshMap.second) {
                     for (auto& meshObject : meshMap.second) {
-                        // Todo: Light culling? Limit number of lights?
                         if (meshObject.parent->isShadowCaster()) {
                             meshObject.parent->setTransformationUniforms(shader);
                             meshObject.mesh->render();

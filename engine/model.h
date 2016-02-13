@@ -29,7 +29,6 @@ public:
 private:
     void addMesh(std::unique_ptr<Mesh> mesh);
 
-    // Todo: Mesh without pointer.
     std::vector<std::unique_ptr<Mesh>> meshes;
 };
 

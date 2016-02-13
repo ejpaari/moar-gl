@@ -26,8 +26,8 @@ private:
     double y = 0.0;
     double deltaX = 0.0;
     double deltaY = 0.0;
-    double sensitivity = 1.0;
-    float movementSpeed = 1.0;
+    double sensitivity = 0.0;
+    float movementSpeed = 0.0;
 };
 
 } // moar

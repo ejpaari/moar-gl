@@ -64,7 +64,6 @@ private:
     std::string shaderPath;
     std::string modelPath;
     std::string texturePath;
-    // Todo: Unnecessary unique_ptrs?
     std::vector<std::unique_ptr<Shader>> shaders;
     std::unordered_map<ShaderKey, Shader*, ShaderKeyHash> shadersByType;
     std::unordered_map<std::string, Shader*> shadersByName;

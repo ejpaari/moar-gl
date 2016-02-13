@@ -11,6 +11,7 @@ MyApp::MyApp() :
     camera(nullptr),
     input(nullptr),
     renderSettings(nullptr),
+    time(nullptr),
     offset(nullptr),
     bar(nullptr),
     monkey(nullptr),
@@ -35,6 +36,7 @@ void MyApp::start()
     resetCamera();
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
+    time = engine->getTime();
 
     moar::Object* sponza = createRenderObject("sponza.obj");
     sponza->setScale(glm::vec3(0.004f, 0.004f, 0.004f));
@@ -66,7 +68,7 @@ void MyApp::start()
     initGUI();
 }
 
-void MyApp::handleInput(GLFWwindow *window)
+void MyApp::handleInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -80,16 +82,16 @@ void MyApp::handleInput(GLFWwindow *window)
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera->move(camera->getForward() * input->getMovementSpeed());
+        camera->move(camera->getForward() * input->getMovementSpeed() * time->getDelta());
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera->move(-camera->getForward() * input->getMovementSpeed());
+        camera->move(-camera->getForward() * input->getMovementSpeed() * time->getDelta());
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera->move(camera->getLeft() * input->getMovementSpeed());
+        camera->move(camera->getLeft() * input->getMovementSpeed() * time->getDelta());
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera->move(-camera->getLeft() * input->getMovementSpeed());
+        camera->move(-camera->getLeft() * input->getMovementSpeed() * time->getDelta());
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
         resetCamera();
@@ -99,9 +101,9 @@ void MyApp::handleInput(GLFWwindow *window)
     camera->rotate(moar::Object::LEFT, input->getCursorDeltaY() * boost::math::constants::degree<double>());
 }
 
-void MyApp::update(double time, double deltaTime)
+void MyApp::update()
 {
-    timeCounter += deltaTime;
+    timeCounter += time->getDelta();
     if (timeCounter < 1.0) {
         ++fpsCounter;
     } else {
@@ -112,8 +114,9 @@ void MyApp::update(double time, double deltaTime)
 
     //    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
 
-    light1->move(glm::vec3(0.0f, sin(time) * 0.01f, 0.0f));
-    light2->move(glm::vec3(0.0f, cos(time) * 0.02f, 0.0f));
+    double t = time->getTime();
+    light1->move(glm::vec3(0.0f, sin(t) * 0.01f, 0.0f));
+    light2->move(glm::vec3(0.0f, cos(t) * 0.02f, 0.0f));
 
     //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }

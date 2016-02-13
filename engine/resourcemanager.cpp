@@ -240,7 +240,7 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
                 if (aMesh->HasTextureCoords(0)) {
                     glm::vec2 t;
                     t.x = aMesh->mTextureCoords[0][j].x;
-                    t.y = aMesh->mTextureCoords[0][j].y;
+                    t.y = -aMesh->mTextureCoords[0][j].y;
                     texCoords.push_back(t);
                 }
             }
@@ -302,7 +302,7 @@ bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
         }
         shaderType ="diffuse";
     }
-
+    // Todo: Are normal maps correctly applied?
     textureType = aiTextureType_NORMALS;
     for (unsigned int i = 0; i < aMaterial->GetTextureCount(textureType); ++i) {
         if (i > 0) {

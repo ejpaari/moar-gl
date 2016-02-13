@@ -40,7 +40,8 @@ SOURCES += \
     ../engine/depthmap.cpp \
     ../engine/depthmap_dir.cpp \
     ../engine/depthmap_point.cpp \
-    ../engine/common/globals.cpp
+    ../engine/common/globals.cpp \
+    ../engine/time.cpp
 
 HEADERS += \
     myapp.h \
@@ -65,7 +66,8 @@ HEADERS += \
     ../engine/depthmap.h \
     ../engine/depthmap_dir.h \
     ../engine/depthmap_point.h \
-    ../engine/common/globals.h
+    ../engine/common/globals.h \
+    ../engine/time.h
 
 # GLFW
 unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL

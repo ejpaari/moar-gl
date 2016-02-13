@@ -7,6 +7,7 @@
 #include "../engine/camera.h"
 #include "../engine/object.h"
 #include "../engine/rendersettings.h"
+#include "../engine/time.h"
 #include "../engine/light.h"
 
 #include <glm/glm.hpp>
@@ -21,7 +22,7 @@ public:
 
     virtual void start() final;
     virtual void handleInput(GLFWwindow* window) final;
-    virtual void update(double time, double deltaTime) final;
+    virtual void update() final;
 
 private:
     void initGUI();
@@ -32,6 +33,7 @@ private:
     moar::Camera* camera;
     moar::Input* input;
     moar::RenderSettings* renderSettings;
+    moar::Time* time;
     moar::Postprocess* offset;
     TwBar* bar;
 

@@ -6,6 +6,7 @@
 #include "gui.h"
 #include "input.h"
 #include "rendersettings.h"
+#include "time.h"
 #include "camera.h"
 #include "object.h"
 #include "light.h"
@@ -43,6 +44,7 @@ public:
     Camera* getCamera();
     Input* getInput();
     RenderSettings* getRenderSettings();
+    Time* getTime();
 
     Object* createObject();
 
@@ -62,6 +64,7 @@ private:
     GUI gui;
     Input input;
     RenderSettings renderSettings;
+    Time time;
 
     using MaterialId = int;
     using ShaderType = std::string;
@@ -81,8 +84,6 @@ private:
     Framebuffer* fb = nullptr;
     const Shader* shader = nullptr;
     Postprocess passthrough;
-
-    double time = 0.0;
 };
 
 } // moar
