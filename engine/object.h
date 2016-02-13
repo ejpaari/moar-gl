@@ -41,6 +41,7 @@ public:
     static const glm::mat4* view;
 
     static void setMeshDefaultMaterial(Material* material);
+    static void setViewMatrixUniform();
 
     explicit Object();
     virtual ~Object();

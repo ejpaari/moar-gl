@@ -285,9 +285,6 @@ bool Engine::init(const std::string& settingsFile)
     GLuint texture = manager.getTexture("brick.png");
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
     material->setShaderType("diffuse");
-    material->setUniform("solidColor",
-                         std::bind(glUniform3f, moar::SOLID_COLOR_LOCATION, 1.0f, 1.0f, 1.0f),
-                         moar::SOLID_COLOR_LOCATION);
 
 #ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
@@ -367,6 +364,7 @@ void Engine::render()
     objectsInFrustum.clear();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+    Object::setViewMatrixUniform();
 
     // Ambient.
     glDepthMask(GL_TRUE);

@@ -34,8 +34,6 @@ public:
 
     void setShaderType(const std::string& shaderType);
     void setTexture(GLuint texture, TextureType type, GLenum target);
-    // Todo: Wrapper function for setting uniforms, this is a bit clumsy.
-    // Todo: Uniforms should be reset for each material, otherwise they "leak" from previous.
     void setUniform(const std::string& name, std::function<void()> func, GLuint location);
 
     std::string getShaderType() const;

@@ -133,13 +133,18 @@ void Object::setMeshDefaultMaterial(Material* material)
     defaultMaterial = material;
 }
 
+void Object::setViewMatrixUniform()
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+    GLintptr matrixSize = sizeof(modelMatrix);
+    glBufferSubData(GL_UNIFORM_BUFFER, matrixSize, matrixSize, glm::value_ptr(*view));
+}
+
 void Object::setTransformationUniforms(const Shader* shader)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLintptr matrixSize = sizeof(modelMatrix);
     glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(modelMatrix));
-    // Todo: It is unnecessary to update view-matrix each time.
-    glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * modelMatrix));
     glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * modelMatrix));
     glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);

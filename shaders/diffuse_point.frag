@@ -7,7 +7,6 @@ in vec2 texCoord;
 
 layout (location = 0) out vec4 outColor;
 
-layout (location = 12) uniform vec3 solidColor;
 layout (location = 20) uniform sampler2D diffuseTex;
 layout (location = 23) uniform samplerCube depthTex;
 layout (location = 42) uniform int receiveShadows;
@@ -34,6 +33,5 @@ void main()
 
     outColor = shadow * 
                vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * 
-               texture(diffuseTex, texCoord) *
-               vec4(solidColor, 1.0);
+               texture(diffuseTex, texCoord);
 }

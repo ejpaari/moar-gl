@@ -18,7 +18,7 @@ layout (std140) uniform LightBlock {
     vec3 lightForward;
 };
 
-#moar::include "../moar-gl/shaders/shadow.c"
+#moar::include "../moar-gl/shaders/shadow_dir.glsl"
 
 void main()
 {    
