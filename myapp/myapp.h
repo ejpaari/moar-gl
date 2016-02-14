@@ -42,11 +42,14 @@ private:
 
     moar::Object* light1;
     moar::Object* light2;
+    moar::Object* light3;
     moar::Object* dirLight;
+    moar::Object* cube;
 
     int fps;
     int fpsCounter;
     unsigned int* drawCount;
+    glm::vec3 position;
     double timeCounter;
 };
 

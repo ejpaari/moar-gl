@@ -18,13 +18,20 @@ layout (std140) uniform LightBlock {
     vec3 lightForward;
 };
 
+#moar::include "../moar-gl/shaders/shadow_point.glsl"
+
 void main()
 {
-// Todo: Shadows.
     vec3 normal_Tan = normalize(texture(normalTex, texCoord).rgb * 2.0 - vec3(1.0));
 
     float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
 
     float lightDistance = length(lightPos - vertexPos_World);
-    outColor = vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * texture(diffuseTex, texCoord);
+    float shadow = receiveShadows != 0 ? 
+          calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane) : 
+          1.0;
+
+    outColor = shadow *
+               vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * 
+               texture(diffuseTex, texCoord);
 }

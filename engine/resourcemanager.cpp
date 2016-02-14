@@ -302,8 +302,7 @@ bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
         }
         shaderType ="diffuse";
     }
-    // Todo: Are normal maps correctly applied?
-    textureType = aiTextureType_NORMALS;
+    textureType = aiTextureType_HEIGHT;
     for (unsigned int i = 0; i < aMaterial->GetTextureCount(textureType); ++i) {
         if (i > 0) {
             break;

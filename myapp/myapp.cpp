@@ -18,7 +18,9 @@ MyApp::MyApp() :
     icosphere(nullptr),
     light1(nullptr),
     light2(nullptr),
+    light3(nullptr),
     dirLight(nullptr),
+    cube(nullptr),
     fps(0),
     fpsCounter(0),
     drawCount(&moar::G_DRAW_COUNT),
@@ -53,10 +55,26 @@ void MyApp::start()
     //    mat = icosphere->getComponent<moar::Material>();
     //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
-    light1 = createLight(glm::vec4(0.8f, 1.0f, 0.8f, 1.5f));
-    light1->setPosition(glm::vec3(1.0f, 2.5f, 0.0f));
+    light1 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
+    light1->setPosition(glm::vec3(-2.0f, 1.5f, 0.0f));
     light2 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.5f));
-    light2->setPosition(glm::vec3(-1.0f, 2.5f, 0.0f));
+    light2->setPosition(glm::vec3(2.0f, 2.5f, 0.4f));
+    light3 = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
+    light3->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));
+
+    cube = engine->createObject();
+    cube->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
+    moar::Material* m = engine->getResourceManager()->createMaterial();
+    m->setTexture(engine->getResourceManager()->getTexture("brick.png"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
+    m->setTexture(engine->getResourceManager()->getTexture("sponza_thorn_ddn.tga"), moar::Material::NORMAL, GL_TEXTURE_2D);
+    m->setShaderType("normalmap");
+    for (auto& mo : cube->getMeshObjects()) {
+        mo.material = m;
+    }
+    cube->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    cube->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
+
+
     //    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
 //    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.7f), moar::Light::DIRECTIONAL);
 //    dirLight->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
@@ -115,10 +133,12 @@ void MyApp::update()
     //    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
 
     double t = time->getTime();
-    light1->move(glm::vec3(0.0f, sin(t) * 0.01f, 0.0f));
+    light1->move(glm::vec3(sin(t) * 0.02f, 0.0f, 0.0f));
     light2->move(glm::vec3(0.0f, cos(t) * 0.02f, 0.0f));
+    light3->move(glm::vec3(0.0f, sin(t) * 0.01f, sin(t) * 0.05f));
 
     //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
+    position = camera->getPosition();
 }
 
 void MyApp::initGUI()
@@ -126,6 +146,7 @@ void MyApp::initGUI()
     bar = TwNewBar("GUI");
     TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
     TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
+    TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
 }
 
 moar::Object* MyApp::createRenderObject(const std::string& modelName)
@@ -143,6 +164,11 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     moar::Light* lightComponent = light->addComponent<moar::Light>();
     lightComponent->setColor(color);
     lightComponent->setType(type);
+    moar::Model* model = engine->getResourceManager()->getModel("sphere.3ds");
+    light->addComponent<moar::Model>(model);
+    light->setScale(glm::vec3(0.05f, 0.05f, 0.05f));
+    light->setShadowCaster(false);
+    light->setShadowReceiver(false);
     return light;
 }
 
