@@ -30,7 +30,7 @@ public:
     Material& operator=(const Material&) = delete;
     Material& operator=(Material&&) = delete;
 
-    void setMaterialUniforms(const Shader* shader);
+    void setUniforms(const Shader* shader);
 
     void setShaderType(const std::string& shaderType);
     void setTexture(GLuint texture, TextureType type, GLenum target);

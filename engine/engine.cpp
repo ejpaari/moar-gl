@@ -308,7 +308,7 @@ void Engine::execute()
         app->update();
 
         updateObjectContainers();
-        updateModelMatrices();
+        updateObjects();
         render();
         gui.render();
 
@@ -321,7 +321,8 @@ void Engine::execute()
 
         G_DRAW_COUNT = 0;
     }
-
+    Light::deleteBuffers();
+    Object::deleteBuffers();
     gui.uninit();
 }
 
@@ -375,12 +376,12 @@ void Engine::render()
     glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
     for (auto& shaderMeshMap : renderMeshes) {
         for (auto& meshMap : shaderMeshMap .second) {
-            manager.getMaterial(meshMap.first)->setMaterialUniforms(shader);
+            manager.getMaterial(meshMap.first)->setUniforms(shader);
             for (auto& meshObject : meshMap.second) {
                 if (!objectInsideFrustum(meshObject)) {
                    continue;
                 }
-                meshObject.parent->setTransformationUniforms(shader);
+                meshObject.parent->setUniforms(shader);
                 meshObject.mesh->render();
                 objectsInFrustum.insert(meshObject.mesh->getId());
             }
@@ -404,9 +405,9 @@ void Engine::render()
         shader = renderSettings.skyboxShader;
         glUseProgram(shader->getProgram());
         skybox->setPosition(camera->getPosition());
-        skybox->setTransformationUniforms(shader);
+        skybox->setUniforms(shader);
         for (auto& meshObject : skybox->getMeshObjects()) {
-            meshObject.material->setMaterialUniforms(shader);
+            meshObject.material->setUniforms(shader);
             meshObject.mesh->render();
         }
     }
@@ -447,14 +448,14 @@ void Engine::lighting(Light::Type lightType)
         glUseProgram(shader->getProgram());
         Light* lightComp = light->getComponent<Light>();
         bool shadowingEnabled = lightComp->isShadowingEnabled();
-        lightComp->setLightUniforms(light->getPosition(), light->getForward());
+        lightComp->setUniforms(light->getPosition(), light->getForward());
         depthMap->bind(light->getPosition(), light->getForward());
         if (shadowingEnabled) {
             for (auto& shaderMeshMap : renderMeshes) {
                 for (auto& meshMap : shaderMeshMap.second) {
                     for (auto& meshObject : meshMap.second) {
                         if (meshObject.parent->isShadowCaster()) {
-                            meshObject.parent->setTransformationUniforms(shader);
+                            meshObject.parent->setUniforms(shader);
                             meshObject.mesh->render();
                         }
                     }
@@ -472,12 +473,12 @@ void Engine::lighting(Light::Type lightType)
             }
             depthMap->activate();
             for (auto& meshMap : shaderMeshMap.second) {
-                manager.getMaterial(meshMap.first)->setMaterialUniforms(shader);
+                manager.getMaterial(meshMap.first)->setUniforms(shader);
                 for (auto& meshObject : meshMap.second) {
                     if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
                         continue;
                     }
-                    meshObject.parent->setTransformationUniforms(shader);
+                    meshObject.parent->setUniforms(shader);
                     meshObject.mesh->render();
                 }
             }
@@ -525,11 +526,13 @@ void Engine::updateObjectContainers()
     G_COMPONENT_CHANGED = false;
 }
 
-void Engine::updateModelMatrices()
+void Engine::updateObjects()
 {
     for (const std::shared_ptr<Object>& obj : allObjects) {
         obj->updateModelMatrix();
     }
+    camera->updateViewMatrix();
+    skybox->setPosition(camera->getPosition());
     skybox->updateModelMatrix();
 }
 

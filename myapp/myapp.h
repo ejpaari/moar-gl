@@ -30,27 +30,24 @@ private:
     moar::Object* createLight(const glm::vec4& color, moar::Light::Type type = moar::Light::POINT);
     void resetCamera();
 
-    moar::Camera* camera;
-    moar::Input* input;
-    moar::RenderSettings* renderSettings;
-    moar::Time* time;
-    moar::Postprocess* offset;
-    TwBar* bar;
+    moar::Camera* camera = nullptr;
+    moar::Input* input = nullptr;
+    moar::RenderSettings* renderSettings = nullptr;
+    moar::Time* time = nullptr;
+    moar::Postprocess* offset = nullptr;
+    TwBar* bar = nullptr;
 
-    moar::Object* monkey;
-    moar::Object* icosphere;
+    moar::Object* light1 = nullptr;
+    moar::Object* light2 = nullptr;
+    moar::Object* light3 = nullptr;
+    moar::Object* dirLight = nullptr;
+    moar::Object* monkey = nullptr;
 
-    moar::Object* light1;
-    moar::Object* light2;
-    moar::Object* light3;
-    moar::Object* dirLight;
-    moar::Object* cube;
-
-    int fps;
-    int fpsCounter;
+    int fps = 0;
+    int fpsCounter = 0;
     unsigned int* drawCount;
     glm::vec3 position;
-    double timeCounter;
+    double timeCounter = 0.0;
 };
 
 #endif // MYAPP_H

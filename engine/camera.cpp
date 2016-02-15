@@ -28,13 +28,11 @@ Camera::~Camera()
 void Camera::setPosition(const glm::vec3& pos)
 {
     Object::setPosition(pos);
-    calculateViewMatrix();
 }
 
 void Camera::move(const glm::vec3& translation)
 {
     Object::move(translation);
-    calculateViewMatrix();
 }
 
 void Camera::rotate(const glm::vec3& axis, float amount) {
@@ -45,7 +43,6 @@ void Camera::rotate(const glm::vec3& axis, float amount) {
     if (rotation.x < -ROTATION_LIMIT) {
         rotation.x = -ROTATION_LIMIT;
     }
-    calculateViewMatrix();
 }
 
 const glm::mat4* Camera::getViewMatrixPointer() const
@@ -61,6 +58,11 @@ const glm::mat4* Camera::getProjectionMatrixPointer() const
 float Camera::getFarClipDistance() const
 {
     return farClipDistance;
+}
+
+void Camera::updateViewMatrix()
+{
+    *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));
 }
 
 bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
@@ -120,11 +122,6 @@ void Camera::removePostprocess(const std::string& name)
 const std::list<Postprocess>& Camera::getPostprocesses() const
 {
     return postprocs;
-}
-
-void Camera::calculateViewMatrix()
-{
-    *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));
 }
 
 void Camera::calculateFrustum()

@@ -9,6 +9,8 @@ namespace moar
 
 class Light
 {
+    friend class Engine;
+
 public:
     enum Type
     {
@@ -24,7 +26,7 @@ public:
     Light& operator=(const Light&) = delete;
     Light& operator=(Light&&) = delete;
 
-    void setLightUniforms(const glm::vec3& position, const glm::vec3& forward);
+    void setUniforms(const glm::vec3& position, const glm::vec3& forward);
 
     void setType(Type type);
     void setColor(const glm::vec4& color);
@@ -36,6 +38,8 @@ public:
 private:
     static GLuint lightBlockBuffer;
     static bool bufferCreated;
+
+    static void deleteBuffers();
 
     Type type = POINT;
     glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 10.0f);

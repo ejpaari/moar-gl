@@ -25,7 +25,7 @@ Material* Object::defaultMaterial = nullptr;
 
 Object::Object() :
     id(++idCounter)
-{    
+{
     if (!bufferCreated) {
         glGenBuffers(1, &transformationBlockBuffer);
         glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
@@ -140,7 +140,13 @@ void Object::setViewMatrixUniform()
     glBufferSubData(GL_UNIFORM_BUFFER, matrixSize, matrixSize, glm::value_ptr(*view));
 }
 
-void Object::setTransformationUniforms(const Shader* shader)
+void Object::deleteBuffers()
+{
+    glDeleteBuffers(1, &transformationBlockBuffer);
+    bufferCreated = false;
+}
+
+void Object::setUniforms(const Shader* shader)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLintptr matrixSize = sizeof(modelMatrix);

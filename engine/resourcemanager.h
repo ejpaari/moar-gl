@@ -59,7 +59,7 @@ private:
 
     bool loadModel(Model* model, const std::string& file);
     bool loadMaterial(aiMaterial* aMaterial, Material* material);
-    bool loadTexture(aiMaterial* aMaterial, aiTextureType aType, unsigned int index, Material* material, Material::TextureType type);
+    bool loadTexture(aiMaterial* aMaterial, aiTextureType aType, Material* material, Material::TextureType type);
 
     std::string shaderPath;
     std::string modelPath;

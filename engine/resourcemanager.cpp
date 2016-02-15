@@ -290,24 +290,18 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
 
 bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
 {
-    std::string shaderType;
+    // Todo: Bump map.
+    std::string shaderType;    
     aiTextureType textureType = aiTextureType_DIFFUSE;
-    // Todo: Support multiple textures.
-    for (unsigned int i = 0; i < aMaterial->GetTextureCount(textureType); ++i) {
-        if (i > 0) {
-            break;
-        }
-        if (!loadTexture(aMaterial, textureType, i, material, Material::DIFFUSE)) {
+    if (aMaterial->GetTextureCount(textureType) > 0) {
+        if (!loadTexture(aMaterial, textureType, material, Material::DIFFUSE)) {
             return false;
         }
         shaderType ="diffuse";
     }
     textureType = aiTextureType_HEIGHT;
-    for (unsigned int i = 0; i < aMaterial->GetTextureCount(textureType); ++i) {
-        if (i > 0) {
-            break;
-        }
-        if (!loadTexture(aMaterial, textureType, i, material, Material::NORMAL)) {
+    if (aMaterial->GetTextureCount(textureType) > 0) {
+        if (!loadTexture(aMaterial, textureType, material, Material::NORMAL)) {
             return false;
         }
         shaderType ="normalmap";
@@ -320,10 +314,10 @@ bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
     return true;
 }
 
-bool ResourceManager::loadTexture(aiMaterial* aMaterial, aiTextureType aType, unsigned int index, Material* material, Material::TextureType type)
+bool ResourceManager::loadTexture(aiMaterial* aMaterial, aiTextureType aType, Material* material, Material::TextureType type)
 {
     aiString path;
-    aMaterial->GetTexture(aType, index, &path);
+    aMaterial->GetTexture(aType, 0, &path);
     GLuint tex = getTexture(std::string(path.C_Str()));
     if (tex == 0) {
         return false;

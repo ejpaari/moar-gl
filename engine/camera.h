@@ -33,6 +33,7 @@ public:
     const glm::mat4* getProjectionMatrixPointer() const;
     float getFarClipDistance() const;
 
+    void updateViewMatrix();
     bool sphereInsideFrustum(const glm::vec3& point, float radius) const;
 
     Postprocess* addPostprocess(const std::string& name, GLuint shader, int priority);
@@ -53,7 +54,6 @@ private:
 
     static const float ROTATION_LIMIT;
 
-    void calculateViewMatrix();
     void calculateFrustum();
     glm::vec2 getClipPlaneSize(float distance);
     Quad getClipPlaneQuad(float distance, glm::vec2 size);

@@ -60,7 +60,7 @@ public:
     unsigned int getId() const;
     glm::vec3 getPosition() const;
     glm::vec3 getRotation() const;
-    glm::vec3 getScale() const;    
+    glm::vec3 getScale() const;
     glm::vec3 getForward() const;
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
@@ -92,13 +92,14 @@ protected:
     glm::vec3 left = LEFT;
 
 private:
+    static void deleteBuffers();
+
     static unsigned int idCounter;
     static GLuint transformationBlockBuffer;
     static bool bufferCreated;
     static Material* defaultMaterial;
 
-    // Todo: Transformation component.
-    void setTransformationUniforms(const Shader* shader);
+    void setUniforms(const Shader* shader);
     void updateModelMatrix();
     glm::mat4x4 getModelMatrix() const;
 

@@ -24,7 +24,7 @@ Material::~Material()
 {
 }
 
-void Material::setMaterialUniforms(const Shader* shader)
+void Material::setUniforms(const Shader* shader)
 {
     for (unsigned int i = 0; i < textures.size(); ++i) {
         if (shader->hasUniform(textures[i].info->location)) {

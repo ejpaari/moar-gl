@@ -52,7 +52,7 @@ private:
     void render();
     void lighting(Light::Type lightType);
     void updateObjectContainers();
-    void updateModelMatrices();
+    void updateObjects();
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
     bool objectInsideFrustum(const Object::MeshObject& mo) const;

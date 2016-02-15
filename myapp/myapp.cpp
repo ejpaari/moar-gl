@@ -8,23 +8,7 @@
 #include <memory>
 
 MyApp::MyApp() :
-    camera(nullptr),
-    input(nullptr),
-    renderSettings(nullptr),
-    time(nullptr),
-    offset(nullptr),
-    bar(nullptr),
-    monkey(nullptr),
-    icosphere(nullptr),
-    light1(nullptr),
-    light2(nullptr),
-    light3(nullptr),
-    dirLight(nullptr),
-    cube(nullptr),
-    fps(0),
-    fpsCounter(0),
-    drawCount(&moar::G_DRAW_COUNT),
-    timeCounter(0.0)
+    drawCount(&moar::G_DRAW_COUNT)
 {
 }
 
@@ -55,6 +39,7 @@ void MyApp::start()
     //    mat = icosphere->getComponent<moar::Material>();
     //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
 
+    // Todo: Improve scene.
     light1 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
     light1->setPosition(glm::vec3(-2.0f, 1.5f, 0.0f));
     light2 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.5f));
@@ -62,18 +47,17 @@ void MyApp::start()
     light3 = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
     light3->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));
 
-    cube = engine->createObject();
-    cube->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
+    monkey = engine->createObject();
+    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
     moar::Material* m = engine->getResourceManager()->createMaterial();
     m->setTexture(engine->getResourceManager()->getTexture("brick.png"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
     m->setTexture(engine->getResourceManager()->getTexture("sponza_thorn_ddn.tga"), moar::Material::NORMAL, GL_TEXTURE_2D);
     m->setShaderType("normalmap");
-    for (auto& mo : cube->getMeshObjects()) {
+    for (auto& mo : monkey->getMeshObjects()) {
         mo.material = m;
     }
-    cube->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    cube->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
-
+    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
 
     //    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
 //    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.7f), moar::Light::DIRECTIONAL);

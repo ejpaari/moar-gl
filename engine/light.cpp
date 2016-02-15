@@ -24,11 +24,10 @@ Light::Light()
 }
 
 Light::~Light()
-{
-    glDeleteBuffers(1, &lightBlockBuffer);
+{    
 }
 
-void Light::setLightUniforms(const glm::vec3& position, const glm::vec3& forward)
+void Light::setUniforms(const glm::vec3& position, const glm::vec3& forward)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
     GLintptr offset = 0;
@@ -59,6 +58,12 @@ void Light::setColor(const glm::vec4& color)
 bool Light::isShadowingEnabled() const
 {
     return shadowingEnabled;
+}
+
+void Light::deleteBuffers()
+{
+   glDeleteBuffers(1, &lightBlockBuffer);
+   bufferCreated = false;
 }
 
 Light::Type Light::getLightType() const
