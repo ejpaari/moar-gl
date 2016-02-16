@@ -37,10 +37,11 @@ private:
     moar::Postprocess* offset = nullptr;
     TwBar* bar = nullptr;
 
-    moar::Object* light1 = nullptr;
-    moar::Object* light2 = nullptr;
+    moar::Object* light1a = nullptr;
+    moar::Object* light1b = nullptr;
+    moar::Object* light2a = nullptr;
+    moar::Object* light2b = nullptr;
     moar::Object* light3 = nullptr;
-    moar::Object* dirLight = nullptr;
     moar::Object* monkey = nullptr;
 
     int fps = 0;

@@ -10,10 +10,10 @@ float calcPointShadow(samplerCube depthTex, vec3 vertexPos_World, vec3 lightPos_
       for(int y = -1; y <= 1; ++y) {
         vec3 dir = vertexToLight + vec3(texelSize.x * x, texelSize.y * y, 0.0);
         float pcfDepth = texture(depthTex, dir).r * farClipDistance;
-        shadow += currentDepth - bias > pcfDepth  ? 0.0 : 1.0;
+        shadow += currentDepth - bias > pcfDepth  ? 0.0 : 0.111111;
       }
     }
-    return shadow /= 9.0;
+    return shadow;
 }
 
 

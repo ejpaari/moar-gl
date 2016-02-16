@@ -27,7 +27,7 @@ public:
 
 private:
     GLuint depthTexture;
-    glm::vec4 frustum = glm::vec4(-10.0f, 10.0f, -10.0f, 10.0f);
+    glm::vec4 frustum = glm::vec4(-6.0f, 6.0f, -6.0f, 6.0f);
     glm::mat4 projectionMatrix = glm::ortho(frustum.x, frustum.y, frustum.z, frustum.w, nearClipDistance, farClipDistance);
     glm::mat4 lightSpaceMatrix;
 };

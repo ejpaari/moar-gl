@@ -27,45 +27,31 @@ void MyApp::start()
     moar::Object* sponza = createRenderObject("sponza.obj");
     sponza->setScale(glm::vec3(0.004f, 0.004f, 0.004f));
 
-    //    monkey = createRenderObject("specular", "monkey.3ds", "checker.png");
-    //    monkey->setPosition(glm::vec3(3.0f, 0.1f, 0.0f));
-    //    monkey->setName("specular_monkey");
-    //    moar::Material* mat = monkey->getComponent<moar::Material>();
-    //    mat->setUniform("specularity", std::bind(glUniform1f, moar::SPECULAR_LOCATION, 50.0f), moar::SPECULAR_LOCATION);
-
-    //    icosphere = createRenderObject("normalmap", "icosphere.3ds", "brick.png");
-    //    icosphere->setPosition(glm::vec3(-3.0f, 2.0f, 0.0f));
-    //    icosphere->setName("icosphere");
-    //    mat = icosphere->getComponent<moar::Material>();
-    //    mat->setTexture(engine->getResourceManager()->getTexture("brick_nmap.png"), moar::Material::TextureType::NORMAL, GL_TEXTURE_2D);
-
-    // Todo: Improve scene.
-    light1 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
-    light1->setPosition(glm::vec3(-2.0f, 1.5f, 0.0f));
-    light2 = createLight(glm::vec4(1.0f, 1.0f, 0.8f, 1.5f));
-    light2->setPosition(glm::vec3(2.0f, 2.5f, 0.4f));
+    light1a = createLight(glm::vec4(1.0f, 0.8f, 0.6f, 1.2f));
+    light1b = createLight(glm::vec4(0.6f, 0.8f, 1.0f, 1.3f));
+    light1b->getComponent<moar::Light>()->setShadowingEnabled(false);
+    light2a = createLight(glm::vec4(0.6f, 1.0f, 0.8f, 1.2f));
+    light2b = createLight(glm::vec4(1.0f, 0.6f, 0.8f, 1.3f));
+    light2b->getComponent<moar::Light>()->setShadowingEnabled(false);
+    // Lion light.
     light3 = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
     light3->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));
 
-    monkey = engine->createObject();
-    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
-    moar::Material* m = engine->getResourceManager()->createMaterial();
-    m->setTexture(engine->getResourceManager()->getTexture("brick.png"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
-    m->setTexture(engine->getResourceManager()->getTexture("sponza_thorn_ddn.tga"), moar::Material::NORMAL, GL_TEXTURE_2D);
-    m->setShaderType("normalmap");
-    for (auto& mo : monkey->getMeshObjects()) {
-        mo.material = m;
-    }
-    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
+//    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
+//    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
+//    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 
-    //    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
-//    dirLight = createLight(glm::vec4(1.0f, 1.0f, 1.0f, 0.7f), moar::Light::DIRECTIONAL);
-//    dirLight->setPosition(glm::vec3(0.0f, 1.0f, 0.0f));
-//    dirLight->setRotation(glm::vec3(-1.0f, 0.0f, 0.0f));
-    //    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
-    //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-    //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
+//    monkey = engine->createObject();
+//    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
+//    moar::Material* m = engine->getResourceManager()->createMaterial();
+//    m->setTexture(engine->getResourceManager()->getTexture("brick.png"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
+//    m->setTexture(engine->getResourceManager()->getTexture("sponza_thorn_ddn.tga"), moar::Material::NORMAL, GL_TEXTURE_2D);
+//    m->setShaderType("normalmap");
+//    for (auto& mo : monkey->getMeshObjects()) {
+//        mo.material = m;
+//    }
+//    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+//    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
 
     initGUI();
 }
@@ -113,16 +99,17 @@ void MyApp::update()
         timeCounter = 0.0;
         fpsCounter = 0;
     }
-
-    //    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
-
-    double t = time->getTime();
-    light1->move(glm::vec3(sin(t) * 0.02f, 0.0f, 0.0f));
-    light2->move(glm::vec3(0.0f, cos(t) * 0.02f, 0.0f));
-    light3->move(glm::vec3(0.0f, sin(t) * 0.01f, sin(t) * 0.05f));
-
-    //    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
+    float t = time->getTime();
+    float sint = static_cast<float>(sin(t));
+    light1a->setPosition(glm::vec3(1.5 + sin(t * 0.1), 1.8 + (sint * 0.3), 0.0f));
+    light1b->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.5), 0.0f));
+    light2a->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
+    light2b->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
+    light3->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.05f));
     position = camera->getPosition();
+
+//    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());
+//    offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 }
 
 void MyApp::initGUI()
@@ -150,7 +137,7 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     lightComponent->setType(type);
     moar::Model* model = engine->getResourceManager()->getModel("sphere.3ds");
     light->addComponent<moar::Model>(model);
-    light->setScale(glm::vec3(0.05f, 0.05f, 0.05f));
+    light->setScale(glm::vec3(0.02f, 0.02f, 0.02f));
     light->setShadowCaster(false);
     light->setShadowReceiver(false);
     return light;
