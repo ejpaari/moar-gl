@@ -105,7 +105,7 @@ void MyApp::update()
     light1b->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.5), 0.0f));
     light2a->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
     light2b->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
-    light3->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.05f));
+    light3->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.04f));
     position = camera->getPosition();
 
 //    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());

@@ -20,19 +20,11 @@ const glm::mat4* Object::view = nullptr;
 
 unsigned int Object::idCounter = 0;
 GLuint Object::transformationBlockBuffer = 0;
-bool Object::bufferCreated = false;
 Material* Object::defaultMaterial = nullptr;
 
 Object::Object() :
     id(++idCounter)
 {
-    if (!bufferCreated) {
-        glGenBuffers(1, &transformationBlockBuffer);
-        glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
-        GLsizeiptr bufferSize = 4 * sizeof(*projection);
-        glBufferData(GL_UNIFORM_BUFFER, bufferSize, 0, GL_DYNAMIC_DRAW); // Initialize as empty
-        bufferCreated = true;
-    }
 }
 
 Object::~Object()
@@ -140,12 +132,6 @@ void Object::setViewMatrixUniform()
     glBufferSubData(GL_UNIFORM_BUFFER, matrixSize, matrixSize, glm::value_ptr(*view));
 }
 
-void Object::deleteBuffers()
-{
-    glDeleteBuffers(1, &transformationBlockBuffer);
-    bufferCreated = false;
-}
-
 void Object::setUniforms(const Shader* shader)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
@@ -171,40 +157,6 @@ void Object::updateModelMatrix()
 glm::mat4x4 Object::getModelMatrix() const
 {
     return modelMatrix;
-}
-
-template<>
-Light* Object::addComponent<Light>()
-{
-    G_COMPONENT_CHANGED = true;
-    light.reset(new Light);
-    return light.get();
-}
-
-template<>
-Model* Object::addComponent<Model>(Model* model)
-{
-    G_COMPONENT_CHANGED = true;
-    this->model = model;
-    meshObjects.clear();
-    for (const auto& mesh : model->getMeshes()) {
-        Material* mat = mesh->getDefaultMaterial();
-        MeshObject mo = {mesh.get(), (mat == nullptr ? defaultMaterial : mat), this};
-        meshObjects.push_back(mo);
-    }
-    return model;
-}
-
-template<>
-Model* Object::getComponent<Model>() const
-{
-    return model;
-}
-
-template<>
-Light* Object::getComponent<Light>() const
-{
-    return light.get();
 }
 
 } // moar

@@ -92,11 +92,8 @@ protected:
     glm::vec3 left = LEFT;
 
 private:
-    static void deleteBuffers();
-
     static unsigned int idCounter;
     static GLuint transformationBlockBuffer;
-    static bool bufferCreated;
     static Material* defaultMaterial;
 
     void setUniforms(const Shader* shader);
@@ -123,7 +120,7 @@ T* Object::addComponent()
 }
 
 template<typename T>
-T* Object::addComponent(T* /*component*/)
+T* Object::addComponent(T*)
 {
     std::cerr << "WARNING: Could not add a component\n";
     return nullptr;
@@ -140,6 +137,40 @@ template<typename T>
 bool Object::hasComponent() const
 {
     return getComponent<T>() != nullptr;
+}
+
+template<>
+inline Light* Object::addComponent<Light>()
+{
+    G_COMPONENT_CHANGED = true;
+    light.reset(new Light);
+    return light.get();
+}
+
+template<>
+inline Model* Object::addComponent<Model>(Model* model)
+{
+    G_COMPONENT_CHANGED = true;
+    this->model = model;
+    meshObjects.clear();
+    for (const auto& mesh : model->getMeshes()) {
+        Material* mat = mesh->getDefaultMaterial();
+        MeshObject mo = {mesh.get(), (mat == nullptr ? defaultMaterial : mat), this};
+        meshObjects.push_back(mo);
+    }
+    return model;
+}
+
+template<>
+inline Model* Object::getComponent<Model>() const
+{
+    return model;
+}
+
+template<>
+inline Light* Object::getComponent<Light>() const
+{
+    return light.get();
 }
 
 } // moar

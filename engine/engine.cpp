@@ -119,6 +119,9 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+    gui.uninit();
+    glDeleteBuffers(1, &Object::transformationBlockBuffer);
+    glDeleteBuffers(1, &Light::lightBlockBuffer);
     glfwTerminate();
 }
 
@@ -261,9 +264,8 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    int size = std::max(renderSettings.windowWidth, renderSettings.windowHeight);
-    depthMapPoint.setWidth(size);
-    depthMapPoint.setHeight(size);
+    depthMapPoint.setWidth(512);
+    depthMapPoint.setHeight(512);
     if (!depthMapPoint.init()) {
         return false;
     }
@@ -285,6 +287,20 @@ bool Engine::init(const std::string& settingsFile)
     GLuint texture = manager.getTexture("brick.png");
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
     material->setShaderType("diffuse");
+
+    GLuint lightBuffer;
+    glGenBuffers(1, &lightBuffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
+    GLsizeiptr lightBufferSize = 16 + 16 + 16;
+    glBufferData(GL_UNIFORM_BUFFER, lightBufferSize, 0, GL_DYNAMIC_DRAW);
+    Light::lightBlockBuffer = lightBuffer;
+
+    GLuint transformationBuffer;
+    glGenBuffers(1, &transformationBuffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, transformationBuffer);
+    GLsizeiptr transformationBufferSize = 4 * sizeof(*Object::projection);
+    glBufferData(GL_UNIFORM_BUFFER, transformationBufferSize, 0, GL_DYNAMIC_DRAW);
+    Object::transformationBlockBuffer = transformationBuffer;
 
 #ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
@@ -321,9 +337,6 @@ void Engine::execute()
 
         G_DRAW_COUNT = 0;
     }
-    Light::deleteBuffers();
-    Object::deleteBuffers();
-    gui.uninit();
 }
 
 ResourceManager* Engine::getResourceManager()
