@@ -25,16 +25,6 @@ Camera::~Camera()
 {
 }
 
-void Camera::setPosition(const glm::vec3& pos)
-{
-    Object::setPosition(pos);
-}
-
-void Camera::move(const glm::vec3& translation)
-{
-    Object::move(translation);
-}
-
 void Camera::rotate(const glm::vec3& axis, float amount) {
     Object::rotate(axis, amount);
     if (rotation.x > ROTATION_LIMIT) {
@@ -42,6 +32,16 @@ void Camera::rotate(const glm::vec3& axis, float amount) {
     }
     if (rotation.x < -ROTATION_LIMIT) {
         rotation.x = -ROTATION_LIMIT;
+    }
+}
+
+void Camera::setRotation(const glm::vec3& rotation) {
+    Object::setRotation(rotation);
+    if (this->rotation.x > ROTATION_LIMIT) {
+        this->rotation.x = ROTATION_LIMIT;
+    }
+    if (this->rotation.x < -ROTATION_LIMIT) {
+        this->rotation.x = -ROTATION_LIMIT;
     }
 }
 
@@ -60,11 +60,6 @@ float Camera::getFarClipDistance() const
     return farClipDistance;
 }
 
-void Camera::updateViewMatrix()
-{
-    *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));
-}
-
 bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
 {
     for (int i = 0; i < SIZE; ++i) {
@@ -80,7 +75,7 @@ Postprocess* Camera::addPostprocess(const std::string& name, GLuint shader, int 
 {
     for (auto& p : postprocs) {
         if (p.getName() == name) {
-            std::cerr << "ERROR: Post process effect already exist: " << name << std::endl;
+            std::cerr << "WARNING: Post process effect already exist: " << name << "\n";
             return nullptr;
         }
     }
@@ -103,25 +98,31 @@ Postprocess* Camera::addPostprocess(const std::string& name, GLuint shader, int 
         if (postprocAdded) {
             return &*iter;
         } else {
-            std::cerr << "ERROR: Could not post processing effect: " << name << std::endl;
+            std::cerr << "WARNING: Could not add post processing effect: " << name << "\n";
             return nullptr;
         }
     }
 }
 
-void Camera::removePostprocess(const std::string& name)
+bool Camera::removePostprocess(const std::string& name)
 {
     for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
         if (iter->getName() == name) {
             postprocs.erase(iter);
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 const std::list<Postprocess>& Camera::getPostprocesses() const
 {
     return postprocs;
+}
+
+void Camera::updateViewMatrix()
+{
+    *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));
 }
 
 void Camera::calculateFrustum()

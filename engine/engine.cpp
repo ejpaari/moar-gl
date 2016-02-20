@@ -20,8 +20,8 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
 {
     if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
 
-    std::cerr << "OpenGL debug callback function" << std::endl;
-    std::cerr << "    Message: "<< message << std::endl;
+    std::cerr << "OpenGL debug callback function\n";
+    std::cerr << "    Message: "<< message << "\n";
 
     std::cerr << "    Source: ";
     switch (source) {
@@ -44,7 +44,7 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
         std::cerr << "OTHER";
         break;
     }
-    std::cerr << std::endl;
+    std::cerr << "\n";
 
     std::cerr << "    Type: ";
     switch (type) {
@@ -79,9 +79,9 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
         std::cerr << "UNKNOWN";
         break;
     }
-    std::cerr << std::endl;
+    std::cerr << "\n";
 
-    std::cerr << "    ID: " << id << std::endl;
+    std::cerr << "    ID: " << id << "\n";
     std::cerr << "    Severity: ";
     switch (severity){
     case GL_DEBUG_SEVERITY_LOW:
@@ -100,12 +100,12 @@ void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenu
         std::cerr << "UNKNOWN";
         break;
     }
-    std::cerr << std::endl << std::endl;
+    std::cerr << "\n\n";
 }
 
 void glfwErrorCallback(int error, const char* description )
 {
-    std::cerr << "ERROR GLFW: " << error << " " << description << std::endl;
+    std::cerr << "ERROR GLFW: " << error << " " << description << "\n";
 }
 
 } // anonymous
@@ -134,7 +134,7 @@ void Engine::setApplication(Application* application)
 bool Engine::init(const std::string& settingsFile)
 {
     if (!glfwInit()) {
-        std::cerr << "ERROR: Failed to initialize GLFW" << std::endl;
+        std::cerr << "ERROR: Failed to initialize GLFW\n";
         return false;
     }
 
@@ -144,8 +144,8 @@ bool Engine::init(const std::string& settingsFile)
     try {
         boost::property_tree::ini_parser::read_ini(settingsFile, pt);
     } catch (std::exception& e) {
-        std::cerr << "ERROR: Could not load setting file; " << settingsFile << std::endl;
-        std::cerr << e.what() << std::endl;
+        std::cerr << "ERROR: Could not load setting file; " << settingsFile << "\n";
+        std::cerr << e.what() << "\n";
         return false;
     }
 
@@ -159,8 +159,8 @@ bool Engine::init(const std::string& settingsFile)
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
     } catch (boost::property_tree::ptree_error& e) {
-        std::cerr << "ERRROR: Could not load OpenGL version info from the .ini-file" << std::endl;
-        std::cerr << e.what() << std::endl;
+        std::cerr << "ERRROR: Could not load OpenGL version info from the .ini-file\n";
+        std::cerr << e.what() << "\n";
         return false;
     }
 
@@ -171,12 +171,11 @@ bool Engine::init(const std::string& settingsFile)
         windowHeight = pt.get<int>("Window.height");
         window = glfwCreateWindow(windowWidth, windowHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
     } catch (boost::property_tree::ptree_error& e) {
-        std::cerr << "WARNING: Could not load window info from the .ini-file" << std::endl;
-        std::cerr << e.what() << std::endl;
+        std::cerr << "WARNING: Could not load window info from the .ini-file\n";
+        std::cerr << e.what() << "\n";
     }
     if (window == NULL) {
-        std::cerr << "ERROR: Failed to create window" << std::endl;
-        glfwTerminate();
+        std::cerr << "ERROR: Failed to create window\n";
         return false;
     }
     renderSettings.windowWidth = windowWidth;
@@ -188,8 +187,8 @@ bool Engine::init(const std::string& settingsFile)
         windowPosX = pt.get<int>("Window.Xposition");
         windowPosY = pt.get<int>("Window.Yposition");
     } catch (boost::property_tree::ptree_error& e) {
-        std::cerr << "WARNING: Could not load window position from the .ini-file" << std::endl;
-        std::cerr << e.what() << std::endl;
+        std::cerr << "WARNING: Could not load window position from the .ini-file\n";
+        std::cerr << e.what() << "\n";
     }
     glfwMakeContextCurrent(window);
     glfwSetWindowPos(window, windowPosX, windowPosY);
@@ -197,7 +196,7 @@ bool Engine::init(const std::string& settingsFile)
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
     if (err != GLEW_OK) {
-        fprintf(stderr, "ERROR: %s\n", glewGetErrorString(err));
+        std::cerr << "ERROR: " << glewGetErrorString(err) << "\n";
         return false;
     }
 #ifdef DEBUG
@@ -221,12 +220,12 @@ bool Engine::init(const std::string& settingsFile)
         input.setSensitivity(sensitivity);
         input.setMovementSpeed(movementSpeed);
     } catch (boost::property_tree::ptree_error& e) {
-        std::cerr << "WARNING: Could not load input info from the .ini-file" << std::endl;
-        std::cerr << e.what() << std::endl;
+        std::cerr << "WARNING: Could not load input info from the .ini-file\n";
+        std::cerr << e.what() << "\n";
     }
 
     if (!gui.init(window)) {
-        std::cerr << "ERROR: Failed to initialize AntTweakBar" << std::endl;
+        std::cerr << "ERROR: Failed to initialize AntTweakBar\n";
         return false;
     }
 
@@ -237,8 +236,8 @@ bool Engine::init(const std::string& settingsFile)
         manager.setTexturePath(pt.get<std::string>("Engine.texturePath"));
         shaderInfoFile = pt.get<std::string>("Engine.shaders");
     } catch (boost::property_tree::ptree_error& e) {
-        std::cerr << "ERROR: Could not load resource path info from the .ini-file" << std::endl;
-        std::cerr << e.what() << std::endl;
+        std::cerr << "ERROR: Could not load resource path info from the .ini-file\n";
+        std::cerr << e.what() << "\n";
         return false;
     }
 
@@ -251,30 +250,27 @@ bool Engine::init(const std::string& settingsFile)
     Object::projection = camera->getProjectionMatrixPointer();
 
     if (!renderSettings.loadSettings(pt, manager)) {
-        std::cerr << "WARNING: Failed to load render settings" << std::endl;
+        std::cerr << "WARNING: Failed to load render settings\n";
     }
 
     if (!createSkybox()) {
-        std::cerr << "WARNING: Failed to create the skybox" << std::endl;
+        std::cerr << "WARNING: Failed to create the skybox\n";
     }
 
-    depthMapDir.setWidth(renderSettings.windowWidth);
-    depthMapDir.setHeight(renderSettings.windowHeight);
+    depthMapDir.setSize(renderSettings.windowWidth, renderSettings.windowHeight);
     if (!depthMapDir.init()) {
         return false;
     }
 
-    depthMapPoint.setWidth(512);
-    depthMapPoint.setHeight(512);
+    depthMapPoint.setSize(512, 512);
     if (!depthMapPoint.init()) {
         return false;
     }
 
-    Framebuffer::setWidth(renderSettings.windowWidth);
-    Framebuffer::setHeight(renderSettings.windowHeight);
+    Framebuffer::setSize(renderSettings.windowWidth, renderSettings.windowHeight);
     bool framebuffersInitialized = fb1.init() && fb2.init();
     if (!framebuffersInitialized) {
-        std::cerr << "ERROR: Framebuffer status is incomplete" << std::endl;
+        std::cerr << "ERROR: Framebuffer status is incomplete\n";
         return false;
     }
 
@@ -551,20 +547,20 @@ void Engine::updateObjects()
 
 void Engine::printInfo(int windowWidth, int windowHeight)
 {
-    std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "GFX: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "OpenGL: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "GLSL: "  << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl << std::endl;
+    std::cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
+    std::cout << "GFX: " << glGetString(GL_RENDERER) << "\n";
+    std::cout << "OpenGL: " << glGetString(GL_VERSION) << "\n";
+    std::cout << "GLSL: "  << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n\n";
 
     GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
-    std::cout << "Resolution: " << mode->width << " x " << mode->height << std::endl;
-    std::cout << "Refresh rate: " << mode->refreshRate << " Hz" << std::endl;
+    std::cout << "Resolution: " << mode->width << " x " << mode->height << "\n";
+    std::cout << "Refresh rate: " << mode->refreshRate << " Hz\n";
     int monitorWidth, monitorHeight;
     glfwGetMonitorPhysicalSize(primaryMonitor, &monitorWidth, &monitorHeight);
-    std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm" << std::endl << std::endl;
+    std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm\n\n";
 
-    std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << std::endl << std::endl;
+    std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << "\n\n";
 }
 
 bool Engine::createSkybox()

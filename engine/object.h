@@ -40,9 +40,6 @@ public:
     static const glm::mat4* projection;
     static const glm::mat4* view;
 
-    static void setMeshDefaultMaterial(Material* material);
-    static void setViewMatrixUniform();
-
     explicit Object();
     virtual ~Object();
     Object(const Object&) = delete;
@@ -65,11 +62,11 @@ public:
     glm::vec3 getUp() const;
     glm::vec3 getLeft() const;
 
-    std::vector<MeshObject>& getMeshObjects();
-
     void setShadowCaster(bool caster);
     void setShadowReceiver(bool receiver);
     bool isShadowCaster() const;
+
+    std::vector<MeshObject>& getMeshObjects();
 
     template<typename T>
     T* addComponent();
@@ -95,6 +92,9 @@ private:
     static unsigned int idCounter;
     static GLuint transformationBlockBuffer;
     static Material* defaultMaterial;
+
+    static void setMeshDefaultMaterial(Material* material);
+    static void setViewMatrixUniform();
 
     void setUniforms(const Shader* shader);
     void updateModelMatrix();

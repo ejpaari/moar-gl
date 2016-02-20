@@ -19,18 +19,6 @@ Light::~Light()
 {    
 }
 
-void Light::setUniforms(const glm::vec3& position, const glm::vec3& forward)
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
-    GLintptr offset = 0;
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, 16, glm::value_ptr(color));
-    offset += 16;
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, 12, glm::value_ptr(position));
-    offset += 16;
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, 12, glm::value_ptr(forward));
-    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
-}
-
 void Light::setType(Light::Type type)
 {
     this->type = type;
@@ -47,14 +35,26 @@ void Light::setColor(const glm::vec4& color)
     this->color = color;
 }
 
+Light::Type Light::getLightType() const
+{
+    return type;
+}
+
 bool Light::isShadowingEnabled() const
 {
     return shadowingEnabled;
 }
 
-Light::Type Light::getLightType() const
+void Light::setUniforms(const glm::vec3& position, const glm::vec3& forward)
 {
-    return type;
+    glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
+    GLintptr offset = 0;
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, 16, glm::value_ptr(color));
+    offset += 16;
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, 12, glm::value_ptr(position));
+    offset += 16;
+    glBufferSubData(GL_UNIFORM_BUFFER, offset, 12, glm::value_ptr(forward));
+    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
 }
 
 } // moar

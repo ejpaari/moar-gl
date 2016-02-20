@@ -16,6 +16,8 @@ namespace moar
 
 class Camera : public Object
 {
+    friend class Engine;
+
 public:
     explicit Camera(float fov = 45.0f, float ratio = 4.0f / 3.0f, float nearClip = 0.1f, float farClip = 100.0f);
     virtual ~Camera();
@@ -24,20 +26,17 @@ public:
     Camera& operator=(const Camera&) = delete;
     Camera& operator=(Camera&&) = delete;
 
-    virtual void setPosition(const glm::vec3& pos);
-
-    virtual void move(const glm::vec3& translation);
     virtual void rotate(const glm::vec3& axis, float amount);
+    virtual void setRotation(const glm::vec3& rotation);
 
     const glm::mat4* getViewMatrixPointer() const;
     const glm::mat4* getProjectionMatrixPointer() const;
     float getFarClipDistance() const;
 
-    void updateViewMatrix();
     bool sphereInsideFrustum(const glm::vec3& point, float radius) const;
 
     Postprocess* addPostprocess(const std::string& name, GLuint shader, int priority);
-    void removePostprocess(const std::string& name);
+    bool removePostprocess(const std::string& name);
     const std::list<Postprocess>& getPostprocesses() const;
 
 private:
@@ -53,6 +52,8 @@ private:
     };
 
     static const float ROTATION_LIMIT;
+
+    void updateViewMatrix();
 
     void calculateFrustum();
     glm::vec2 getClipPlaneSize(float distance);

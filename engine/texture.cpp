@@ -40,7 +40,7 @@ bool Texture::load(const std::string& file)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    std::cout << "Loaded texture: " << file << std::endl;
+    std::cout << "Loaded texture: " << file << "\n";
 
     return true;
 }
@@ -48,7 +48,7 @@ bool Texture::load(const std::string& file)
 bool Texture::load(const std::vector<std::string>& files)
 {
     if (files.size() != 6) {
-        std::cerr << "WARNING: Could not load cube map texture, requires six faces" << std::endl;
+        std::cerr << "WARNING: Could not load cube map texture, requires six faces\n";
         return false;
     }
 
@@ -59,7 +59,7 @@ bool Texture::load(const std::vector<std::string>& files)
     for(unsigned int i = 0; i < files.size(); i++) {
         unsigned char* image = SOIL_load_image(files[i].c_str(), &width, &height, 0, SOIL_LOAD_RGB);
         if (!image) {
-            std::cerr << "WARNING: Failed to load cube texture; " << files[i] << std::endl;
+            std::cerr << "WARNING: Failed to load cube texture; " << files[i] << "\n";
             return false;
         }
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
@@ -74,7 +74,7 @@ bool Texture::load(const std::vector<std::string>& files)
 
     std::cout << "Loaded cube map textures:";
     std::for_each(files.begin(), files.end(), [] (const std::string& s) { std::cout << " " << s; });
-    std::cout << std::endl;
+    std::cout << "\n";
 
     return true;
 }

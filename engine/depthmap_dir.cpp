@@ -20,7 +20,7 @@ DepthMapDirectional::~DepthMapDirectional()
 bool DepthMapDirectional::init()
 {
     if (width == 0 || height == 0) {
-        std::cerr << "ERROR: Shadow map width or height not initilized." << std::endl;
+        std::cerr << "ERROR: Shadow map width or height not initilized.\n";
     }
 
     glGenTextures(1, &depthTexture);

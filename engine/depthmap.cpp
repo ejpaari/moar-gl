@@ -13,13 +13,9 @@ DepthMap::~DepthMap()
 {
 }
 
-void DepthMap::setWidth(int width)
+void DepthMap::setSize(int width, int height)
 {
     this->width = width;
-}
-
-void DepthMap::setHeight(int height)
-{
     this->height = height;
 }
 
@@ -35,7 +31,7 @@ bool DepthMap::createFramebuffer(GLuint& framebuffer, GLuint& texture, bool cube
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
         return true;
     } else {
-        std::cerr << "ERROR: Depth map framebuffer status is incomplete." << std::endl;
+        std::cerr << "ERROR: Depth map framebuffer status is incomplete.\n";
         return false;
     }
 }

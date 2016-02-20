@@ -23,6 +23,26 @@ Mesh::~Mesh()
     glDeleteVertexArrays(1, &VAO);
 }
 
+Material* Mesh::getDefaultMaterial() const
+{
+    return material;
+}
+
+unsigned int Mesh::getId() const
+{
+    return id;
+}
+
+glm::vec3 Mesh::getCenterPoint() const
+{
+    return centerPoint;
+}
+
+float Mesh::getBoundingRadius() const
+{
+    return boundingRadius;
+}
+
 void Mesh::setIndices(const std::vector<unsigned int>& indices)
 {
     numIndices = indices.size();
@@ -54,26 +74,6 @@ void Mesh::setTangents(const std::vector<glm::vec3>& tangents)
 void Mesh::setDefaultMaterial(Material* material)
 {
     this->material = material;
-}
-
-Material* Mesh::getDefaultMaterial() const
-{
-    return material;
-}
-
-unsigned int Mesh::getId() const
-{
-    return id;
-}
-
-glm::vec3 Mesh::getCenterPoint() const
-{
-    return centerPoint;
-}
-
-float Mesh::getBoundingRadius() const
-{
-    return boundingRadius;
 }
 
 void Mesh::render() const

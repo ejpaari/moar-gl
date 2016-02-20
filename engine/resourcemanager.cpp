@@ -58,10 +58,10 @@ bool ResourceManager::loadShaders(const std::string& path)
                     }
 
                     if (!shader->linkProgram()) {
-                        std::cerr << "WARNING: Failed to link shader program: " << line << std::endl;
+                        std::cerr << "WARNING: Failed to link shader program: " << line << "\n";
                         return false;
                     }
-                    std::cout << "Created shader: " << line << std::endl;
+                    std::cout << "Created shader: " << line << "\n";
                     shadersByName.insert(std::make_pair(line, shader.get()));
 
                     if (fragment.find("_point") != std::string::npos) {
@@ -77,18 +77,18 @@ bool ResourceManager::loadShaders(const std::string& path)
                     geometry.clear();
                     fragment.clear();
                 } else {
-                    std::cerr << "ERROR: Duplicate shader names, can not initialize" << std::endl;
+                    std::cerr << "ERROR: Duplicate shader names, can not initialize\n";
                     return false;
                 }
             } else {
-                std::cerr << "ERROR: Failed to parse shaders file" << std::endl;
+                std::cerr << "ERROR: Failed to parse shaders file\n";
                 return false;
             }
         }
         shaderInfo.close();
         return true;
     } else {
-        std::cerr << "ERROR: Could not open shader info file: " << path << std::endl;
+        std::cerr << "ERROR: Could not open shader info file: " << path << "\n";
         return false;
     }
     return true;
@@ -98,7 +98,12 @@ Material* ResourceManager::createMaterial()
 {
     std::unique_ptr<Material> material(new Material());
     auto iter = materials.insert(std::make_pair(material->getId(), std::move(material)));
-    return iter.second ? iter.first->second.get() : nullptr;
+    if (iter.second) {
+        return iter.first->second.get();
+    } else {
+        std::cerr << "WARNING: Could not create material\n";
+        return nullptr;
+    }
 }
 
 const Shader* ResourceManager::getShader(const std::string& name)
@@ -107,8 +112,8 @@ const Shader* ResourceManager::getShader(const std::string& name)
     if (found != shadersByName.end()) {
         return found->second;
     } else {
-        std::cerr << "ERROR: Could not find shader: " << name << std::endl;
-        return 0;
+        std::cerr << "ERROR: Could not find shader: " << name << "\n";
+        return nullptr;
     }
 }
 
@@ -118,8 +123,8 @@ const Shader* ResourceManager::getShader(const std::string& shader, const Light:
     if (found != shadersByType.end()) {
         return found->second;
     } else {
-        std::cerr << "ERROR: Could not find shader \"" << shader << "\" with light type " << light << std::endl;
-        return 0;
+        std::cerr << "ERROR: Could not find shader \"" << shader << "\" with light type " << light << "\n";
+        return nullptr;
     }
 }
 
@@ -131,11 +136,16 @@ Model* ResourceManager::getModel(const std::string& modelName)
         std::unique_ptr<Model> model(new Model());
         bool isGood = loadModel(model.get(), modelFile);
         if (!isGood) {
-            std::cerr << "WARNING: Failed to load model; " << modelFile << std::endl;
+            std::cerr << "WARNING: Failed to load model; " << modelFile << "\n";
             return nullptr;
         }
         auto iter = models.insert(std::make_pair(modelName, std::move(model)));
-        return iter.second ? iter.first->second.get() : nullptr;
+        if (iter.second) {
+            return iter.first->second.get();
+        } else {
+            std::cerr << "WARNING: Could not insert model " << modelName << "\n";
+            return nullptr;
+        }
     } else {
         return found->second.get();
     }
@@ -149,11 +159,16 @@ GLuint ResourceManager::getTexture(const std::string& textureName)
         std::unique_ptr<Texture> texture(new Texture());
         bool isGood = texture->load(textureFile);
         if (!isGood) {
-            std::cerr << "WARNING: Failed to load texture; " << textureFile << std::endl;
+            std::cerr << "WARNING: Failed to load texture; " << textureFile << "\n";
             return 0;
         }
-        auto iter = textures.insert(std::pair<std::string, std::unique_ptr<Texture>>(textureName, std::move(texture)));
-        return iter.first->second->getID();
+        auto iter = textures.insert(std::make_pair(textureName, std::move(texture)));
+        if (iter.second) {
+            return iter.first->second->getID();
+        } else {
+            std::cerr << "WARNING: Could not insert texture " << textureName << "\n";
+            return 0;
+        }
     } else {
         return found->second->getID();
     }
@@ -175,7 +190,12 @@ GLuint ResourceManager::getCubeTexture(std::vector<std::string> textureNames)
             return 0;
         }
         auto iter = cubeTextures.insert(std::make_pair(textureKey, std::move(texture)));
-        return iter.first->second->getID();
+        if (iter.second) {
+            return iter.first->second->getID();
+        } else {
+            std::cerr << "WARNING: Could not insert cube texture\n";
+            return 0;
+        }
     } else {
         return found->second->getID();
     }
@@ -202,7 +222,7 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
 
     if (aScene) {
         if (aScene->mNumMeshes == 0) {
-            std::cerr << "WARNING: No mesh found in the model; " << file << std::endl;
+            std::cerr << "WARNING: No mesh found in the model; " << file << "\n";
             return false;
         }
 
@@ -247,7 +267,7 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
 
             for (unsigned int j = 0; j < aMesh->mNumFaces; ++j) {
                 if (aMesh->mFaces[j].mNumIndices != 3) {
-                    std::cerr << "WARNING: Unable to parse model indices; " << file << std::endl;
+                    std::cerr << "WARNING: Unable to parse model indices; " << file << "\n";
                     return false;
                 }
                 indices.push_back(aMesh->mFaces[j].mIndices[0]);
@@ -266,6 +286,7 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
             }
             mesh->calculateCenterPointAndRadius();
 
+            // Todo: Do not reload existing materials.
             aiMaterial* aMaterial = aScene->mMaterials[aMesh->mMaterialIndex];
             if (aMaterial) {
                 std::unique_ptr<Material> mat(new Material());
@@ -279,11 +300,11 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
             }
             model->addMesh(std::move(mesh));
         }
-        std::cout << "Loaded model: " << file << std::endl;
+        std::cout << "Loaded model: " << file << "\n";
         return true;
     } else {
-        std::cerr << "WARNING: Failed to read model; " << file << std::endl;
-        std::cerr << importer.GetErrorString() << std::endl;
+        std::cerr << "WARNING: Failed to read model \"" << file << "\"\n";
+        std::cerr << importer.GetErrorString() << "\n";
         return false;
     }
 }

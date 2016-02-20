@@ -33,8 +33,8 @@ bool RenderSettings::loadSettings(const boost::property_tree::ptree& pt, Resourc
         ambientColor.g = pt.get<float>("Render.ambientColorG");
         ambientColor.b = pt.get<float>("Render.ambientColorB");
     } catch (boost::property_tree::ptree_error& e) {
-        std::cerr << "WARNING: Could not load render settings from the .ini-file" << std::endl;
-        std::cerr << e.what() << std::endl;
+        std::cerr << "WARNING: Could not load render settings from the .ini-file\n";
+        std::cerr << e.what() << "\n";
         return false;
     }
 

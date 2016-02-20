@@ -26,8 +26,6 @@ public:
     Light& operator=(const Light&) = delete;
     Light& operator=(Light&&) = delete;
 
-    void setUniforms(const glm::vec3& position, const glm::vec3& forward);
-
     void setType(Type type);
     void setColor(const glm::vec4& color);
     void setShadowingEnabled(bool enabled);
@@ -37,6 +35,8 @@ public:
 
 private:
     static GLuint lightBlockBuffer;
+
+    void setUniforms(const glm::vec3& position, const glm::vec3& forward);
 
     Type type = POINT;
     glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 10.0f);

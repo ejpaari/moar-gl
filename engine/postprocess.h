@@ -18,6 +18,7 @@ public:
     Postprocess(Postprocess&&);
     Postprocess& operator=(Postprocess&);
     Postprocess& operator=(Postprocess&&);
+
     void bind() const;
     void setUniform(const std::string& name, std::function<void()> func);
 

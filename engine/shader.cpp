@@ -28,7 +28,7 @@ bool Shader::attachShader(GLenum shaderType, const char *filename)
     GLuint shader = glCreateShader(shaderType);
     if (!shader || !compileShader(shader, filename)) {
         glDeleteShader(shader);
-        std::cerr << "WARNING: Failed to attach shader " << filename << std::endl;
+        std::cerr << "WARNING: Failed to attach shader " << filename << "\n";
         return false;
     }
 
@@ -114,7 +114,7 @@ bool Shader::compileShader(GLuint shader, const char* filename)
                     shaderCode += buffer.str() + "\n";
                     includeFile.close();
                 } else {
-                    std::cerr << "ERROR: Could not open include file: " << includeFilename << std::endl;
+                    std::cerr << "ERROR: Could not open include file: " << includeFilename << "\n";
                     return false;
                 }
             } else {
@@ -123,7 +123,7 @@ bool Shader::compileShader(GLuint shader, const char* filename)
         }
         shaderFile.close();
     } else {
-        std::cerr << "ERROR: Could not open shader file: " << filename << std::endl;
+        std::cerr << "ERROR: Could not open shader file: " << filename << "\n";
         return false;
     }
 
@@ -156,7 +156,7 @@ bool Shader::readUniformLocations()
         GLint uniform = values[0];
         if (uniform  != -1) {
             if (uniform  < 0 || uniform >= MAX_LOCATION) {
-                std::cerr << "ERROR: Uniforma locations do not match" << std::endl;
+                std::cerr << "ERROR: Uniforma locations do not match\n";
                 return false;
             }
             uniforms.set(uniform);

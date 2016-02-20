@@ -21,8 +21,7 @@ public:
     virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir) = 0;
     virtual void activate() = 0;
 
-    void setWidth(int width);
-    void setHeight(int height);
+    void setSize(int width, int height);
 
 protected:
     bool createFramebuffer(GLuint& framebuffer, GLuint& texture, bool cube);

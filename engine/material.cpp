@@ -24,23 +24,6 @@ Material::~Material()
 {
 }
 
-void Material::setUniforms(const Shader* shader)
-{
-    for (unsigned int i = 0; i < textures.size(); ++i) {
-        if (shader->hasUniform(textures[i].info->location)) {
-            glActiveTexture(textures[i].info->unit);
-            glBindTexture(textures[i].target, textures[i].glId);
-            glUniform1i(textures[i].info->location, textures[i].info->value);
-        }
-    }
-
-    for (auto iter = uniforms.begin(); iter != uniforms.end(); ++iter) {
-        if (shader->hasUniform(iter->second.location)) {
-            iter->second.func();
-        }
-    }
-}
-
 void Material::setShaderType(const std::string& shaderType)
 {
     G_COMPONENT_CHANGED = true;
@@ -69,18 +52,6 @@ void Material::setUniform(const std::string& name, std::function<void ()> func, 
     uniforms[name] = uniform;
 }
 
-const Material::TextureInfo* Material::getTextureInfo(TextureType type)
-{
-    for (unsigned int i = 0; i < (sizeof(textureInfos)/sizeof(*textureInfos)); ++i) {
-        if (textureInfos[i].type == type) {
-            return &textureInfos[i];
-        }
-    }
-
-    std::cerr << "WARNING: Could not map material texture information" << std::endl;
-    return nullptr;
-}
-
 std::string Material::getShaderType() const
 {
     return shaderType;
@@ -89,6 +60,35 @@ std::string Material::getShaderType() const
 int Material::getId() const
 {
     return id;
+}
+
+void Material::setUniforms(const Shader* shader)
+{
+    for (unsigned int i = 0; i < textures.size(); ++i) {
+        if (shader->hasUniform(textures[i].info->location)) {
+            glActiveTexture(textures[i].info->unit);
+            glBindTexture(textures[i].target, textures[i].glId);
+            glUniform1i(textures[i].info->location, textures[i].info->value);
+        }
+    }
+
+    for (auto iter = uniforms.begin(); iter != uniforms.end(); ++iter) {
+        if (shader->hasUniform(iter->second.location)) {
+            iter->second.func();
+        }
+    }
+}
+
+const Material::TextureInfo* Material::getTextureInfo(TextureType type)
+{
+    for (unsigned int i = 0; i < (sizeof(textureInfos)/sizeof(*textureInfos)); ++i) {
+        if (textureInfos[i].type == type) {
+            return &textureInfos[i];
+        }
+    }
+
+    std::cerr << "WARNING: Could not map material texture information\n";
+    return nullptr;
 }
 
 } // moar

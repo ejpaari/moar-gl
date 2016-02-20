@@ -7,6 +7,12 @@ namespace moar
 int Framebuffer::width = 800;
 int Framebuffer::height = 600;
 
+void Framebuffer::setSize(int width, int height)
+{
+    Framebuffer::width = width;
+    Framebuffer::height = height;
+}
+
 Framebuffer::Framebuffer()
 {
 }
@@ -79,16 +85,6 @@ void Framebuffer::setPreviousFrame(GLuint texture)
 GLuint Framebuffer::getRenderedTexture() const
 {
     return renderedTexture;
-}
-
-void Framebuffer::setWidth(int width)
-{
-    Framebuffer::width = width;
-}
-
-void Framebuffer::setHeight(int height)
-{
-    Framebuffer::height = height;
 }
 
 } // moar

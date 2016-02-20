@@ -2,6 +2,7 @@
 #include "../engine/engine.h"
 
 #include <memory>
+#include <cstdlib>
 
 int main(/*int argc, char* argv[]*/)
 {
@@ -9,8 +10,8 @@ int main(/*int argc, char* argv[]*/)
     MyApp* app = new MyApp();
     engine.setApplication(app);
     if (!engine.init("../moar-gl/myapp/settings.ini")) {
-        return -1;
+        return EXIT_FAILURE;
     }
     engine.execute();
-    return 0;
+    return EXIT_SUCCESS;
 }

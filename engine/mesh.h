@@ -13,6 +13,7 @@ namespace moar
 class Mesh
 {
     friend class ResourceManager;
+    friend class Engine;
 
 public:
     explicit Mesh();
@@ -22,6 +23,14 @@ public:
     Mesh& operator=(const Mesh&) = delete;
     Mesh& operator=(Mesh&&) = delete;
 
+    Material* getDefaultMaterial() const;
+    unsigned int getId() const;
+    glm::vec3 getCenterPoint() const;
+    float getBoundingRadius() const;
+
+private:
+    static unsigned int idCounter;
+
     void setIndices(const std::vector<unsigned int>& indices);
     void setVertices(const std::vector<glm::vec3>& vertices);
     void setTextureCoordinates(const std::vector<glm::vec2>& coords);
@@ -29,15 +38,7 @@ public:
     void setTangents(const std::vector<glm::vec3>& tangents);
     void setDefaultMaterial(Material* material);
 
-    Material* getDefaultMaterial() const;
-    unsigned int getId() const;
-    glm::vec3 getCenterPoint() const;
-    float getBoundingRadius() const;
-
     void render() const;
-
-private:
-    static unsigned int idCounter;
 
     void checkBoundingBoxLimits(const glm::vec3& vert);
     void calculateCenterPointAndRadius();

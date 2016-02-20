@@ -15,6 +15,8 @@ namespace moar
 
 class Material
 {
+    friend class Engine;
+
 public:
     enum TextureType
     {
@@ -29,8 +31,6 @@ public:
     Material(Material&&) = delete;
     Material& operator=(const Material&) = delete;
     Material& operator=(Material&&) = delete;
-
-    void setUniforms(const Shader* shader);
 
     void setShaderType(const std::string& shaderType);
     void setTexture(GLuint texture, TextureType type, GLenum target);
@@ -65,6 +65,7 @@ private:
     static const TextureInfo textureInfos[];
     static int idCounter;
 
+    void setUniforms(const Shader* shader);
     const TextureInfo* getTextureInfo(TextureType type);
 
     std::string shaderType;

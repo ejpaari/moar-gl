@@ -9,8 +9,7 @@ namespace moar
 class Framebuffer
 {
 public:
-    static void setWidth(int width);
-    static void setHeight(int height);
+    static void setSize(int width, int height);
 
     explicit Framebuffer();
     ~Framebuffer();
