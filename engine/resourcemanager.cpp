@@ -311,21 +311,27 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
 
 bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
 {
-    // Todo: Bump map.
     std::string shaderType;    
     aiTextureType textureType = aiTextureType_DIFFUSE;
     if (aMaterial->GetTextureCount(textureType) > 0) {
         if (!loadTexture(aMaterial, textureType, material, Material::DIFFUSE)) {
             return false;
         }
-        shaderType ="diffuse";
+        shaderType = "diffuse";
     }
     textureType = aiTextureType_HEIGHT;
     if (aMaterial->GetTextureCount(textureType) > 0) {
         if (!loadTexture(aMaterial, textureType, material, Material::NORMAL)) {
             return false;
         }
-        shaderType ="normalmap";
+        shaderType = "normalmap";
+    }
+    textureType = aiTextureType_DISPLACEMENT;
+    if (aMaterial->GetTextureCount(textureType) > 0) {
+        if (!loadTexture(aMaterial, textureType, material, Material::BUMP)) {
+            return false;
+        }
+        shaderType = "bumpmap";
     }
 
     if (shaderType.empty()) {

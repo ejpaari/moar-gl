@@ -22,6 +22,14 @@ normalmap_dir.vert
 normalmap_dir.frag
 normalmap_dir
 
+bumpmap_point.vert
+bumpmap_point.frag
+bumpmap_point
+
+bumpmap_dir.vert
+bumpmap_dir.frag
+bumpmap_dir
+
 skybox.vert
 skybox.frag
 skybox

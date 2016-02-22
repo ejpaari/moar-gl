@@ -22,7 +22,7 @@ public:
     {
         DIFFUSE,
         NORMAL,
-        DISPLACEMENT
+        BUMP
     };
 
     Material();

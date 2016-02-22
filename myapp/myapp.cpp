@@ -41,17 +41,19 @@ void MyApp::start()
 //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
 //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 
-//    monkey = engine->createObject();
-//    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
-//    moar::Material* m = engine->getResourceManager()->createMaterial();
-//    m->setTexture(engine->getResourceManager()->getTexture("brick.png"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
-//    m->setTexture(engine->getResourceManager()->getTexture("sponza_thorn_ddn.tga"), moar::Material::NORMAL, GL_TEXTURE_2D);
-//    m->setShaderType("normalmap");
-//    for (auto& mo : monkey->getMeshObjects()) {
-//        mo.material = m;
-//    }
-//    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-//    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
+    monkey = engine->createObject();
+    monkey->setShadowReceiver(false);
+    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
+    moar::Material* m = engine->getResourceManager()->createMaterial();
+    m->setTexture(engine->getResourceManager()->getTexture("spnza_bricks_a_diff.tga"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
+    m->setTexture(engine->getResourceManager()->getTexture("brickwork_nmap.png"), moar::Material::NORMAL, GL_TEXTURE_2D);
+    m->setTexture(engine->getResourceManager()->getTexture("brickwork_bmap.png"), moar::Material::BUMP, GL_TEXTURE_2D);
+    m->setShaderType("bumpmap");
+    for (auto& mo : monkey->getMeshObjects()) {
+        mo.material = m;
+    }
+    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
 
     initGUI();
 }

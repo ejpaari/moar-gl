@@ -10,9 +10,9 @@ int Material::idCounter = 0;
 
 const Material::TextureInfo Material::textureInfos[] =
 {
-    {Material::TextureType::DIFFUSE, "DiffuseTex", GL_TEXTURE1, 1, DIFFUSE_TEX_LOCATION},
-    {Material::TextureType::NORMAL, "NormalTex", GL_TEXTURE2, 2, NORMAL_TEX_LOCATION},
-    {Material::TextureType::DISPLACEMENT, "DisplacementTex", GL_TEXTURE3, 3, DISPLACEMENT_TEX_LOCATION},
+    {Material::TextureType::DIFFUSE, "diffuseTex", GL_TEXTURE1, 1, DIFFUSE_TEX_LOCATION},
+    {Material::TextureType::NORMAL, "normalTex", GL_TEXTURE2, 2, NORMAL_TEX_LOCATION},
+    {Material::TextureType::BUMP, "bumpTex", GL_TEXTURE3, 3, BUMP_TEX_LOCATION},
 };
 
 Material::Material()
