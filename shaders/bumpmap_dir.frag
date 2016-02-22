@@ -21,6 +21,7 @@ layout (std140) uniform LightBlock {
 
 void main()
 {
+    // TODO
     vec3 normal_Tan = normalize(texture(normalTex, texCoord).rgb * 2.0 - vec3(1.0));
     float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
         float shadow = receiveShadows != 0 ? calcShadow(depthTex, pos_Light) : 1.0;

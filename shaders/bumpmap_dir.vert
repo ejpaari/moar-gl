@@ -35,6 +35,8 @@ void main()
     vec3 L = -lightForward;
     lightDir_Tan = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
 
+    // TODO
+    
     texCoord = tex;
     pos_Light = lightSpaceProj * M * vec4(position, 1.0);
     gl_Position = MVP * vec4(position, 1.0);
