@@ -25,27 +25,23 @@ layout (std140) uniform LightBlock {
 
 #moar::include "../moar-gl/shaders/shadow_point.glsl"
 
-const float BUMP_DEPTH = 0.3;
+const float BUMP_DEPTH = 0.25;
 const int NUM_STEPS = 100;
-const float STEP_DEPTH = 0.0025;
 
 void main()
 {
-    float currentDepth = 0.0;
     vec3 dir = -eyeDir_Cam;
-    vec3 step = vec3(dot(dir, normalize(T)), dot(dir, normalize(B)), dot(dir, N));
-    vec2 offsetStep = step.xy;
-    float height = 0.0;
+    vec2 step = vec2(dot(dir, normalize(T)), dot(dir, normalize(B)));
+    float stepDepth = BUMP_DEPTH / NUM_STEPS;
+    float currentDepth = 0.0;
+    float height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
 
-    for (int i = 0; i < NUM_STEPS; ++i) {
-        height = texture(bumpTex, texCoord + currentDepth * offsetStep).r * BUMP_DEPTH;
-        if (currentDepth < height) {
-            currentDepth += STEP_DEPTH;
-        } else {
-            break;
-        }
+    while ((BUMP_DEPTH - currentDepth) > height) {
+        height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
+        currentDepth += stepDepth;
     }
-    vec2 bumpTexCoord = texCoord + currentDepth * offsetStep;
+    
+    vec2 bumpTexCoord = texCoord + currentDepth * step;
 
     vec3 normal_Tan = normalize(texture(normalTex, bumpTexCoord).rgb * 2.0 - vec3(1.0));
 
