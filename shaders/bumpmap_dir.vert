@@ -24,18 +24,23 @@ out vec3 vertexPos_World;
 out vec3 lightDir_Tan;
 out vec3 eyeDir_Tan;
 out vec2 texCoord;
+out vec3 N;
+out vec3 T;
+out vec3 B;
+out vec3 eyeDir_Cam;
 out vec4 pos_Light;
 
 void main()
 {
-    vec3 N = normalize(mat3(M) * normal);
-    vec3 T = normalize(mat3(M) * tangent);
-    vec3 B = cross(N, T);
+    N = mat3(MV) * normal;
+    T = mat3(MV) * tangent;
+    B = cross(T, N);
 
     vec3 L = -lightForward;
     lightDir_Tan = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
 
-    // TODO
+    vec3 vertexPos_Cam = vec3(MV * vec4(position, 1.0));
+    eyeDir_Cam = normalize(vec3(0.0) - vertexPos_Cam);
     
     texCoord = tex;
     pos_Light = lightSpaceProj * M * vec4(position, 1.0);
