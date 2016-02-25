@@ -25,8 +25,8 @@ layout (std140) uniform LightBlock {
 
 #moar::include "../moar-gl/shaders/shadow_point.glsl"
 
-const float BUMP_DEPTH = 0.25;
-const int NUM_STEPS = 100;
+const float BUMP_DEPTH = 0.025;
+const int NUM_STEPS = 50;
 
 void main()
 {
