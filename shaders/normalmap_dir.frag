@@ -18,6 +18,7 @@ layout (std140) uniform LightBlock {
 };
 
 #moar::include "../moar-gl/shaders/shadow_dir.glsl"
+#moar::include "../moar-gl/shaders/discard.glsl"
 
 void main()
 {
@@ -25,5 +26,9 @@ void main()
     float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
         float shadow = receiveShadows != 0 ? calcShadow(depthTex, pos_Light) : 1.0;
 
-    outColor = shadow * vec4(lightColor.xyz * lightColor.w * diff, 1.0) * texture(diffuseTex, texCoord);
+    vec4 texColor = texture(diffuseTex, texCoord);
+    if (shouldDiscard(texColor.a)) {
+        discard;
+    }
+    outColor = shadow * vec4(lightColor.xyz * lightColor.w * diff, 1.0) * texColor;
 }

@@ -19,6 +19,7 @@ layout (std140) uniform LightBlock {
 };
 
 #moar::include "../moar-gl/shaders/shadow_point.glsl"
+#moar::include "../moar-gl/shaders/discard.glsl"
 
 void main()
 {
@@ -31,7 +32,11 @@ void main()
           calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane) : 
           1.0;
 
+    vec4 texColor = texture(diffuseTex, texCoord);
+    if (shouldDiscard(texColor.a)) {
+        discard;
+    }
     outColor = shadow *
                vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * 
-               texture(diffuseTex, texCoord);
+               texColor;
 }
