@@ -12,7 +12,7 @@ layout (location = 20) uniform sampler2D diffuseTex;
 void main()
 {
     vec4 texColor = texture(diffuseTex, texCoord);
-    if (shouldDiscard(texColor.a)) {
+    if (isTransparent(texColor.a)) {
         discard;
     }
     outColor = vec4(ambient, 1.0) * texColor;

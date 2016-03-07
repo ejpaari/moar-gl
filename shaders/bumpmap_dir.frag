@@ -23,6 +23,7 @@ layout (std140) uniform LightBlock {
 };
 
 #moar::include "../moar-gl/shaders/shadow_dir.glsl"
+#moar::include "../moar-gl/shaders/discard.glsl"
 
 const float BUMP_DEPTH = 0.025;
 const int NUM_STEPS = 50;
@@ -41,10 +42,15 @@ void main()
     }
     
     vec2 bumpTexCoord = texCoord + currentDepth * step;
+    vec4 texColor = texture(diffuseTex, bumpTexCoord);
+
+    if (isTransparent(texColor.a)) {
+        discard;
+    }    
 
     vec3 normal_Tan = normalize(texture(normalTex, bumpTexCoord).rgb * 2.0 - vec3(1.0));
     float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
         float shadow = receiveShadows != 0 ? calcShadow(depthTex, pos_Light) : 1.0;
 
-    outColor = shadow * vec4(lightColor.xyz * lightColor.w * diff, 1.0) * texture(diffuseTex, bumpTexCoord);
+    outColor = shadow * vec4(lightColor.xyz * lightColor.w * diff, 1.0) * texColor;
 }

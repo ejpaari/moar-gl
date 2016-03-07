@@ -27,7 +27,7 @@ void main()
         float shadow = receiveShadows != 0 ? calcShadow(depthTex, pos_Light) : 1.0;
 
     vec4 texColor = texture(diffuseTex, texCoord);
-    if (shouldDiscard(texColor.a)) {
+    if (isTransparent(texColor.a)) {
         discard;
     }
     outColor = shadow * vec4(lightColor.xyz * lightColor.w * diff, 1.0) * texColor;

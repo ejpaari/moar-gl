@@ -23,20 +23,23 @@ layout (std140) uniform LightBlock {
 
 void main()
 {    
+    vec4 texColor = texture(diffuseTex, texCoord);
+    float lightDistance = length(lightPos - vertexPos_World);
+    float lightPower = lightColor.w / (lightDistance * lightDistance);
+
+    if (isTransparent(texColor.a) || isTooFar(lightPower)) {
+        discard;
+    }
+
     vec3 n = normalize(normal_Cam);
     vec3 l = normalize(lightDir_Cam);
     float diff = clamp(dot(n,l), 0, 1);
 
-    float lightDistance = length(lightPos - vertexPos_World);
     float shadow = receiveShadows != 0 ? 
           calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane) : 
           1.0;
 
-    vec4 texColor = texture(diffuseTex, texCoord);
-    if (shouldDiscard(texColor.a)) {
-        discard;
-    }
     outColor = shadow * 
-               vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) * 
+               vec4(lightColor.xyz * diff * lightPower, 1.0) * 
                texColor;
 }

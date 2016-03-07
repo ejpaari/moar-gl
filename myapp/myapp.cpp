@@ -45,19 +45,19 @@ void MyApp::start()
 //    offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
 //    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 
-    monkey = engine->createObject();
-    monkey->setShadowReceiver(false);
-    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
-    moar::Material* m = engine->getResourceManager()->createMaterial();
-    m->setTexture(engine->getResourceManager()->getTexture("spnza_bricks_a_diff.tga"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
-    m->setTexture(engine->getResourceManager()->getTexture("brickwork_nmap.png"), moar::Material::NORMAL, GL_TEXTURE_2D);
-    m->setTexture(engine->getResourceManager()->getTexture("brickwork_bmap.png"), moar::Material::BUMP, GL_TEXTURE_2D);
-    m->setShaderType("bumpmap");
-    for (auto& mo : monkey->getMeshObjects()) {
-        mo.material = m;
-    }
-    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
+//    monkey = engine->createObject();
+//    monkey->setShadowReceiver(false);
+//    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
+//    moar::Material* m = engine->getResourceManager()->createMaterial();
+//    m->setTexture(engine->getResourceManager()->getTexture("spnza_bricks_a_diff.tga"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
+//    m->setTexture(engine->getResourceManager()->getTexture("brickwork_nmap.png"), moar::Material::NORMAL, GL_TEXTURE_2D);
+//    m->setTexture(engine->getResourceManager()->getTexture("brickwork_bmap.png"), moar::Material::BUMP, GL_TEXTURE_2D);
+//    m->setShaderType("bumpmap");
+//    for (auto& mo : monkey->getMeshObjects()) {
+//        mo.material = m;
+//    }
+//    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
+//    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
 
     initGUI();
 }
@@ -111,7 +111,7 @@ void MyApp::update()
     light1b->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.5), 0.0f));
     light2a->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
     light2b->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
-    light3->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.04f));
+    light3->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.03f));
     position = camera->getPosition();
 
 //    monkey1->rotate(rotationAxis, rotationSpeed * boost::math::constants::degree<double>());

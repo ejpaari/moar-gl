@@ -24,12 +24,20 @@ layout (std140) uniform LightBlock {
 };
 
 #moar::include "../moar-gl/shaders/shadow_point.glsl"
+#moar::include "../moar-gl/shaders/discard.glsl"
 
 const float BUMP_DEPTH = 0.025;
 const int NUM_STEPS = 50;
 
 void main()
 {
+    float lightDistance = length(lightPos - vertexPos_World);
+    float lightPower = lightColor.w / (lightDistance * lightDistance);
+
+    if (isTooFar(lightPower)) {
+        discard;
+    }
+
     vec3 dir = -eyeDir_Cam;
     vec2 step = vec2(dot(dir, normalize(T)), dot(dir, normalize(B)));
     float stepDepth = BUMP_DEPTH / NUM_STEPS;
@@ -42,17 +50,21 @@ void main()
     }
     
     vec2 bumpTexCoord = texCoord + currentDepth * step;
+    vec4 texColor = texture(diffuseTex, bumpTexCoord);
+
+    if (isTransparent(texColor.a)) {
+        discard;
+    }
 
     vec3 normal_Tan = normalize(texture(normalTex, bumpTexCoord).rgb * 2.0 - vec3(1.0));
 
     float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
 
-    float lightDistance = length(lightPos - vertexPos_World);
     float shadow = receiveShadows != 0 ? 
           calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane) : 
           1.0;
 
     outColor = shadow *
-               vec4(lightColor.xyz * lightColor.w * diff / (lightDistance * lightDistance), 1.0) *
-               texture(diffuseTex, bumpTexCoord);
+               vec4(lightColor.xyz * diff * lightPower, 1.0) *
+               texColor;
 }
