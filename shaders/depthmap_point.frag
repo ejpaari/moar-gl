@@ -1,5 +1,3 @@
-#version 450 core
-
 in vec4 fragPos;
 
 layout (location = 43) uniform float farPlane;

@@ -1,5 +1,3 @@
-#version 450 core
-
 layout (location = 1) in vec3 position;
 
 out vec3 texCoord;

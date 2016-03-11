@@ -1,5 +1,3 @@
-#version 450 core
-
 layout (location = 1) in vec3 position;
 
 layout (std140) uniform TransformationBlock {

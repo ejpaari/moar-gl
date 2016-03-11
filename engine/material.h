@@ -5,7 +5,6 @@
 
 #include <GL/glew.h>
 #include <string>
-#include <tuple>
 #include <vector>
 #include <functional>
 #include <unordered_map>
@@ -32,11 +31,11 @@ public:
     Material& operator=(const Material&) = delete;
     Material& operator=(Material&&) = delete;
 
-    void setShaderType(const std::string& shaderType);
+    void setShaderType(int shaderType);
     void setTexture(GLuint texture, TextureType type, GLenum target);
     void setUniform(const std::string& name, std::function<void()> func, GLuint location);
 
-    std::string getShaderType() const;
+    int getShaderType() const;
     int getId() const;
 
 private:
@@ -68,7 +67,7 @@ private:
     void setUniforms(const Shader* shader);
     const TextureInfo* getTextureInfo(TextureType type);
 
-    std::string shaderType;
+    int shaderType = Shader::UNDEFINED;
     std::vector<MaterialTexture> textures;
     std::unordered_map<std::string, CustomUniform> uniforms;
 

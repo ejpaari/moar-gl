@@ -40,23 +40,24 @@ public:
     Material* createMaterial();
 
     const Shader* getShader(const std::string& name);
-    const Shader* getShader(const std::string& shader, const Light::Type light);
+    const Shader* getShader(int shaderType, Light::Type light);
     Model* getModel(const std::string& modelName);
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
     Material* getMaterial(int id);
 
 private:
-    using ShaderKey = std::pair<std::string, Light::Type>;
+    using ShaderKey = std::pair<int, Light::Type>;
 
     struct ShaderKeyHash
     {
         size_t operator()(const ShaderKey& key) const
         {
-            return std::hash<std::string>()(key.first + std::to_string(key.second));
+            return std::hash<std::string>()(std::to_string(key.first) + std::to_string(key.second));
         }
     };
 
+    bool loadShader(int shaderType);
     bool loadModel(Model* model, const std::string& file);
     bool loadMaterial(aiMaterial* aMaterial, Material* material);
     bool loadTexture(aiMaterial* aMaterial, aiTextureType aType, Material* material, Material::TextureType type);

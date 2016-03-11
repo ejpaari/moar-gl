@@ -10,8 +10,6 @@
 namespace moar
 {
 
-const std::string Shader::INCLUDE_DIRECTIVE = "#moar::include";
-
 Shader::Shader()
 {
     program = glCreateProgram();
@@ -23,12 +21,15 @@ Shader::~Shader()
     glDeleteProgram(program);
 }
 
-bool Shader::attachShader(GLenum shaderType, const char *filename)
+bool Shader::attachShader(GLenum shaderType, const std::string& filename, const std::string& defines)
 {
     GLuint shader = glCreateShader(shaderType);
-    if (!shader || !compileShader(shader, filename)) {
+    if (!shader || !compileShader(shader, filename, defines)) {
         glDeleteShader(shader);
         std::cerr << "WARNING: Failed to attach shader " << filename << "\n";
+        if (!defines.empty()) {
+            std::cerr << "with additional defines:\n" << defines << "\n";
+        }
         return false;
     }
 
@@ -86,41 +87,17 @@ bool Shader::hasUniform(GLuint location) const
     return uniforms[location];
 }
 
-bool Shader::compileShader(GLuint shader, const char* filename)
+bool Shader::compileShader(GLuint shader, const std::string& filename, const std::string& defines)
 {
-    std::ifstream shaderFile(filename);
-    std::string line;
-    std::string shaderCode;
+    // Todo: Repeatedly opening the same file for light shaders.
+    std::ifstream shaderFile(filename.c_str());
+    std::string shaderCode = GLSL_VERSION + defines;
 
     if (shaderFile.is_open()) {
-        shaderFile.seekg(0, std::ios_base::end);
-        size_t shaderSize = shaderFile.tellg();
-        shaderFile.seekg(0, std::ios_base::beg);
-        shaderCode.reserve(shaderSize);
-
-        while (std::getline(shaderFile, line)) {
-            if (!line.empty() && line[0] == '#' && line.find(INCLUDE_DIRECTIVE) != std::string::npos) {
-                auto start = line.find_first_of('"') + 1;
-                auto end = line.find_last_of('"');
-                std::string includeFilename = line.substr(start, end - start);
-                std::ifstream includeFile(includeFilename.c_str());
-                if (includeFile.is_open()) {
-                    includeFile.seekg(0, std::ios_base::end);
-                    size_t includeSize = includeFile.tellg();
-                    includeFile.seekg(0, std::ios_base::beg);
-                    shaderCode.reserve(shaderCode.capacity() + includeSize);
-                    std::stringstream buffer;
-                    buffer << includeFile.rdbuf();
-                    shaderCode += buffer.str() + "\n";
-                    includeFile.close();
-                } else {
-                    std::cerr << "ERROR: Could not open include file: " << includeFilename << "\n";
-                    return false;
-                }
-            } else {
-                shaderCode += line + "\n";
-            }
-        }
+        shaderFile.seekg(0, std::ios::end);
+        shaderCode.reserve(shaderCode.size() + shaderFile.tellg());
+        shaderFile.seekg(0, std::ios::beg);
+        shaderCode.append((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
         shaderFile.close();
     } else {
         std::cerr << "ERROR: Could not open shader file: " << filename << "\n";
@@ -128,7 +105,7 @@ bool Shader::compileShader(GLuint shader, const char* filename)
     }
 
     const char* shaderCodeCstr = shaderCode.c_str();
-    glShaderSource(shader, 1, &shaderCodeCstr , NULL);
+    glShaderSource(shader, 1, &shaderCodeCstr, NULL);
 
     glCompileShader(shader);
     GLint status = 0;
@@ -136,7 +113,7 @@ bool Shader::compileShader(GLuint shader, const char* filename)
     if (!status) {
         char buffer[4096];
         glGetShaderInfoLog(shader, 4096, NULL, buffer);
-        fprintf(stderr, "%s: %s\n", filename, buffer);
+        fprintf(stderr, "%s: %s\n", filename.c_str(), buffer);
         return false;
     }
 

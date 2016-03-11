@@ -282,7 +282,7 @@ bool Engine::init(const std::string& settingsFile)
     Object::setMeshDefaultMaterial(material);
     GLuint texture = manager.getTexture("brick.png");
     material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
-    material->setShaderType("diffuse");
+    material->setShaderType(Shader::DIFFUSE);
 
     GLuint lightBuffer;
     glGenBuffers(1, &lightBuffer);
@@ -453,7 +453,7 @@ void Engine::lighting(Light::Type lightType)
     }
 
     for (auto& light : lights[lightType]) {
-        shader = manager.getShader("depthmap", lightType);
+        shader = manager.getShader(Shader::DEPTH, lightType);
         glUseProgram(shader->getProgram());
         Light* lightComp = light->getComponent<Light>();
         bool shadowingEnabled = lightComp->isShadowingEnabled();
@@ -504,7 +504,7 @@ void Engine::updateObjectContainers()
     for (const auto obj : allObjects) {
         for (auto& meshObject : obj->getMeshObjects()) {
             if (meshObject.material != nullptr) {
-                ShaderType shaderType = meshObject.material->getShaderType();
+                int shaderType = meshObject.material->getShaderType();
                 MaterialId materialId = meshObject.material->getId();
                 std::vector<Object::MeshObject>& meshes = renderMeshes[shaderType][materialId];
                 if (std::find(meshes.begin(), meshes.end(), meshObject) == meshes.end()) {

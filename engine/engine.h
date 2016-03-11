@@ -67,7 +67,7 @@ private:
     Time time;
 
     using MaterialId = int;
-    using ShaderType = std::string;
+    using ShaderType = int;
     using MeshMap = std::map<MaterialId, std::vector<Object::MeshObject>>;
     std::map<ShaderType, MeshMap> renderMeshes;
     std::vector<std::vector<Object*>> lights;

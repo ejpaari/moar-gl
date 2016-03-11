@@ -24,7 +24,7 @@ Material::~Material()
 {
 }
 
-void Material::setShaderType(const std::string& shaderType)
+void Material::setShaderType(int shaderType)
 {
     G_COMPONENT_CHANGED = true;
     this->shaderType = shaderType;    
@@ -32,6 +32,7 @@ void Material::setShaderType(const std::string& shaderType)
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)
 {
+    // Todo: Reset textures if not set.
     for (unsigned int i = 0; i < textures.size(); ++i) {
         if (textures[i].info->type == type) {
             textures[i].glId = texture;
@@ -52,7 +53,7 @@ void Material::setUniform(const std::string& name, std::function<void ()> func, 
     uniforms[name] = uniform;
 }
 
-std::string Material::getShaderType() const
+int Material::getShaderType() const
 {
     return shaderType;
 }

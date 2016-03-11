@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 namespace moar
 {
@@ -31,55 +32,54 @@ bool ResourceManager::loadShaders(const std::string& path)
     std::string vertex = "";
     std::string fragment = "";
     std::string geometry = "";
+    std::string name = "";
     std::ifstream shaderInfo(path.c_str());
     if (shaderInfo.is_open()) {
         while (std::getline(shaderInfo, line)) {
-            if (line.empty()) {
-                continue;
-            } else if (line.find(".vert") != std::string::npos) {
+            if (line.find(".vert") != std::string::npos) {
                 vertex = line;
-            } else if (line.find(".frag") != std::string::npos) {
-                fragment = line;
+                name = vertex.substr(0, vertex.find(".vert"));
             } else if (line.find(".geom") != std::string::npos) {
                 geometry = line;
-            } else if (!vertex.empty() && !fragment.empty()){
-                auto found = shadersByName.find(line);
-                if (found == shadersByName.end()) {
-                    std::unique_ptr<Shader> shader(new Shader());
-
-                    bool shadersAttached = shader->attachShader(GL_VERTEX_SHADER, std::string(shaderPath + vertex).c_str());
-                    shadersAttached = shadersAttached && shader->attachShader(GL_FRAGMENT_SHADER, std::string(shaderPath + fragment).c_str());
-                    if (!geometry.empty()) {
-                        shadersAttached = shadersAttached && shader->attachShader(GL_GEOMETRY_SHADER, std::string(shaderPath + geometry).c_str());
-                    }
-
-                    if (!shadersAttached) {
-                        return false;
-                    }
-
-                    if (!shader->linkProgram()) {
-                        std::cerr << "WARNING: Failed to link shader program: " << line << "\n";
-                        return false;
-                    }
-                    std::cout << "Created shader: " << line << "\n";
-                    shadersByName.insert(std::make_pair(line, shader.get()));
-
-                    if (fragment.find("_point") != std::string::npos) {
-                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find("_")), Light::POINT);
-                        shadersByType.insert(std::make_pair(key, shader.get()));
-                    } else if (fragment.find("_dir") != std::string::npos) {
-                        ShaderKey key = std::make_pair(vertex.substr(0, vertex.find("_")), Light::DIRECTIONAL);
-                        shadersByType.insert(std::make_pair(key, shader.get()));
-                    }
-                    shaders.push_back(std::move(shader));
-
-                    vertex.clear();
-                    geometry.clear();
-                    fragment.clear();
-                } else {
-                    std::cerr << "ERROR: Duplicate shader names, can not initialize\n";
+            } else if (line.find(".frag") != std::string::npos) {
+                fragment = line;
+            } else if (line.empty() && !vertex.empty() && !fragment.empty() && !name.empty()) {
+                if (shadersByName.find(name) != shadersByName.end()) {
+                    std::cerr << "ERROR: Duplicate shader names, can not initialize (" << name << ")\n";
                     return false;
                 }
+
+                std::unique_ptr<Shader> shader(new Shader());
+
+                bool attached = shader->attachShader(GL_VERTEX_SHADER, shaderPath + vertex);
+                attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, shaderPath + fragment);
+                if (!geometry.empty()) {
+                    attached = attached && shader->attachShader(GL_GEOMETRY_SHADER, shaderPath + geometry);
+                }
+
+                if (!attached) {
+                    return false;
+                }
+                if (!shader->linkProgram()) {
+                    std::cerr << "WARNING: Failed to link shader program: " << name << "\n";
+                    return false;
+                }
+                std::cout << "Created shader: " << name << "\n";
+                shadersByName.insert(std::make_pair(name, shader.get()));
+
+                if (name == "depthmap_point") {
+                    ShaderKey key = std::make_pair(Shader::DEPTH, Light::POINT);
+                    shadersByType.insert(std::make_pair(key, shader.get()));
+                } else if (name == "depthmap_dir") {
+                    ShaderKey key = std::make_pair(Shader::DEPTH, Light::DIRECTIONAL);
+                    shadersByType.insert(std::make_pair(key, shader.get()));
+                }
+
+                shaders.push_back(std::move(shader));
+                vertex.clear();
+                fragment.clear();
+                geometry.clear();
+                name.clear();
             } else {
                 std::cerr << "ERROR: Failed to parse shaders file\n";
                 return false;
@@ -117,13 +117,13 @@ const Shader* ResourceManager::getShader(const std::string& name)
     }
 }
 
-const Shader* ResourceManager::getShader(const std::string& shader, const Light::Type light)
+const Shader* ResourceManager::getShader(int shaderType, Light::Type light)
 {
-    auto found = shadersByType.find(std::make_pair(shader, light));
+    auto found = shadersByType.find(std::make_pair(shaderType, light));
     if (found != shadersByType.end()) {
         return found->second;
     } else {
-        std::cerr << "ERROR: Could not find shader \"" << shader << "\" with light type " << light << "\n";
+        std::cerr << "ERROR: Could not find shader " << shaderType << " with light type " << light << "\n";
         return nullptr;
     }
 }
@@ -212,6 +212,46 @@ Material* ResourceManager::getMaterial(int id)
     }
 }
 
+bool ResourceManager::loadShader(int shaderType)
+{
+    ShaderKey key = std::make_pair(shaderType, Light::POINT);
+    if (shadersByType.find(key) != shadersByType.end()) {
+        return true;
+    }
+
+    std::stringstream ss;
+    if (shaderType & Shader::DIFFUSE) {
+        ss << DIFFUSE_DEFINE << "\n";
+    }
+    if (shaderType & Shader::SPECULAR) {
+        ss << SPECULAR_DEFINE << "\n";
+    }
+    if (shaderType & Shader::NORMAL) {
+        ss << NORMAL_DEFINE << "\n";
+    }
+    if (shaderType & Shader::BUMP) {
+        ss << BUMP_DEFINE << "\n";
+    }
+    std::unique_ptr<Shader> shader(new Shader());
+    std::string path = shaderPath + LIGHT_POINT_SHADER;
+    // Todo: LIGHT_DIR_SHADER.
+    bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", ss.str());
+    attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", ss.str());
+
+    if (!attached) {
+        return false;
+    }
+    if (!shader->linkProgram()) {
+        std::cerr << "WARNING: Failed to link shader program with mask: " << std::bitset<8>(shaderType) << "\n";
+        return false;
+    }
+
+    std::cout << "Created shader with mask: " << std::bitset<8>(shaderType) << "\n";
+    shadersByType.insert(std::make_pair(key, shader.get()));
+    shaders.push_back(std::move(shader));
+    return true;
+}
+
 bool ResourceManager::loadModel(Model* model, const std::string& file)
 {
     Assimp::Importer importer;
@@ -294,8 +334,10 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
                     mesh->setDefaultMaterial(mat.get());
                     auto iter = materials.insert(std::make_pair(mat->getId(), std::move(mat)));
                     if (!iter.second) {
-                        std::cerr << "ERROR: Could not insert material.\n";
+                        std::cerr << "ERROR: Could not insert material\n";
                     }
+                } else {
+                    std::cerr << "WARNING: Could not load material\n";
                 }
             }
             model->addMesh(std::move(mesh));
@@ -311,30 +353,29 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
 
 bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
 {
-    std::string shaderType;    
+    int shaderType = Shader::DIFFUSE;
     aiTextureType textureType = aiTextureType_DIFFUSE;
     if (aMaterial->GetTextureCount(textureType) > 0) {
         if (!loadTexture(aMaterial, textureType, material, Material::DIFFUSE)) {
             return false;
         }
-        shaderType = "diffuse";
     }
     textureType = aiTextureType_HEIGHT;
     if (aMaterial->GetTextureCount(textureType) > 0) {
         if (!loadTexture(aMaterial, textureType, material, Material::NORMAL)) {
             return false;
         }
-        shaderType = "normalmap";
+        shaderType |= Shader::NORMAL;
     }
     textureType = aiTextureType_DISPLACEMENT;
     if (aMaterial->GetTextureCount(textureType) > 0) {
         if (!loadTexture(aMaterial, textureType, material, Material::BUMP)) {
             return false;
         }
-        shaderType = "bumpmap";
+        shaderType |= Shader::BUMP;
     }
 
-    if (shaderType.empty()) {
+    if (!loadShader(shaderType)) {
         return false;
     }
     material->setShaderType(shaderType);
