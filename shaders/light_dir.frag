@@ -1,17 +1,19 @@
-in vec3 vertexPos_World;
 in vec2 texCoord;
+in vec4 pos_Light;
 
 #if defined(DIFFUSE) || defined(SPECULAR)
-in vec3 normal_Cam;
-in vec3 lightDir_Cam;
+in vec3 normal_World;
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
 in vec3 N;
 in vec3 T;
 in vec3 B;
-in vec3 eyeDir_Cam;
 in vec3 lightDir_Tan;
+#endif
+
+#if defined(BUMP)
+in vec3 eyeDir_Cam;
 #endif
 
 layout(location = 0) out vec4 outColor;
@@ -28,9 +30,8 @@ layout (location = 21) uniform sampler2D normalTex;
 layout (location = 22) uniform sampler2D bumpTex;
 #endif
 
-layout (location = 23) uniform samplerCube depthTex;
+layout (location = 23) uniform sampler2D depthTex;
 layout (location = 42) uniform int receiveShadows;
-layout (location = 43) uniform float farPlane;
 
 layout (std140) uniform LightBlock {
   vec4 lightColor;
@@ -43,18 +44,22 @@ const float BUMP_DEPTH = 0.025;
 const int NUM_STEPS = 50;
 #endif
 
-float calcPointShadow(samplerCube depthTex, vec3 vertexPos_World, vec3 lightPos_World, float farClipDistance)
+float calcDirShadow(sampler2D depthTex, vec4 pos_Light)
 {
-  vec3 vertexToLight = vertexPos_World - lightPos_World;
-  float currentDepth = length(vertexToLight);
-  float bias = 0.05;
+  vec3 projCoords = pos_Light.xyz / pos_Light.w;
+  if (projCoords.z > 1.0) {
+    return 1.0;
+  }
+  projCoords = projCoords * 0.5 + 0.5;
+  float closestDepth = texture(depthTex, projCoords.xy).r;
+  float currentDepth = projCoords.z;
+  float bias = 0.005;//max(0.05 * (1.0 - dot(normal_World, lightForward)), 0.005);
 
   float shadow = 0.0;
-  vec2 texelSize = 2.0 * length(vertexToLight) / textureSize(depthTex, 0);
+  vec2 texelSize = 1.0 / textureSize(depthTex, 0);
   for(int x = -1; x <= 1; ++x) {
     for(int y = -1; y <= 1; ++y) {
-      vec3 dir = vertexToLight + vec3(texelSize.x * x, texelSize.y * y, 0.0);
-      float pcfDepth = texture(depthTex, dir).r * farClipDistance;
+      float pcfDepth = texture(depthTex, projCoords.xy + vec2(x, y) * texelSize).r;
       shadow += currentDepth - bias > pcfDepth  ? 0.0 : 0.111111;
     }
   }
@@ -66,20 +71,8 @@ bool isTransparent(float alpha)
   return alpha < 0.1;
 }
 
-bool isTooFar(float lightPower)
-{
-  return lightPower < 0.05;
-}
-
 void main()
 {
-  float lightDistance = length(lightPos - vertexPos_World);
-  float lightPower = lightColor.w / (lightDistance * lightDistance);
-
-  if (isTooFar(lightPower)) {
-    discard;
-  }
-
 #if defined(BUMP)
   vec3 dir = -eyeDir_Cam;
   vec2 step = vec2(dot(dir, normalize(T)), dot(dir, normalize(B)));
@@ -111,14 +104,12 @@ void main()
   vec3 normal_Tan = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
   float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
 #elif defined(DIFFUSE)
-  vec3 n = normalize(normal_Cam);
-  vec3 l = normalize(lightDir_Cam);
+  vec3 n = normal_World;
+  vec3 l = -lightForward;
   float diff = clamp(dot(n,l), 0, 1);
 #endif
 
-  float shadow = receiveShadows != 0 ? 
-    calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane) : 
-    1.0;
+  float shadow = receiveShadows != 0 ? calcDirShadow(depthTex, pos_Light) : 1.0;
 
-  outColor = shadow * vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
+  outColor = shadow * vec4(lightColor.xyz * diff * lightColor.w, 1.0) * texColor;
 }

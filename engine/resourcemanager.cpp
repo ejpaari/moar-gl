@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 namespace moar
 {
@@ -119,13 +120,31 @@ const Shader* ResourceManager::getShader(const std::string& name)
 
 const Shader* ResourceManager::getShader(int shaderType, Light::Type light)
 {
-    auto found = shadersByType.find(std::make_pair(shaderType, light));
-    if (found != shadersByType.end()) {
-        return found->second;
+    auto getShaderPtr = [&] () -> Shader* {
+        auto found = shadersByType.find(std::make_pair(shaderType, light));
+        if (found != shadersByType.end()) {
+            return found->second;
+        } else {
+            return nullptr;
+        }
+    };
+
+    Shader* s = getShaderPtr();
+    if (s != nullptr) {
+        return s;
     } else {
-        std::cerr << "ERROR: Could not find shader " << shaderType << " with light type " << light << "\n";
-        return nullptr;
+        if (loadShader(shaderType)) {
+            s = getShaderPtr();
+            if (s != nullptr) {
+                return s;
+            } else {
+                std::cerr << "ERROR: Could not find shader " << shaderType << " with light type " << light << "\n";
+            }
+        } else {
+            std::cerr << "ERROR: Could not load shader " << shaderType << " with light type " << light << "\n";
+        }
     }
+    return nullptr;
 }
 
 Model* ResourceManager::getModel(const std::string& modelName)
@@ -214,8 +233,12 @@ Material* ResourceManager::getMaterial(int id)
 
 bool ResourceManager::loadShader(int shaderType)
 {
-    ShaderKey key = std::make_pair(shaderType, Light::POINT);
-    if (shadersByType.find(key) != shadersByType.end()) {
+    std::vector<ShaderKey> keys = {
+        std::make_pair(shaderType, Light::POINT),
+        std::make_pair(shaderType, Light::DIRECTIONAL)
+    };
+
+    if (std::all_of(keys.begin(), keys.end(), [&] (ShaderKey key) { return shadersByType.find(key) != shadersByType.end(); })) {
         return true;
     }
 
@@ -232,24 +255,29 @@ bool ResourceManager::loadShader(int shaderType)
     if (shaderType & Shader::BUMP) {
         ss << BUMP_DEFINE << "\n";
     }
-    std::unique_ptr<Shader> shader(new Shader());
-    std::string path = shaderPath + LIGHT_POINT_SHADER;
-    // Todo: LIGHT_DIR_SHADER.
-    bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", ss.str());
-    attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", ss.str());
 
-    if (!attached) {
-        return false;
-    }
-    if (!shader->linkProgram()) {
-        std::cerr << "WARNING: Failed to link shader program with mask: " << std::bitset<8>(shaderType) << "\n";
-        return false;
-    }
+    auto createShader = [&] (const std::string& path, ShaderKey key)
+    {
+        std::unique_ptr<Shader> shader(new Shader());
+        bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", ss.str());
+        attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", ss.str());
 
-    std::cout << "Created shader with mask: " << std::bitset<8>(shaderType) << "\n";
-    shadersByType.insert(std::make_pair(key, shader.get()));
-    shaders.push_back(std::move(shader));
-    return true;
+        if (!attached) {
+            return false;
+        }
+        if (!shader->linkProgram()) {
+            std::cerr << "WARNING: Failed to link shader: " << path << " with mask: " << std::bitset<8>(shaderType) << "\n";
+            return false;
+        }
+
+        std::cout << "Created shader: " << path << " with mask: " << std::bitset<8>(shaderType) << "\n";
+        shadersByType.insert(std::make_pair(key, shader.get()));
+        shaders.push_back(std::move(shader));
+        return true;
+    };
+
+    return createShader(shaderPath + LIGHT_POINT_SHADER, std::make_pair(shaderType, Light::POINT)) &&
+           createShader(shaderPath + LIGHT_DIR_SHADER, std::make_pair(shaderType, Light::DIRECTIONAL));
 }
 
 bool ResourceManager::loadModel(Model* model, const std::string& file)
@@ -337,7 +365,7 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
                         std::cerr << "ERROR: Could not insert material\n";
                     }
                 } else {
-                    std::cerr << "WARNING: Could not load material\n";
+                    std::cerr << "WARNING: Could not load material for " << file << "\n";
                 }
             }
             model->addMesh(std::move(mesh));
@@ -353,12 +381,13 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
 
 bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
 {
-    int shaderType = Shader::DIFFUSE;
+    int shaderType = 0;
     aiTextureType textureType = aiTextureType_DIFFUSE;
     if (aMaterial->GetTextureCount(textureType) > 0) {
         if (!loadTexture(aMaterial, textureType, material, Material::DIFFUSE)) {
             return false;
         }
+        shaderType |= Shader::DIFFUSE;
     }
     textureType = aiTextureType_HEIGHT;
     if (aMaterial->GetTextureCount(textureType) > 0) {

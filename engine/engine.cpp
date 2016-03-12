@@ -279,10 +279,9 @@ bool Engine::init(const std::string& settingsFile)
     lights.resize(Light::Type::NUM_TYPES);
 
     Material* material = manager.createMaterial();
-    Object::setMeshDefaultMaterial(material);
-    GLuint texture = manager.getTexture("brick.png");
-    material->setTexture(texture, moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+    material->setTexture(manager.getTexture("brick.png"), moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
     material->setShaderType(Shader::DIFFUSE);
+    Object::setMeshDefaultMaterial(material);
 
     GLuint lightBuffer;
     glGenBuffers(1, &lightBuffer);
@@ -503,13 +502,11 @@ void Engine::updateObjectContainers()
 
     for (const auto obj : allObjects) {
         for (auto& meshObject : obj->getMeshObjects()) {
-            if (meshObject.material != nullptr) {
-                int shaderType = meshObject.material->getShaderType();
-                MaterialId materialId = meshObject.material->getId();
-                std::vector<Object::MeshObject>& meshes = renderMeshes[shaderType][materialId];
-                if (std::find(meshes.begin(), meshes.end(), meshObject) == meshes.end()) {
-                    meshes.push_back(meshObject);
-                }
+            int shaderType = meshObject.material->getShaderType();
+            MaterialId materialId = meshObject.material->getId();
+            std::vector<Object::MeshObject>& meshes = renderMeshes[shaderType][materialId];
+            if (std::find(meshes.begin(), meshes.end(), meshObject) == meshes.end()) {
+                meshes.push_back(meshObject);
             }
         }
         if (obj->hasComponent<Light>()) {
@@ -521,14 +518,14 @@ void Engine::updateObjectContainers()
         }
     }
     for (auto& objs : lights) {
-        objs.erase(std::remove_if(objs.begin(), objs.end(), [](Object* obj){ return !obj->hasComponent<Light>(); }),
+        objs.erase(std::remove_if(objs.begin(), objs.end(), [] (Object* obj) { return !obj->hasComponent<Light>(); }),
                 objs.end());
     }
 
     for (auto& shaderMeshMap : renderMeshes) {
         for (auto& meshMap : shaderMeshMap.second) {
             std::vector<Object::MeshObject>& meshes = meshMap.second;
-            meshes.erase(std::remove_if(meshes.begin(), meshes.end(), [](Object::MeshObject mo){ return mo.material == nullptr; }),
+            meshes.erase(std::remove_if(meshes.begin(), meshes.end(), [] (Object::MeshObject mo) { return mo.parent == nullptr; }),
                     meshes.end());
         }
     }
