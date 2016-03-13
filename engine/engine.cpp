@@ -529,6 +529,10 @@ void Engine::updateObjectContainers()
                     meshes.end());
         }
     }
+
+#if DEBUG
+    manager.checkMissingTextures();
+#endif
     G_COMPONENT_CHANGED = false;
 }
 

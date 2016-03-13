@@ -46,6 +46,8 @@ public:
     GLuint getCubeTexture(std::vector<std::string> textureNames);
     Material* getMaterial(int id);
 
+    void checkMissingTextures() const;
+
 private:
     using ShaderKey = std::pair<int, Light::Type>;
 

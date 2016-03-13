@@ -31,8 +31,7 @@ void Material::setShaderType(int shaderType)
 }
 
 void Material::setTexture(GLuint texture, TextureType type, GLenum target)
-{
-    // Todo: Reset textures if not set.
+{    
     for (unsigned int i = 0; i < textures.size(); ++i) {
         if (textures[i].info->type == type) {
             textures[i].glId = texture;
@@ -61,6 +60,28 @@ int Material::getShaderType() const
 int Material::getId() const
 {
     return id;
+}
+
+void Material::checkMissingTextures() const
+{
+    auto checkTexture = [&] (TextureType textureType) {
+        for (const auto& texture : textures) {
+            if (texture.info->type == textureType) {
+                return;
+            }
+        }
+        std::cerr << "WARNING: Texture type " << textureType << " missing from material with id " << id << "\n";
+    };
+
+    if (shaderType & Shader::DIFFUSE) {
+        checkTexture(DIFFUSE);
+    }
+    if (shaderType & Shader::NORMAL) {
+        checkTexture(NORMAL);
+    }
+    if (shaderType & Shader::BUMP) {
+        checkTexture(BUMP);
+    }
 }
 
 void Material::setUniforms(const Shader* shader)

@@ -231,6 +231,13 @@ Material* ResourceManager::getMaterial(int id)
     }
 }
 
+void ResourceManager::checkMissingTextures() const
+{
+    for (const auto& mat : materials) {
+        mat.second->checkMissingTextures();
+    }
+}
+
 bool ResourceManager::loadShader(int shaderType)
 {
     std::vector<ShaderKey> keys = {

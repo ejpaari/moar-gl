@@ -38,6 +38,8 @@ public:
     int getShaderType() const;
     int getId() const;
 
+    void checkMissingTextures() const;
+
 private:
     struct CustomUniform
     {
