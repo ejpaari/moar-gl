@@ -251,40 +251,42 @@ bool ResourceManager::loadShader(int shaderType)
 
     std::stringstream ss;
     if (shaderType & Shader::DIFFUSE) {
-        ss << DIFFUSE_DEFINE << "\n";
+        ss << DIFFUSE_DEFINE;
     }
     if (shaderType & Shader::SPECULAR) {
-        ss << SPECULAR_DEFINE << "\n";
+        ss << SPECULAR_DEFINE;
     }
     if (shaderType & Shader::NORMAL) {
-        ss << NORMAL_DEFINE << "\n";
+        ss << NORMAL_DEFINE;
     }
     if (shaderType & Shader::BUMP) {
-        ss << BUMP_DEFINE << "\n";
+        ss << BUMP_DEFINE;
     }
 
-    auto createShader = [&] (const std::string& path, ShaderKey key)
+    std::string path = shaderPath + LIGHT_SHADER;
+    auto createLightingShader = [&] (Light::Type lightType, std::string defines)
     {
+        defines += lightType == Light::POINT ? POINT_DEFINE : DIRECTIONAL_DEFINE;
         std::unique_ptr<Shader> shader(new Shader());
-        bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", ss.str());
-        attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", ss.str());
+        bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", defines);
+        attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", defines);
 
         if (!attached) {
             return false;
         }
         if (!shader->linkProgram()) {
-            std::cerr << "WARNING: Failed to link shader: " << path << " with mask: " << std::bitset<8>(shaderType) << "\n";
+            std::cerr << "WARNING: Failed to link light shader for light type " << lightType << " with mask: " << std::bitset<8>(shaderType) << "\n";
             return false;
         }
 
-        std::cout << "Created shader: " << path << " with mask: " << std::bitset<8>(shaderType) << "\n";
+        std::cout << "Created light shader for light type " << lightType << " with mask " << std::bitset<8>(shaderType) << "\n";
+        ShaderKey key = std::make_pair(shaderType, lightType);
         shadersByType.insert(std::make_pair(key, shader.get()));
         shaders.push_back(std::move(shader));
         return true;
     };
 
-    return createShader(shaderPath + LIGHT_POINT_SHADER, std::make_pair(shaderType, Light::POINT)) &&
-           createShader(shaderPath + LIGHT_DIR_SHADER, std::make_pair(shaderType, Light::DIRECTIONAL));
+    return createLightingShader(Light::POINT, ss.str()) && createLightingShader(Light::DIRECTIONAL, ss.str());
 }
 
 bool ResourceManager::loadModel(Model* model, const std::string& file)

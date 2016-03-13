@@ -3,13 +3,14 @@
 namespace moar
 {
 const std::string GLSL_VERSION = "#version 450 core\n";
-const std::string DIFFUSE_DEFINE = "#define DIFFUSE";
-const std::string SPECULAR_DEFINE = "#define SPECULAR";
-const std::string NORMAL_DEFINE = "#define NORMAL";
-const std::string BUMP_DEFINE = "#define BUMP";
+const std::string POINT_DEFINE = "#define POINT\n";
+const std::string DIRECTIONAL_DEFINE = "#define DIRECTIONAL\n";
+const std::string DIFFUSE_DEFINE = "#define DIFFUSE\n";
+const std::string SPECULAR_DEFINE = "#define SPECULAR\n";
+const std::string NORMAL_DEFINE = "#define NORMAL\n";
+const std::string BUMP_DEFINE = "#define BUMP\n";
 
-const std::string LIGHT_POINT_SHADER = "light_point";
-const std::string LIGHT_DIR_SHADER = "light_dir";
+const std::string LIGHT_SHADER = "light";
 
 const int TRANSFORMATION_BINDING_POINT = 1;
 const int LIGHT_BINDING_POINT = 2;

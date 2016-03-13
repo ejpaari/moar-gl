@@ -27,7 +27,8 @@ void MyApp::start()
 #define SPONZA
 //#define MONKEY
 #define POINT_LIGHTS
-//#define DIR_LIGHT
+#define DIR_LIGHT
+// Todo: There's something wrong with postprocs.
 //#define POSTPROC
 
 #ifdef SPONZA

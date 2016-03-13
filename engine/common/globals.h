@@ -8,13 +8,14 @@
 namespace moar
 {
 extern const std::string GLSL_VERSION;
+extern const std::string POINT_DEFINE;
+extern const std::string DIRECTIONAL_DEFINE;
 extern const std::string DIFFUSE_DEFINE;
 extern const std::string SPECULAR_DEFINE;
 extern const std::string NORMAL_DEFINE;
 extern const std::string BUMP_DEFINE;
 
-extern const std::string LIGHT_POINT_SHADER;
-extern const std::string LIGHT_DIR_SHADER;
+extern const std::string LIGHT_SHADER;
 
 extern const int TRANSFORMATION_BINDING_POINT;
 extern const int LIGHT_BINDING_POINT;
