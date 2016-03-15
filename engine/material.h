@@ -20,6 +20,7 @@ public:
     enum TextureType
     {
         DIFFUSE,
+        SPECULAR,
         NORMAL,
         BUMP
     };

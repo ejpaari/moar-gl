@@ -363,7 +363,6 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
             }
             mesh->calculateCenterPointAndRadius();
 
-            // Todo: Do not reload existing materials.
             aiMaterial* aMaterial = aScene->mMaterials[aMesh->mMaterialIndex];
             if (aMaterial) {
                 std::unique_ptr<Material> mat(new Material());
@@ -391,44 +390,33 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
 bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
 {
     int shaderType = 0;
-    aiTextureType textureType = aiTextureType_DIFFUSE;
-    if (aMaterial->GetTextureCount(textureType) > 0) {
-        if (!loadTexture(aMaterial, textureType, material, Material::DIFFUSE)) {
-            return false;
+    auto loadTexture = [&] (aiTextureType aType, Material::TextureType textureType, Shader::Type currentShaderType)
+    {
+        if (aMaterial->GetTextureCount(aType) == 0) {
+            return true;
         }
-        shaderType |= Shader::DIFFUSE;
-    }
-    textureType = aiTextureType_HEIGHT;
-    if (aMaterial->GetTextureCount(textureType) > 0) {
-        if (!loadTexture(aMaterial, textureType, material, Material::NORMAL)) {
-            return false;
-        }
-        shaderType |= Shader::NORMAL;
-    }
-    textureType = aiTextureType_DISPLACEMENT;
-    if (aMaterial->GetTextureCount(textureType) > 0) {
-        if (!loadTexture(aMaterial, textureType, material, Material::BUMP)) {
-            return false;
-        }
-        shaderType |= Shader::BUMP;
-    }
 
-    if (!loadShader(shaderType)) {
+        aiString path;
+        aMaterial->GetTexture(aType, 0, &path);
+        GLuint tex = getTexture(std::string(path.C_Str()));
+        if (tex == 0) {
+            return false;
+        }
+        material->setTexture(tex, textureType, GL_TEXTURE_2D);
+        shaderType |= currentShaderType;
+        return true;
+    };
+
+    bool valid =
+            loadTexture(aiTextureType_DIFFUSE, Material::DIFFUSE, Shader::DIFFUSE) &&
+            loadTexture(aiTextureType_SPECULAR, Material::SPECULAR, Shader::SPECULAR) &&
+            loadTexture(aiTextureType_HEIGHT, Material::NORMAL, Shader::NORMAL) &&
+            loadTexture(aiTextureType_DISPLACEMENT, Material::BUMP, Shader::BUMP);
+
+    if (!valid || !loadShader(shaderType)) {
         return false;
     }
     material->setShaderType(shaderType);
-    return true;
-}
-
-bool ResourceManager::loadTexture(aiMaterial* aMaterial, aiTextureType aType, Material* material, Material::TextureType type)
-{
-    aiString path;
-    aMaterial->GetTexture(aType, 0, &path);
-    GLuint tex = getTexture(std::string(path.C_Str()));
-    if (tex == 0) {
-        return false;
-    }
-    material->setTexture(tex, type, GL_TEXTURE_2D);
     return true;
 }
 

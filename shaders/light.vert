@@ -45,7 +45,7 @@ out vec3 B;
 out vec3 lightDir_Tan;
 #endif
 
-#if defined(BUMP)
+#if defined(BUMP) || defined(SPECULAR)
 out vec3 eyeDir_Cam;
 #endif
 
@@ -62,28 +62,27 @@ void main()
 #endif
 
 #if defined(DIFFUSE) || defined(SPECULAR)
-#if defined(POINT)
-  normal_Cam = vec3(MV * vec4(normal, 0.0));
-  lightDir_Cam = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
-#else
-  normal_World = normalize(vec3(M * vec4(normal, 0.0)));
-#endif
+  #if defined(POINT)
+    normal_Cam = vec3(MV * vec4(normal, 0.0));
+    lightDir_Cam = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
+  #else
+    normal_World = normalize(vec3(M * vec4(normal, 0.0)));
+  #endif
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
   N = mat3(MV) * normal;
   T = mat3(MV) * tangent;
   B = cross(T, N);
-
-#if defined(POINT)
-  vec3 L = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
-#else
-  vec3 L = vec3(V * vec4(-lightForward, 0.0));
-#endif
+  #if defined(POINT)
+    vec3 L = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
+  #else
+    vec3 L = vec3(V * vec4(-lightForward, 0.0));
+  #endif
   lightDir_Tan = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
 #endif
 
-#if defined(BUMP)
+#if defined(BUMP) || defined(SPECULAR)
   eyeDir_Cam = normalize(vec3(0.0) - vertexPos_Cam);
 #endif
 }

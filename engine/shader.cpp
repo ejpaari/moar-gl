@@ -89,7 +89,6 @@ bool Shader::hasUniform(GLuint location) const
 
 bool Shader::compileShader(GLuint shader, const std::string& filename, const std::string& defines)
 {
-    // Todo: Repeatedly opening the same file for light shaders.
     std::ifstream shaderFile(filename.c_str());
     std::string shaderCode = GLSL_VERSION + defines;
 

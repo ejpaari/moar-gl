@@ -1,9 +1,14 @@
 #!/bin/bash
 
-BUILD_DIR=../build-moar-gl-Desktop_Qt_5_4_1_GCC_64bit-Debug
+BUILD_DIR=../build-moar-gl-Desktop_Qt_5_4_1_GCC_64bit-Release
 CPPCHECK_DIR=myapp/
 
-echo "Running valgrind with cachegrind..."
-VALGRIND_FILE=valgrind.txt
-valgrind --tool=cachegrind ./$BUILD_DIR/moar-gl
-echo "valgrind with cachegrind complete"
+function execute {
+echo "Running valgrind with $1..."
+valgrind --tool=$1 ./$BUILD_DIR/moar-gl
+echo "valgrind with $1 complete"
+}
+
+execute cachegrind
+echo ""
+execute callgrind

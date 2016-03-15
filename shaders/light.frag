@@ -18,6 +18,10 @@ layout (location = 23) uniform samplerCube depthTex;
 layout (location = 23) uniform sampler2D depthTex;
 #endif
 
+#if defined(SPECULAR)
+layout (location = 24) uniform sampler2D specularTex;
+#endif
+
 layout (location = 42) uniform int receiveShadows;
 #if defined(POINT)
 layout (location = 43) uniform float farPlane;
@@ -53,7 +57,7 @@ in vec3 B;
 in vec3 lightDir_Tan;
 #endif
 
-#if defined(BUMP)
+#if defined(BUMP) || defined(SPECULAR)
 in vec3 eyeDir_Cam;
 #endif
 
@@ -107,20 +111,13 @@ bool isTransparent(float alpha)
   return alpha < 0.1;
 }
 
-bool isTooFar(float lightPower)
-{
-  return lightPower < 0.05;
-}
-
 void main()
 {
+  outColor = vec4(0.0);
 #if defined(POINT)
   float lightDistance = length(lightPos - vertexPos_World);
-  float lightPower = lightColor.w / (lightDistance * lightDistance);
-
-  if (isTooFar(lightPower)) {
-    discard;
-  }
+  float lightDistSqr = lightDistance * lightDistance;
+  float lightPower = lightColor.w / lightDistSqr;
 #else
   float lightPower = lightColor.w;
 #endif
@@ -150,18 +147,21 @@ void main()
   vec4 texColor = vec4(1.0);
   float diff = 1.0;
 #endif
+  
+#if defined(DIFFUSE) || defined(SPECULAR)
+  #if defined(POINT)
+    vec3 n = normalize(normal_Cam);
+    vec3 l = normalize(lightDir_Cam);
+  #else
+    vec3 n = normal_World;
+    vec3 l = -lightForward;
+  #endif
+#endif
 
 #if defined(NORMAL)
   vec3 normal_Tan = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
   float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
 #elif defined(DIFFUSE)
-#if defined(POINT)
-  vec3 n = normalize(normal_Cam);
-  vec3 l = normalize(lightDir_Cam);
-#else
-  vec3 n = normal_World;
-  vec3 l = -lightForward;
-#endif
   float diff = clamp(dot(n,l), 0, 1);
 #endif
 
@@ -174,5 +174,21 @@ void main()
 #endif
   }
 
-  outColor = shadow * vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
+  outColor += shadow * vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
+
+#if defined(SPECULAR)
+  vec3 e = eyeDir_Cam;
+  vec3 r = reflect(-l,n);
+  float spec = clamp(dot(e,r), 0, 1);
+  float specularity = (1.0 - texture(specularTex, sampleCoord).r) * 10.0;
+  // Todo: Fine tune / fix specular power.
+  // Todo: Use normal from normal map if available.
+  float specular = pow(spec, specularity) * 0.15;
+  #if defined(POINT)
+    vec4 specSum = vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
+  #else
+    vec4 specSum = vec4(vec3(specular * lightPower), 1.0);
+  #endif
+  outColor += specSum;
+#endif
 }

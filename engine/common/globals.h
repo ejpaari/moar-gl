@@ -36,6 +36,7 @@ extern const GLuint DIFFUSE_TEX_LOCATION;
 extern const GLuint NORMAL_TEX_LOCATION;
 extern const GLuint BUMP_TEX_LOCATION;
 extern const GLuint DEPTH_TEX_LOCATION;
+extern const GLuint SPEC_TEX_LOCATION;
 
 extern const GLuint RENDERED_TEX_LOCATION;
 

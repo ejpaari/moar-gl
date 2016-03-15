@@ -27,8 +27,7 @@ void MyApp::start()
 #define SPONZA
 //#define MONKEY
 #define POINT_LIGHTS
-#define DIR_LIGHT
-// Todo: There's something wrong with postprocs.
+//#define DIR_LIGHT
 //#define POSTPROC
 
 #ifdef SPONZA
@@ -42,9 +41,14 @@ void MyApp::start()
     monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
     moar::Material* m = engine->getResourceManager()->createMaterial();
     m->setTexture(engine->getResourceManager()->getTexture("spnza_bricks_a_diff.tga"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
-    m->setTexture(engine->getResourceManager()->getTexture("brickwork_nmap.png"), moar::Material::NORMAL, GL_TEXTURE_2D);
-    m->setTexture(engine->getResourceManager()->getTexture("brickwork_bmap.png"), moar::Material::BUMP, GL_TEXTURE_2D);
-    int shaderType = moar::Shader::DIFFUSE | moar::Shader::NORMAL | moar::Shader::BUMP;
+    m->setTexture(engine->getResourceManager()->getTexture("spnza_bricks_a_spec.tga"), moar::Material::SPECULAR, GL_TEXTURE_2D);
+//    m->setTexture(engine->getResourceManager()->getTexture("brickwork_nmap.png"), moar::Material::NORMAL, GL_TEXTURE_2D);
+//    m->setTexture(engine->getResourceManager()->getTexture("brickwork_bmap.png"), moar::Material::BUMP, GL_TEXTURE_2D);
+    int shaderType =
+            moar::Shader::DIFFUSE |
+            moar::Shader::SPECULAR;
+//            moar::Shader::NORMAL |
+//            moar::Shader::BUMP;
     m->setShaderType(shaderType);
     for (auto& mo : monkey->getMeshObjects()) {
         mo.material = m;
