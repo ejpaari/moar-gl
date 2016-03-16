@@ -49,6 +49,10 @@ out vec3 lightDir_Tan;
 out vec3 eyeDir_Cam;
 #endif
 
+#if defined(SPECULAR) && defined(NORMAL)
+out vec3 eyeDir_Tan;
+#endif
+
 void main()
 {
   gl_Position = MVP * vec4(position, 1.0);
@@ -84,5 +88,9 @@ void main()
 
 #if defined(BUMP) || defined(SPECULAR)
   eyeDir_Cam = normalize(vec3(0.0) - vertexPos_Cam);
+#endif
+
+#if defined(SPECULAR) && defined(NORMAL)
+  eyeDir_Tan = normalize(vec3(dot(eyeDir_Cam, T), dot(eyeDir_Cam, B), dot(eyeDir_Cam, N)));
 #endif
 }

@@ -61,6 +61,10 @@ in vec3 lightDir_Tan;
 in vec3 eyeDir_Cam;
 #endif
 
+#if defined(SPECULAR) && defined(NORMAL)
+in vec3 eyeDir_Tan;
+#endif
+
 #if defined(BUMP)
 const float BUMP_DEPTH = 0.025;
 const int NUM_STEPS = 50;
@@ -147,8 +151,11 @@ void main()
   vec4 texColor = vec4(1.0);
   float diff = 1.0;
 #endif
-  
-#if defined(DIFFUSE) || defined(SPECULAR)
+
+#if defined(NORMAL)
+  vec3 normal_Tan = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
+  float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
+#elif defined(DIFFUSE) || defined(SPECULAR)
   #if defined(POINT)
     vec3 n = normalize(normal_Cam);
     vec3 l = normalize(lightDir_Cam);
@@ -156,13 +163,7 @@ void main()
     vec3 n = normal_World;
     vec3 l = -lightForward;
   #endif
-#endif
-
-#if defined(NORMAL)
-  vec3 normal_Tan = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
-  float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
-#elif defined(DIFFUSE)
-  float diff = clamp(dot(n,l), 0, 1);
+  float diff = clamp(dot(n, l), 0, 1);
 #endif
 
   float shadow = 1.0;
@@ -177,18 +178,19 @@ void main()
   outColor += shadow * vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
 
 #if defined(SPECULAR)
-  vec3 e = eyeDir_Cam;
-  vec3 r = reflect(-l,n);
-  float spec = clamp(dot(e,r), 0, 1);
-  float specularity = (1.0 - texture(specularTex, sampleCoord).r) * 10.0;
-  // Todo: Fine tune / fix specular power.
-  // Todo: Use normal from normal map if available.
-  float specular = pow(spec, specularity) * 0.15;
-  #if defined(POINT)
-    vec4 specSum = vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
+  #if defined(NORMAL)
+    vec3 e = eyeDir_Tan;
+    vec3 r = reflect(-lightDir_Tan, normal_Tan);
   #else
-    vec4 specSum = vec4(vec3(specular * lightPower), 1.0);
+    vec3 e = eyeDir_Cam;
+    vec3 r = reflect(-l, n);
   #endif
-  outColor += specSum;
+  float spec = clamp(dot(e, r), 0, 1);
+  float specular = pow(spec, 10.0f) * texture(specularTex, sampleCoord).r;
+  #if defined(POINT)
+    outColor +=  vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
+  #else
+    outColor += vec4(vec3(specular * lightPower), 1.0);
+  #endif
 #endif
 }
