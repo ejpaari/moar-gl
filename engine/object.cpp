@@ -18,9 +18,15 @@ const glm::vec3 Object::LEFT = glm::vec3(-1.0f, 0.0f, 0.0f);
 const glm::mat4* Object::projection = nullptr;
 const glm::mat4* Object::view = nullptr;
 
+glm::mat4 Object::viewProjection;
 unsigned int Object::idCounter = 0;
 GLuint Object::transformationBlockBuffer = 0;
 Material* Object::defaultMaterial = nullptr;
+
+void Object::updateViewProjectionMatrix()
+{
+    viewProjection = (*projection) * (*view);
+}
 
 Object::Object() :
     id(++idCounter)
@@ -137,8 +143,8 @@ void Object::setUniforms(const Shader* shader)
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLintptr matrixSize = sizeof(modelMatrix);
     glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(modelMatrix));
-    glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr((*view) * modelMatrix));
-    glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr((*projection) * (*view) * modelMatrix));
+    glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr(modelViewMatrix));
+    glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr(modelViewProjectionMatrix));
     glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
 
     if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
@@ -152,6 +158,8 @@ void Object::updateModelMatrix()
             glm::translate(position) *
             glm::yawPitchRoll(rotation.y, rotation.x, rotation.z) *
             glm::scale(scale);
+    modelViewMatrix = (*view) * modelMatrix;
+    modelViewProjectionMatrix = viewProjection * modelMatrix;
 }
 
 glm::mat4x4 Object::getModelMatrix() const

@@ -538,10 +538,11 @@ void Engine::updateObjectContainers()
 
 void Engine::updateObjects()
 {
+    Object::updateViewProjectionMatrix();
     for (const std::shared_ptr<Object>& obj : allObjects) {
         obj->updateModelMatrix();
     }
-    camera->updateViewMatrix();
+    camera->updateViewMatrix();    
     skybox->setPosition(camera->getPosition());
     skybox->updateModelMatrix();
 }

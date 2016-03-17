@@ -12,6 +12,10 @@ CONFIG -= app_bundle
 CONFIG += c++11
 DEFINES += DEBUG
 
+#QMAKE_CXXFLAGS_DEBUG *= -pg
+#QMAKE_LFLAGS_DEBUG *= -pg
+#CONFIG += debug
+
 TEMPLATE = app
 
 DISTFILES += \

@@ -40,6 +40,8 @@ public:
     static const glm::mat4* projection;
     static const glm::mat4* view;
 
+    static void updateViewProjectionMatrix();
+
     explicit Object();
     virtual ~Object();
     Object(const Object&) = delete;
@@ -89,6 +91,7 @@ protected:
     glm::vec3 left = LEFT;
 
 private:
+    static glm::mat4 viewProjection;
     static unsigned int idCounter;
     static GLuint transformationBlockBuffer;
     static Material* defaultMaterial;
@@ -106,6 +109,8 @@ private:
     bool shadowReceiver = true;
 
     glm::mat4x4 modelMatrix;
+    glm::mat4x4 modelViewMatrix;
+    glm::mat4x4 modelViewProjectionMatrix;
 
     std::unique_ptr<Light> light = nullptr;
     Model* model = nullptr;
