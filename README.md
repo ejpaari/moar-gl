@@ -16,7 +16,7 @@ GLFW & Assimp as submodules
 
 Sponza model from http://www.crytek.com/cryengine/cryengine3/downloads
 
-### Grahpic features:
+### Graphic features:
 - Multi-pass forward rendering with ambient pass
 - Diffuse, normal, bump and specular mapping
 - Real-time hard shadows
