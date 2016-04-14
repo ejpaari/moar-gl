@@ -1,5 +1,7 @@
 # moar-gl
 
+### Tools:
+
 C++11
 
 GLEW 7.0
@@ -13,3 +15,14 @@ Boost 1.57.0
 GLFW & Assimp as submodules
 
 Sponza model from http://www.crytek.com/cryengine/cryengine3/downloads
+
+### Grahpic features:
+- Multi-pass forward rendering with ambient pass
+- Diffuse, normal, bump and specular mapping
+- Real-time hard shadows
+- Point and directional lighting
+- Post-processing shaders
+- Frustum culling (bounding sphere)
+- Skybox
+
+http://i.imgur.com/rtqzEtS.jpg
