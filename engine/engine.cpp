@@ -163,6 +163,7 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << e.what() << "\n";
         return false;
     }
+    glEnable(GL_MULTISAMPLE);
 
     int windowWidth = 800;
     int windowHeight = 600;
@@ -268,7 +269,7 @@ bool Engine::init(const std::string& settingsFile)
     }
 
     Framebuffer::setSize(renderSettings.windowWidth, renderSettings.windowHeight);
-    bool framebuffersInitialized = fb1.init() && fb2.init();
+    bool framebuffersInitialized = fb1.init(true) && fb2.init(true) && blitBuffer.init(false);
     if (!framebuffersInitialized) {
         std::cerr << "ERROR: Framebuffer status is incomplete\n";
         return false;
@@ -420,20 +421,25 @@ void Engine::render()
         }
     }
 
-    // Post-process ping-pong    
-    GLuint renderedTex = fb->getRenderedTexture();
+    // Post-process ping-pong
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
     int i = 0;
+    GLuint renderedTex = 0;
     for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
+        blitBuffer.blit(fb->getFramebuffer());
+        renderedTex = blitBuffer.getRenderedTexture();
         fb = i % 2 == 0 ? &fb2 : &fb1;
         fb->setPreviousFrame(renderedTex);
         fb->bind();
         iter->bind();
         fb->activate();
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        renderedTex = fb->getRenderedTexture();
         ++i;
     }
+
+    blitBuffer.blit(fb->getFramebuffer());
+    renderedTex = blitBuffer.getRenderedTexture();
+
     passthrough.bind();
     fb = postprocs.size() % 2 == 0 ? &fb1 : &fb2;
     fb->setPreviousFrame(renderedTex);
@@ -444,9 +450,9 @@ void Engine::render()
 
 void Engine::lighting(Light::Type lightType)
 {
-    DepthMap* depthMap = nullptr;        
+    DepthMap* depthMap = nullptr;
     if (lightType == Light::DIRECTIONAL) {
-        depthMap = &depthMapDir;        
+        depthMap = &depthMapDir;
     } else {
         depthMap = &depthMapPoint;
     }
@@ -542,7 +548,7 @@ void Engine::updateObjects()
     for (const std::shared_ptr<Object>& obj : allObjects) {
         obj->updateModelMatrix();
     }
-    camera->updateViewMatrix();    
+    camera->updateViewMatrix();
     skybox->setPosition(camera->getPosition());
     skybox->updateModelMatrix();
 }

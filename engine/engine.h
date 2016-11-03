@@ -81,6 +81,7 @@ private:
     DepthMapPoint depthMapPoint;
     Framebuffer fb1;
     Framebuffer fb2;
+    Framebuffer blitBuffer;
     Framebuffer* fb = nullptr;
     const Shader* shader = nullptr;
     Postprocess passthrough;

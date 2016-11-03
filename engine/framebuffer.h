@@ -18,12 +18,14 @@ public:
     Framebuffer& operator=(const Framebuffer&) = delete;
     Framebuffer& operator=(Framebuffer&&) = delete;
 
-    bool init();
+    bool init(bool multisample);
     void activate();
     void bind() const;
+    void blit(GLuint blitBuffer) const;
 
     void setPreviousFrame(GLuint texture);
     GLuint getRenderedTexture() const;
+    GLuint getFramebuffer() const;
 
 private:
     static int width;
