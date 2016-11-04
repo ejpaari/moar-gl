@@ -188,7 +188,7 @@ void main()
   float spec = clamp(dot(e, r), 0, 1);
   float specular = pow(spec, 10.0f) * texture(specularTex, sampleCoord).r;
   #if defined(POINT)
-    outColor +=  vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
+    outColor += vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
   #else
     outColor += vec4(vec3(specular * lightPower), 1.0);
   #endif

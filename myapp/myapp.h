@@ -28,7 +28,7 @@ private:
     void initGUI();
     moar::Object* createRenderObject(const std::string& modelName);
     moar::Object* createLight(const glm::vec4& color, moar::Light::Type type = moar::Light::POINT);
-    void resetCamera();
+    void resetCamera(int spot);
 
     moar::Camera* camera = nullptr;
     moar::Input* input = nullptr;

@@ -21,7 +21,7 @@ public:
     bool init(bool multisample);
     void activate();
     void bind() const;
-    void blit(GLuint blitBuffer) const;
+    GLuint blit(GLuint blitBuffer) const;
 
     void setPreviousFrame(GLuint texture);
     GLuint getRenderedTexture() const;

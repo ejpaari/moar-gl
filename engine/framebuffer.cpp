@@ -34,7 +34,7 @@ bool Framebuffer::init(bool multisample)
 
     if (multisample) {
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, renderedTexture);
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, width, height, GL_TRUE);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, width, height, GL_TRUE);
 
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, renderedTexture, 0);
@@ -46,7 +46,7 @@ bool Framebuffer::init(bool multisample)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
     } else {
         glBindTexture(GL_TEXTURE_2D, renderedTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -92,11 +92,12 @@ void Framebuffer::bind() const
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 
-void Framebuffer::blit(GLuint blitBuffer) const
+GLuint Framebuffer::blit(GLuint blitBuffer) const
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, blitBuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    return renderedTexture;
 }
 
 void Framebuffer::setPreviousFrame(GLuint texture)

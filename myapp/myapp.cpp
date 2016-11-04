@@ -18,8 +18,7 @@ MyApp::~MyApp()
 
 void MyApp::start()
 {
-    camera = engine->getCamera();
-    resetCamera();
+    camera = engine->getCamera();    
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
     time = engine->getTime();
@@ -29,6 +28,8 @@ void MyApp::start()
 #define POINT_LIGHTS
 //#define DIR_LIGHT
 //#define POSTPROC
+#define HDR
+//#define HDR_LIGHT
 
 #ifdef SPONZA
     moar::Object* sponza = createRenderObject("sponza.obj");
@@ -66,7 +67,7 @@ void MyApp::start()
     light2b->getComponent<moar::Light>()->setShadowingEnabled(false);
     // Lion light.
     light3 = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
-    light3->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));
+    light3->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));    
 #endif
 
 #ifdef DIR_LIGHT
@@ -81,7 +82,17 @@ void MyApp::start()
     camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 #endif
 
+#ifdef HDR
+    camera->addPostprocess("hdr", engine->getResourceManager()->getShader("hdr")->getProgram(), 1);
+#endif
+
+#ifdef HDR_LIGHT
+    auto hdrLight = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
+    hdrLight->setPosition(glm::vec3(4.97f, 0.22f, -2.37f));
+#endif
+
     initGUI();
+    resetCamera(1);
 }
 
 void MyApp::handleInput(GLFWwindow* window)
@@ -109,8 +120,11 @@ void MyApp::handleInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera->move(-camera->getLeft() * input->getMovementSpeed() * time->getDelta());
     }
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        resetCamera();
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        resetCamera(1);
+    }
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        resetCamera(2);
     }
 
     camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());
@@ -172,8 +186,20 @@ moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
     return light;
 }
 
-void MyApp::resetCamera()
+void MyApp::resetCamera(int spot)
 {
-    camera->setPosition(glm::vec3(0.0f, 0.5f, 0.5f));
-    camera->setRotation(glm::vec3(0.0f, 0.9f, 0.0f));
+    switch(spot) {
+    case 1: {
+        camera->setPosition(glm::vec3(0.0f, 0.5f, 0.5f));
+        camera->setRotation(glm::vec3(0.0f, 0.9f, 0.0f));
+        break;
+    }
+    case 2: {
+        camera->setPosition(glm::vec3(1.8f, 0.9f, -1.5f));
+        camera->setRotation(glm::vec3(0.0f, -1.2f, 0.0f));
+        break;
+    }
+    default: {
+    }
+    }
 }

@@ -20,3 +20,6 @@ offset.frag
 passthrough.vert
 passthrough.frag
 
+hdr.vert
+hdr.frag
+

@@ -424,24 +424,25 @@ void Engine::render()
     // Post-process ping-pong
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
     int i = 0;
-    blitBuffer.blit(fb->getFramebuffer());
-    GLuint renderedTex = blitBuffer.getRenderedTexture();
     for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
+        GLuint renderedTex = blitBuffer.blit(fb->getFramebuffer());
         fb = i % 2 == 0 ? &fb2 : &fb1;
         fb->setPreviousFrame(renderedTex);
-        fb->bind();
+        fb->bind();        
         iter->bind();
         fb->activate();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        renderedTex = fb->getRenderedTexture();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDrawArrays(GL_TRIANGLES, 0, 6);        
         ++i;
     }
 
     passthrough.bind();
+    GLuint renderedTex = blitBuffer.blit(fb->getFramebuffer());
     fb = postprocs.size() % 2 == 0 ? &fb1 : &fb2;
     fb->setPreviousFrame(renderedTex);
     fb->activate();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
