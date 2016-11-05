@@ -23,3 +23,9 @@ passthrough.frag
 hdr.vert
 hdr.frag
 
+bloom.vert
+bloom.frag
+
+bloom_blend.vert
+bloom_blend.frag
+
