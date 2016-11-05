@@ -263,7 +263,7 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    depthMapPoint.setSize(512, 512);
+    depthMapPoint.setSize(1024, 1024);
     if (!depthMapPoint.init()) {
         return false;
     }

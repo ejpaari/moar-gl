@@ -59,15 +59,15 @@ void MyApp::start()
 #endif
 
 #ifdef POINT_LIGHTS
-    light1a = createLight(glm::vec4(1.0f, 0.8f, 0.6f, 1.2f));
-    light1b = createLight(glm::vec4(0.6f, 0.8f, 1.0f, 1.3f));
-    light1b->getComponent<moar::Light>()->setShadowingEnabled(false);
-    light2a = createLight(glm::vec4(0.6f, 1.0f, 0.8f, 1.2f));
-    light2b = createLight(glm::vec4(1.0f, 0.6f, 0.8f, 1.3f));
-    light2b->getComponent<moar::Light>()->setShadowingEnabled(false);
+    light1 = createLight(glm::vec4(1.0f, 0.8f, 0.6f, 1.2f));
+    light2 = createLight(glm::vec4(0.6f, 0.8f, 1.0f, 1.3f));
+    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
+    light3 = createLight(glm::vec4(0.6f, 1.0f, 0.8f, 1.2f));
+    light4 = createLight(glm::vec4(1.0f, 0.6f, 0.8f, 1.3f));
+    light4->getComponent<moar::Light>()->setShadowingEnabled(false);
     // Lion light.
-    light3 = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
-    light3->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));    
+    light5 = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
+    light5->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));
 #endif
 
 #ifdef DIR_LIGHT
@@ -144,11 +144,11 @@ void MyApp::update()
 #ifdef POINT_LIGHTS
     float t = time->getTime();
     float sint = static_cast<float>(sin(t));
-    light1a->setPosition(glm::vec3(1.5 + sin(t * 0.1), 1.8 + (sint * 0.3), 0.0f));
-    light1b->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.5), 0.0f));
-    light2a->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
-    light2b->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
-    light3->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.03f));
+    light1->setPosition(glm::vec3(1.5 + sin(t * 0.1), 1.8 + (sint * 0.3), 0.0f));
+    light2->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.5), 0.0f));
+    light3->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
+    light4->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
+    light5->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.03f));
 #endif
     position = camera->getPosition();
 
