@@ -39,6 +39,11 @@ public:
     bool removePostprocess(const std::string& name);
     const std::list<Postprocess>& getPostprocesses() const;
 
+    unsigned int getBloomIterations() const;
+    void setBloomIterations(unsigned int iterations);
+    bool isHDREnabled() const;
+    void setHDREnabled(bool status);
+
 private:
     enum Side
     {
@@ -69,6 +74,8 @@ private:
     std::unique_ptr<glm::mat4> projectionMatrix;
 
     std::list<Postprocess> postprocs;
+    unsigned int bloomIterations = 0;
+    bool useHDR = false;
 };
 
 } // moar

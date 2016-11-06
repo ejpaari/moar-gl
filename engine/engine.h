@@ -11,6 +11,7 @@
 #include "object.h"
 #include "light.h"
 #include "framebuffer.h"
+#include "post_framebuffer.h"
 #include "depthmap_dir.h"
 #include "depthmap_point.h"
 #include "shader.h"
@@ -56,6 +57,7 @@ private:
     void printInfo(int windowWidth, int windowHeight);
     bool createSkybox();
     bool objectInsideFrustum(const Object::MeshObject& mo) const;
+    void setPostFramebuffer();
 
     std::shared_ptr<Application> app;
 
@@ -79,10 +81,12 @@ private:
 
     DepthMapDirectional depthMapDir;
     DepthMapPoint depthMapPoint;
-    Framebuffer fb1;
-    Framebuffer fb2;
-    Framebuffer blitBuffer;
-    Framebuffer* fb = nullptr;
+    Framebuffer fb;
+    PostFramebuffer postBuffer1;
+    PostFramebuffer postBuffer2;
+    PostFramebuffer blitBuffer1;
+    PostFramebuffer blitBuffer2;
+    PostFramebuffer* postBuffer = nullptr;
     const Shader* shader = nullptr;
     Postprocess passthrough;
 };

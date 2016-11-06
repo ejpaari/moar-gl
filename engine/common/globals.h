@@ -38,12 +38,14 @@ extern const GLuint BUMP_TEX_LOCATION;
 extern const GLuint DEPTH_TEX_LOCATION;
 extern const GLuint SPEC_TEX_LOCATION;
 
-extern const GLuint RENDERED_TEX_LOCATION;
+extern const GLuint RENDERED_TEX_LOCATION0;
+extern const GLuint RENDERED_TEX_LOCATION1;
 
 extern const GLuint TIME_LOCATION;
 extern const GLuint SCREEN_SIZE_LOCATION;
 extern const GLuint RECEIVE_SHADOWS_LOCATION;
 extern const GLuint FAR_CLIP_DISTANCE_LOCATION;
+extern const GLuint BLOOM_FILTER_HORIZONTAL;
 
 extern const GLuint LIGHT_SPACE_PROJ_LOCATION;
 extern const GLuint LIGHT_SPACE_VP_LOCATION;

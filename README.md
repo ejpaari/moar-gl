@@ -21,8 +21,9 @@ Sponza model from http://www.crytek.com/cryengine/cryengine3/downloads
 - Diffuse, normal, bump and specular mapping
 - Real-time hard shadows
 - Point and directional lighting
-- Post-processing shaders
+- Bloom & HDR
+- Custom post-processing shaders
 - Frustum culling (bounding sphere)
 - Skybox
 
-http://i.imgur.com/rtqzEtS.jpg
+http://imgur.com/a/IxZIF

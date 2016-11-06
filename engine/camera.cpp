@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
+#include <cassert>
 
 namespace moar
 {
@@ -118,6 +119,27 @@ bool Camera::removePostprocess(const std::string& name)
 const std::list<Postprocess>& Camera::getPostprocesses() const
 {
     return postprocs;
+}
+
+unsigned int Camera::getBloomIterations() const
+{
+    return bloomIterations;
+}
+
+void Camera::setBloomIterations(unsigned int iterations)
+{
+    assert(iterations % 2 == 0);
+    bloomIterations = iterations;
+}
+
+bool Camera::isHDREnabled() const
+{
+    return useHDR;
+}
+
+void Camera::setHDREnabled(bool status)
+{
+    useHDR = status;
 }
 
 void Camera::updateViewMatrix()

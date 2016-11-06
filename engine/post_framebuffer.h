@@ -1,29 +1,31 @@
-#ifndef FRAMEBUFFER_H
-#define FRAMEBUFFER_H
+#ifndef POSTFRAMEBUFFER_H
+#define POSTFRAMEBUFFER_H
 
 #include <GL/glew.h>
+#include <vector>
 
 namespace moar
 {
 
-class Framebuffer
+class PostFramebuffer
 {
 public:
     static void setSize(int width, int height);
 
-    explicit Framebuffer();
-    ~Framebuffer();
-    Framebuffer(const Framebuffer&) = delete;
-    Framebuffer(Framebuffer&&) = delete;
-    Framebuffer& operator=(const Framebuffer&) = delete;
-    Framebuffer& operator=(Framebuffer&&) = delete;
+    explicit PostFramebuffer();
+    ~PostFramebuffer();
+    PostFramebuffer(const PostFramebuffer&) = delete;
+    PostFramebuffer(PostFramebuffer&&) = delete;
+    PostFramebuffer& operator=(const PostFramebuffer&) = delete;
+    PostFramebuffer& operator=(PostFramebuffer&&) = delete;
 
-    bool init(bool multisample);
+    bool init();
     void activate();
     void bind() const;
-    GLuint blit(GLuint blitBuffer) const;
+    GLuint draw(const std::vector<GLuint>& textures);
+    GLuint blit(GLuint blitBuffer, int attachment) const;
 
-    void setPreviousFrame(GLuint texture);
+    void setInputTextures(const std::vector<GLuint>& textures);
     GLuint getRenderedTexture() const;
     GLuint getFramebuffer() const;
 
@@ -33,12 +35,11 @@ private:
 
     GLuint framebuffer;
     GLuint renderedTexture;
-    GLuint depthRenderbuffer;
     GLuint quadVAO;
     GLuint quadBuffer;
-    GLuint previousFrame;
+    std::vector<GLuint> inputTextures;
 };
 
 } // moar
 
-#endif // FRAMEBUFFER_H
+#endif // POSTFRAMEBUFFER_H

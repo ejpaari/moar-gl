@@ -269,7 +269,13 @@ bool Engine::init(const std::string& settingsFile)
     }
 
     Framebuffer::setSize(renderSettings.windowWidth, renderSettings.windowHeight);
-    bool framebuffersInitialized = fb1.init(true) && fb2.init(true) && blitBuffer.init(false);
+    PostFramebuffer::setSize(renderSettings.windowWidth, renderSettings.windowHeight);
+    bool framebuffersInitialized =
+            fb.init(2) &&
+            postBuffer1.init() &&
+            postBuffer2.init() &&
+            blitBuffer1.init() &&
+            blitBuffer2.init();
     if (!framebuffersInitialized) {
         std::cerr << "ERROR: Framebuffer status is incomplete\n";
         return false;
@@ -369,8 +375,7 @@ Object* Engine::createObject()
 
 void Engine::render()
 {
-    fb = &fb1;
-    fb->bind();
+    fb.bind();
     objectsInFrustum.clear();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -423,24 +428,38 @@ void Engine::render()
 
     // Post-process ping-pong
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
-    int i = 0;
+    GLuint renderedTex = blitBuffer1.blit(fb.getFramebuffer(), 0);
+
+    if (camera->getBloomIterations() > 0) {
+        GLuint bloomTex = blitBuffer2.blit(fb.getFramebuffer(), 1);
+        glUseProgram(manager.getShader("bloom_blur")->getProgram());
+        GLboolean horizontal = true;
+        for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
+            glUniform1i(moar::BLOOM_FILTER_HORIZONTAL, horizontal);
+            setPostFramebuffer();
+            bloomTex = postBuffer->draw(std::vector<GLuint>(1, bloomTex));
+            horizontal = !horizontal;
+        }
+        glUseProgram(manager.getShader("bloom_blend")->getProgram());
+        renderedTex = blitBuffer2.draw(std::vector<GLuint>{renderedTex, bloomTex});
+    }
+
+    if (camera->isHDREnabled()) {
+        glUseProgram(manager.getShader("hdr")->getProgram());
+        setPostFramebuffer();
+        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
+    }
+
     for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
-        GLuint renderedTex = blitBuffer.blit(fb->getFramebuffer());
-        fb = i % 2 == 0 ? &fb2 : &fb1;
-        fb->setPreviousFrame(renderedTex);
-        fb->bind();        
         iter->bind();
-        fb->activate();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, 6);        
-        ++i;
+        setPostFramebuffer();
+        renderedTex = postBuffer->draw(std::vector<GLuint>(1, renderedTex));
     }
 
     passthrough.bind();
-    GLuint renderedTex = blitBuffer.blit(fb->getFramebuffer());
-    fb = postprocs.size() % 2 == 0 ? &fb1 : &fb2;
-    fb->setPreviousFrame(renderedTex);
-    fb->activate();
+    setPostFramebuffer();
+    postBuffer->setInputTextures(std::vector<GLuint>(1, renderedTex));
+    postBuffer->activate();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -475,7 +494,7 @@ void Engine::lighting(Light::Type lightType)
             }
         }
 
-        fb->bind();
+        fb.bind();
 
         for (auto& shaderMeshMap : renderMeshes) {
             shader = manager.getShader(shaderMeshMap.first, lightType);
@@ -599,6 +618,11 @@ bool Engine::objectInsideFrustum(const Object::MeshObject& mo) const
     float scaleMultiplier = std::max(std::max(scale.x, scale.y), scale.z);
     float radius = mo.mesh->getBoundingRadius() * scaleMultiplier ;
     return camera->sphereInsideFrustum(point, radius);
+}
+
+void Engine::setPostFramebuffer()
+{
+    postBuffer = postBuffer != &postBuffer1 ? &postBuffer1 : &postBuffer2;
 }
 
 } // moar

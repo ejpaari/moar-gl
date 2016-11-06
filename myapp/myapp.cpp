@@ -26,10 +26,12 @@ void MyApp::start()
 #define SPONZA
 //#define MONKEY
 #define POINT_LIGHTS
+#define MOVE
 //#define DIR_LIGHT
 //#define POSTPROC
-#define HDR
-//#define HDR_LIGHT
+#define HDR_BLOOM
+//#define CORNER_LIGHT
+//#define GUI
 
 #ifdef SPONZA
     moar::Object* sponza = createRenderObject("sponza.obj");
@@ -82,11 +84,12 @@ void MyApp::start()
     camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 #endif
 
-#ifdef HDR
-    camera->addPostprocess("hdr", engine->getResourceManager()->getShader("hdr")->getProgram(), 1);
+#ifdef HDR_BLOOM
+    camera->setHDREnabled(true);
+    camera->setBloomIterations(12);
 #endif
 
-#ifdef HDR_LIGHT
+#ifdef CORNER_LIGHT
     auto hdrLight = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
     hdrLight->setPosition(glm::vec3(4.97f, 0.22f, -2.37f));
 #endif
@@ -120,6 +123,18 @@ void MyApp::handleInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         camera->move(-camera->getLeft() * input->getMovementSpeed() * time->getDelta());
     }
+    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+        camera->setBloomIterations(0);
+    }
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+        camera->setBloomIterations(12);
+    }
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
+        camera->setHDREnabled(false);
+    }
+    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+        camera->setHDREnabled(true);
+    }
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         resetCamera(1);
     }
@@ -142,6 +157,7 @@ void MyApp::update()
         fpsCounter = 0;
     }
 #ifdef POINT_LIGHTS
+#ifdef MOVE
     float t = time->getTime();
     float sint = static_cast<float>(sin(t));
     light1->setPosition(glm::vec3(1.5 + sin(t * 0.1), 1.8 + (sint * 0.3), 0.0f));
@@ -149,6 +165,7 @@ void MyApp::update()
     light3->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
     light4->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
     light5->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.03f));
+#endif
 #endif
     position = camera->getPosition();
 
@@ -159,10 +176,12 @@ void MyApp::update()
 
 void MyApp::initGUI()
 {
+#ifdef GUI
     bar = TwNewBar("GUI");
     TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
     TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
     TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
+#endif
 }
 
 moar::Object* MyApp::createRenderObject(const std::string& modelName)
