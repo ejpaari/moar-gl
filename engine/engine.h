@@ -11,9 +11,9 @@
 #include "object.h"
 #include "light.h"
 #include "framebuffer.h"
-#include "post_framebuffer.h"
-#include "depthmap_dir.h"
-#include "depthmap_point.h"
+#include "postframebuffer.h"
+#include "depthmapdir.h"
+#include "depthmappoint.h"
 #include "shader.h"
 
 #include <GL/glew.h>
@@ -47,9 +47,11 @@ public:
     RenderSettings* getRenderSettings();
     Time* getTime();
 
-    Object* createObject();
+    Object* createObject(const std::string& name = "");
+    bool loadLevel(const std::string& level);
 
 private:
+    void resetLevel();
     void render();
     void lighting(Light::Type lightType);
     void updateObjectContainers();

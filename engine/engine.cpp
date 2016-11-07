@@ -5,11 +5,14 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/exceptions.hpp>
 #include <exception>
 #include <utility>
+#include <fstream>
 #include <algorithm>
 
 namespace
@@ -283,7 +286,7 @@ bool Engine::init(const std::string& settingsFile)
 
     passthrough = Postprocess("passthrough", manager.getShader("passthrough")->getProgram(), 0);
 
-    lights.resize(Light::Type::NUM_TYPES);
+    resetLevel();
 
     Material* material = manager.createMaterial();
     material->setTexture(manager.getTexture("brick.png"), moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
@@ -366,11 +369,91 @@ Time*Engine::getTime()
     return &time;
 }
 
-Object* Engine::createObject()
+Object* Engine::createObject(const std::string& name)
 {
-    std::shared_ptr<moar::Object> obj(new moar::Object());
+    std::shared_ptr<moar::Object> obj(new moar::Object(name));
     allObjects.push_back(obj);
     return obj.get();
+}
+
+bool Engine::loadLevel(const std::string& level)
+{
+    std::ifstream ifs(level.c_str());
+    if (!ifs) {
+        std::cerr << "WARNING: Could not open level file: " << level << "\n";
+        return false;
+    }
+
+    std::string word;
+
+    Object* obj = nullptr;
+    try {
+        float x, y, z, w;
+        bool a, b;
+        while (ifs) {
+            ifs >> word;
+            boost::trim(word);
+            if (word.empty()) {
+                continue;
+            }
+            if (word[0] == '#') {
+                std::getline(ifs, word);
+                continue;
+            }
+            if (word == "name") {
+                ifs >> word;
+                obj = createObject(word);
+                ifs >> x >> y >> z;
+                obj->setPosition(glm::vec3(x, y, z));
+                ifs >> x >> y >> z;
+                obj->setRotation(glm::vec3(x, y, z));
+                ifs >> x >> y >> z;
+                obj->setScale(glm::vec3(x, y, z));
+                ifs >> a >> b;
+                obj->setShadowCaster(a);
+                obj->setShadowReceiver(b);
+                word.clear();
+            }
+            if (word == "component") {
+                if (!obj) {
+                    throw std::runtime_error("Component without an object");
+                }
+                ifs >> word;
+                if (word == "model") {
+                    ifs >> word;
+                    Model* modelComponent = getResourceManager()->getModel(word);
+                    obj->addComponent<Model>(modelComponent);
+                    word.clear();
+                }
+                if (word == "light") {
+                    Light* lightComponent = obj->addComponent<Light>();
+                    ifs >> x >> y >> z >> w;
+                    lightComponent->setColor(glm::vec4(x, y, z, w));
+                    ifs >> word;
+                    if (word == "point") {
+                        lightComponent->setType(Light::Type::POINT);
+                    } else if (word == "directional") {
+                        lightComponent->setType(Light::Type::DIRECTIONAL);
+                    } else {
+                        throw std::runtime_error("Unknown light type: " + word);
+                    }
+                    word.clear();
+                }
+            }
+        }
+    } catch (std::exception& e) {
+        std::cerr << "WARNING: Could not parse level: " << level << " - " << e.what() << "\n";
+        return false;
+    }
+    return true;
+}
+
+void Engine::resetLevel()
+{
+    renderMeshes.clear();
+    lights.clear();
+    lights.resize(Light::Type::NUM_TYPES);
+    allObjects.clear();
 }
 
 void Engine::render()

@@ -22,21 +22,16 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
     time = engine->getTime();
+    if (!engine->loadLevel("sponza.lvl")) {
+        std::cerr << "WARNING: Level loading failed\n";
+    }
 
-#define SPONZA
 //#define MONKEY
-#define POINT_LIGHTS
-#define MOVE
+//#define MOVE
 //#define DIR_LIGHT
 //#define POSTPROC
 #define HDR_BLOOM
-//#define CORNER_LIGHT
 //#define GUI
-
-#ifdef SPONZA
-    moar::Object* sponza = createRenderObject("sponza.obj");
-    sponza->setScale(glm::vec3(0.004f, 0.004f, 0.004f));
-#endif
 
 #ifdef MONKEY
     monkey = engine->createObject();
@@ -60,24 +55,6 @@ void MyApp::start()
     monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
 #endif
 
-#ifdef POINT_LIGHTS
-    light1 = createLight(glm::vec4(1.0f, 0.8f, 0.6f, 1.2f));
-    light2 = createLight(glm::vec4(0.6f, 0.8f, 1.0f, 1.3f));
-    light2->getComponent<moar::Light>()->setShadowingEnabled(false);
-    light3 = createLight(glm::vec4(0.6f, 1.0f, 0.8f, 1.2f));
-    light4 = createLight(glm::vec4(1.0f, 0.6f, 0.8f, 1.3f));
-    light4->getComponent<moar::Light>()->setShadowingEnabled(false);
-    // Lion light.
-    light5 = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
-    light5->setPosition(glm::vec3(-5.0f, 0.5f, -0.4f));
-#endif
-
-#ifdef DIR_LIGHT
-    moar::Object* dirLight = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f), moar::Light::DIRECTIONAL);
-    dirLight->setPosition(glm::vec3(0.0f, 5.0f, 0.0f));
-    dirLight->setRotation(glm::vec3(-1.5f, 0.0f, 0.0f));
-#endif
-
 #ifdef POSTPROC
     offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
     offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
@@ -87,11 +64,6 @@ void MyApp::start()
 #ifdef HDR_BLOOM
     camera->setHDREnabled(true);
     camera->setBloomIterations(12);
-#endif
-
-#ifdef CORNER_LIGHT
-    auto hdrLight = createLight(glm::vec4(0.8f, 0.9f, 1.0f, 0.5f));
-    hdrLight->setPosition(glm::vec3(4.97f, 0.22f, -2.37f));
 #endif
 
     initGUI();
@@ -156,7 +128,6 @@ void MyApp::update()
         timeCounter = 0.0;
         fpsCounter = 0;
     }
-#ifdef POINT_LIGHTS
 #ifdef MOVE
     float t = time->getTime();
     float sint = static_cast<float>(sin(t));
@@ -165,7 +136,6 @@ void MyApp::update()
     light3->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
     light4->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
     light5->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.03f));
-#endif
 #endif
     position = camera->getPosition();
 
@@ -182,27 +152,6 @@ void MyApp::initGUI()
     TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
     TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
 #endif
-}
-
-moar::Object* MyApp::createRenderObject(const std::string& modelName)
-{
-    moar::Object* renderObj= engine->createObject();
-    moar::Model* model = engine->getResourceManager()->getModel(modelName);
-    renderObj->addComponent<moar::Model>(model);
-    return renderObj;
-}
-
-moar::Object* MyApp::createLight(const glm::vec4& color, moar::Light::Type type)
-{
-    moar::Object* light = engine->createObject();
-    moar::Light* lightComponent = light->addComponent<moar::Light>();
-    lightComponent->setColor(color);
-    lightComponent->setType(type);
-    light->addComponent<moar::Model>(engine->getResourceManager()->getModel("sphere.3ds"));
-    light->setScale(glm::vec3(0.02f, 0.02f, 0.02f));
-    light->setShadowCaster(false);
-    light->setShadowReceiver(false);
-    return light;
 }
 
 void MyApp::resetCamera(int spot)

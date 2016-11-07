@@ -1,4 +1,4 @@
-#include "post_framebuffer.h"
+#include "postframebuffer.h"
 #include "common/globals.h"
 
 namespace moar
@@ -101,11 +101,6 @@ GLuint PostFramebuffer::blit(GLuint blitBuffer, int attachment) const
 void PostFramebuffer::setInputTextures(const std::vector<GLuint>& textures)
 {
     inputTextures = textures;
-}
-
-GLuint PostFramebuffer::getRenderedTexture() const
-{
-    return renderedTexture;
 }
 
 GLuint PostFramebuffer::getFramebuffer() const

@@ -26,7 +26,6 @@ public:
     GLuint blit(GLuint blitBuffer, int attachment) const;
 
     void setInputTextures(const std::vector<GLuint>& textures);
-    GLuint getRenderedTexture() const;
     GLuint getFramebuffer() const;
 
 private:

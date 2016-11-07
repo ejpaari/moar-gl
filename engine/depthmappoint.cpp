@@ -1,4 +1,4 @@
-#include "depthmap_point.h"
+#include "depthmappoint.h"
 #include "common/globals.h"
 
 #include <glm/gtc/type_ptr.hpp>

@@ -43,6 +43,7 @@ public:
     static void updateViewProjectionMatrix();
 
     explicit Object();
+    explicit Object(const std::string& name);
     virtual ~Object();
     Object(const Object&) = delete;
     Object(Object&&) = delete;
@@ -104,6 +105,7 @@ private:
     glm::mat4x4 getModelMatrix() const;
 
     unsigned int id;
+    std::string name = "";
 
     bool shadowCaster = true;
     bool shadowReceiver = true;

@@ -1,0 +1,41 @@
+# object name
+# position
+# rotation
+# scale
+# shadow_caster shadow_receiver
+# component (model, light, ...)
+# model
+# model_name
+# light
+# color
+# type
+
+name sponza
+0.0 0.0 0.0
+0.0 0.0 0.0
+0.004 0.004 0.004
+1 0
+component model
+sponza.obj
+
+name light1
+3.0 1.0 -0.0
+0.0 0.0 0.0
+0.02 0.02 0.02
+1 0
+component model
+sphere.3ds
+component light
+1.0 0.8 0.6 1.2
+point
+
+name light1
+-2.0 1.0 0.0
+0.0 0.0 0.0
+0.02 0.02 0.02
+1 0
+component model
+sphere.3ds
+component light
+1.0 0.8 0.6 1.2
+point

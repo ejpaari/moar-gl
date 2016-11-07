@@ -33,6 +33,12 @@ Object::Object() :
 {
 }
 
+Object::Object(const std::string& name) :
+    id(++idCounter),
+    name(name)
+{
+}
+
 Object::~Object()
 {
 }
