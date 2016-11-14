@@ -238,6 +238,7 @@ bool Engine::init(const std::string& settingsFile)
         manager.setShaderPath(pt.get<std::string>("Engine.shaderPath"));
         manager.setModelPath(pt.get<std::string>("Engine.modelPath"));
         manager.setTexturePath(pt.get<std::string>("Engine.texturePath"));
+        manager.setLevelPath(pt.get<std::string>("Engine.levelPath"));
         shaderInfoFile = pt.get<std::string>("Engine.shaders");
     } catch (boost::property_tree::ptree_error& e) {
         std::cerr << "ERROR: Could not load resource path info from the .ini-file\n";
@@ -384,6 +385,8 @@ bool Engine::loadLevel(const std::string& level)
         return false;
     }
 
+    resetLevel();
+
     std::string word;
 
     Object* obj = nullptr;
@@ -395,12 +398,21 @@ bool Engine::loadLevel(const std::string& level)
             boost::trim(word);
             if (word.empty()) {
                 continue;
-            }
-            if (word[0] == '#') {
+            } else if (word[0] == '#') {
                 std::getline(ifs, word);
                 continue;
-            }
-            if (word == "name") {
+            } else if (word == "general") {
+                ifs >> x >> y >> z;
+                renderSettings.ambientColor = glm::vec3(x, y, z);
+                std::vector<std::string> skyboxTextures(6, "");
+                for (int i = 0; i < 6; ++i) {
+                    ifs >> skyboxTextures[i];
+                }
+                renderSettings.skyboxTextures = skyboxTextures;
+                if (!createSkybox()) {
+                    std::cerr << "WARNING: Failed to create the skybox\n";
+                }
+            } else if (word == "name") {
                 ifs >> word;
                 obj = createObject(word);
                 ifs >> x >> y >> z;
@@ -413,8 +425,7 @@ bool Engine::loadLevel(const std::string& level)
                 obj->setShadowCaster(a);
                 obj->setShadowReceiver(b);
                 word.clear();
-            }
-            if (word == "component") {
+            } else if (word == "component") {
                 if (!obj) {
                     throw std::runtime_error("Component without an object");
                 }
@@ -424,8 +435,7 @@ bool Engine::loadLevel(const std::string& level)
                     Model* modelComponent = getResourceManager()->getModel(word);
                     obj->addComponent<Model>(modelComponent);
                     word.clear();
-                }
-                if (word == "light") {
+                } else if (word == "light") {
                     Light* lightComponent = obj->addComponent<Light>();
                     ifs >> x >> y >> z >> w;
                     lightComponent->setColor(glm::vec4(x, y, z, w));
@@ -437,8 +447,14 @@ bool Engine::loadLevel(const std::string& level)
                     } else {
                         throw std::runtime_error("Unknown light type: " + word);
                     }
+                    ifs >> a;
+                    lightComponent->setShadowingEnabled(a);
                     word.clear();
+                } else {
+                    throw std::runtime_error("Component name is " + word);
                 }
+            } else {
+                throw std::runtime_error("Object value is " + word);
             }
         }
     } catch (std::exception& e) {
@@ -454,6 +470,7 @@ void Engine::resetLevel()
     lights.clear();
     lights.resize(Light::Type::NUM_TYPES);
     allObjects.clear();
+    manager.clear();
 }
 
 void Engine::render()

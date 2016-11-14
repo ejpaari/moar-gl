@@ -35,7 +35,9 @@ public:
     void setShaderPath(const std::string& path);
     void setModelPath(const std::string& path);
     void setTexturePath(const std::string& path);
+    void setLevelPath(const std::string& path);
     bool loadShaders(const std::string& path);
+    void clear();
 
     Material* createMaterial();
 
@@ -45,6 +47,7 @@ public:
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
     Material* getMaterial(int id);
+    std::string getLevelPath() const;
 
     void checkMissingTextures() const;
 
@@ -66,6 +69,7 @@ private:
     std::string shaderPath;
     std::string modelPath;
     std::string texturePath;
+    std::string levelPath;
     std::vector<std::unique_ptr<Shader>> shaders;
     std::unordered_map<ShaderKey, Shader*, ShaderKeyHash> shadersByType;
     std::unordered_map<std::string, Shader*> shadersByName;

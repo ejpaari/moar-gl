@@ -1,3 +1,10 @@
+# ambient color
+# skybox textures
+
+general
+0.05 0.05 0.05
+sb_px.png sb_nx.png sb_py.png sb_ny.png sb_pz.png sb_nz.png
+
 # object name
 # position
 # rotation
@@ -14,7 +21,7 @@ name sponza
 0.0 0.0 0.0
 0.0 0.0 0.0
 0.004 0.004 0.004
-1 0
+1 1
 component model
 sponza.obj
 
@@ -28,6 +35,7 @@ sphere.3ds
 component light
 1.0 0.8 0.6 1.2
 point
+1
 
 name light1
 -2.0 1.0 0.0
@@ -39,3 +47,4 @@ sphere.3ds
 component light
 1.0 0.8 0.6 1.2
 point
+1

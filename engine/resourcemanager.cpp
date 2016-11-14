@@ -27,6 +27,11 @@ void ResourceManager::setTexturePath(const std::string& path)
     texturePath = path;
 }
 
+void ResourceManager::setLevelPath(const std::string& path)
+{
+    levelPath = path;
+}
+
 bool ResourceManager::loadShaders(const std::string& path)
 {
     std::string line = "";
@@ -93,6 +98,14 @@ bool ResourceManager::loadShaders(const std::string& path)
         return false;
     }
     return true;
+}
+
+void ResourceManager::clear()
+{
+    materials.clear();
+    textures.clear();
+    cubeTextures.clear();
+    models.clear();
 }
 
 Material* ResourceManager::createMaterial()
@@ -229,6 +242,11 @@ Material* ResourceManager::getMaterial(int id)
         std::cerr << "ERROR: Could not find material with id " << id << "\n";
         return 0;
     }
+}
+
+std::string ResourceManager::getLevelPath() const
+{
+    return levelPath;
 }
 
 void ResourceManager::checkMissingTextures() const

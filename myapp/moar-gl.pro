@@ -18,6 +18,12 @@ DEFINES += DEBUG
 
 TEMPLATE = app
 
+copydata.commands = $(COPY_DIR) $$PWD/settings.ini $$OUT_PWD
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata
+
 DISTFILES += \
     settings.ini
 
