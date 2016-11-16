@@ -1,0 +1,46 @@
+# ambient color
+# skybox textures
+
+general
+0.1 0.1 0.1
+sb_px.png sb_nx.png sb_py.png sb_ny.png sb_pz.png sb_nz.png
+
+# object name
+# position
+# rotation
+# scale
+# shadow_caster shadow_receiver
+# component (model, light, ...)
+# model
+# model_name
+# light
+# color
+# type
+
+name droid
+0.0 0.0 0.0
+0.0 0.0 0.0
+0.02 0.02 0.02
+1 1
+component model
+attack_droid.obj
+
+name floor
+0.0 0.0 0.0
+0.0 0.0 0.0
+2.0 0.01 2.0
+0 1
+component model
+cube.3ds
+
+name light1
+1.0 2.0 1.0
+0.0 0.0 0.0
+0.1 0.1 0.1
+1 0
+component model
+sphere.3ds
+component light
+1.0 0.8 0.6 2.2
+point
+1

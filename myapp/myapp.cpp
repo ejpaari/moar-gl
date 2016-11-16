@@ -22,7 +22,7 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
     time = engine->getTime();
-    if (!engine->loadLevel(engine->getResourceManager()->getLevelPath() + "sponza.lvl")) {
+    if (!engine->loadLevel(engine->getResourceManager()->getLevelPath() + "droid.lvl")) {
         std::cerr << "WARNING: Level loading failed\n";
     }
 
