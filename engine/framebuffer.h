@@ -30,8 +30,8 @@ private:
     static int height;
 
     GLuint framebuffer;
-    GLuint renderedTexture;
-    GLuint depthRenderbuffer;
+    GLuint renderedTexture = 0;
+    GLuint depthRenderbuffer = 0;
     std::vector<GLuint> outputTextures;
 };
 

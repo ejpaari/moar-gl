@@ -38,6 +38,7 @@ public:
 
     int getShaderType() const;
     int getId() const;
+    unsigned int getNumTextures() const;
 
     void checkMissingTextures() const;
 

@@ -63,6 +63,11 @@ int Material::getId() const
     return id;
 }
 
+unsigned int Material::getNumTextures() const
+{
+    return textures.size();
+}
+
 void Material::checkMissingTextures() const
 {
     auto checkTexture = [&] (TextureType textureType) {

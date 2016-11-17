@@ -24,7 +24,7 @@ public:
     GLuint getID() const;
 
 private:
-    GLuint id;
+    GLuint id = 0;
 };
 
 } // moar

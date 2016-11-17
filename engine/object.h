@@ -162,7 +162,8 @@ inline Model* Object::addComponent<Model>(Model* model)
     meshObjects.clear();
     for (const auto& mesh : model->getMeshes()) {
         Material* mat = mesh->getDefaultMaterial();
-        MeshObject mo = {mesh.get(), (mat == nullptr ? defaultMaterial : mat), this};
+        bool useDefaultMaterial = mat == nullptr || mat->getNumTextures() == 0;
+        MeshObject mo = {mesh.get(), (useDefaultMaterial ? defaultMaterial : mat), this};
         meshObjects.push_back(mo);
     }
     return model;

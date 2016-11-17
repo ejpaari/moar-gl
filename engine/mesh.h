@@ -46,12 +46,12 @@ private:
     template<typename T>
     void setBufferData(GLuint buffer, const std::vector<T>& data, int position, int size);
 
-    GLuint VAO;
-    GLuint vertexBuffer;
-    GLuint indexBuffer;
-    GLuint normalBuffer;
-    GLuint tangentBuffer;
-    GLuint texBuffer;
+    GLuint VAO = 0;
+    GLuint vertexBuffer = 0;
+    GLuint indexBuffer = 0;
+    GLuint normalBuffer = 0;
+    GLuint tangentBuffer = 0;
+    GLuint texBuffer = 0;
     unsigned int numIndices = 0;
 
     Material* material = nullptr;

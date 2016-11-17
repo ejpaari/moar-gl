@@ -102,10 +102,10 @@ bool ResourceManager::loadShaders(const std::string& path)
 
 void ResourceManager::clear()
 {
-    materials.clear();
     textures.clear();
     cubeTextures.clear();
     models.clear();
+    materials.clear();
 }
 
 Material* ResourceManager::createMaterial()

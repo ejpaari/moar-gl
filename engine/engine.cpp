@@ -215,7 +215,6 @@ bool Engine::init(const std::string& settingsFile)
 
     printInfo(windowWidth, windowHeight);
 
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     try {
@@ -258,10 +257,6 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "WARNING: Failed to load render settings\n";
     }
 
-    if (!createSkybox()) {
-        std::cerr << "WARNING: Failed to create the skybox\n";
-    }
-
     depthMapDir.setSize(renderSettings.windowWidth, renderSettings.windowHeight);
     if (!depthMapDir.init()) {
         return false;
@@ -287,13 +282,6 @@ bool Engine::init(const std::string& settingsFile)
 
     passthrough = Postprocess("passthrough", manager.getShader("passthrough")->getProgram(), 0);
 
-    resetLevel();
-
-    Material* material = manager.createMaterial();
-    material->setTexture(manager.getTexture("brick.png"), moar::Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
-    material->setShaderType(Shader::DIFFUSE);
-    Object::setMeshDefaultMaterial(material);
-
     GLuint lightBuffer;
     glGenBuffers(1, &lightBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
@@ -308,10 +296,14 @@ bool Engine::init(const std::string& settingsFile)
     glBufferData(GL_UNIFORM_BUFFER, transformationBufferSize, 0, GL_DYNAMIC_DRAW);
     Object::transformationBlockBuffer = transformationBuffer;
 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
 #ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
 #endif
 
+    resetLevel();
     return true;
 }
 
@@ -321,11 +313,10 @@ void Engine::execute()
     double x = 0.0;
     double y = 0.0;
     while (app->isRunning()) {
+        glfwPollEvents();
         glfwGetCursorPos(window, &x, &y);
         input.setCursorPosition(x, y);
-
-        time.update();
-
+        time.update();        
         app->handleInput(window);
         app->update();
 
@@ -372,7 +363,7 @@ Time*Engine::getTime()
 
 Object* Engine::createObject(const std::string& name)
 {
-    std::shared_ptr<moar::Object> obj(new moar::Object(name));
+    std::shared_ptr<Object> obj(new Object(name));
     allObjects.push_back(obj);
     return obj.get();
 }
@@ -385,6 +376,7 @@ bool Engine::loadLevel(const std::string& level)
         return false;
     }
 
+    std::cout << "\nLoading a new level: " << level << "\n\n";
     resetLevel();
 
     std::string word;
@@ -432,7 +424,7 @@ bool Engine::loadLevel(const std::string& level)
                 ifs >> word;
                 if (word == "model") {
                     ifs >> word;
-                    Model* modelComponent = getResourceManager()->getModel(word);
+                    Model* modelComponent = manager.getModel(word);
                     obj->addComponent<Model>(modelComponent);
                     word.clear();
                 } else if (word == "light") {
@@ -461,6 +453,7 @@ bool Engine::loadLevel(const std::string& level)
         std::cerr << "WARNING: Could not parse level: " << level << " - " << e.what() << "\n";
         return false;
     }
+    G_COMPONENT_CHANGED = true;
     return true;
 }
 
@@ -471,6 +464,11 @@ void Engine::resetLevel()
     lights.resize(Light::Type::NUM_TYPES);
     allObjects.clear();
     manager.clear();
+
+    Material* material = manager.createMaterial();
+    material->setTexture(manager.getTexture("white.png"), Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+    material->setShaderType(Shader::DIFFUSE);
+    Object::setMeshDefaultMaterial(material);
 }
 
 void Engine::render()
@@ -481,7 +479,6 @@ void Engine::render()
     glEnable(GL_DEPTH_TEST);
     Object::setViewMatrixUniform();
 
-    // Ambient.
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glDisable(GL_BLEND);
@@ -506,27 +503,24 @@ void Engine::render()
     glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    // Lighting.
     lighting(Light::DIRECTIONAL);
     lighting(Light::POINT);
 
     glDisable(GL_BLEND);
     glDepthFunc(GL_LEQUAL);
 
-    // Skybox.
     if (skybox) {
         glCullFace(GL_FRONT);
         shader = renderSettings.skyboxShader;
         glUseProgram(shader->getProgram());
-        skybox->setPosition(camera->getPosition());
         skybox->setUniforms(shader);
         for (auto& meshObject : skybox->getMeshObjects()) {
             meshObject.material->setUniforms(shader);
             meshObject.mesh->render();
         }
+        glCullFace(GL_BACK);
     }
 
-    // Post-process ping-pong
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
     GLuint renderedTex = blitBuffer1.blit(fb.getFramebuffer(), 0);
 
@@ -535,7 +529,7 @@ void Engine::render()
         glUseProgram(manager.getShader("bloom_blur")->getProgram());
         GLboolean horizontal = true;
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
-            glUniform1i(moar::BLOOM_FILTER_HORIZONTAL, horizontal);
+            glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
             setPostFramebuffer();
             bloomTex = postBuffer->draw(std::vector<GLuint>(1, bloomTex));
             horizontal = !horizontal;
@@ -661,11 +655,11 @@ void Engine::updateObjectContainers()
 
 void Engine::updateObjects()
 {
+    camera->updateViewMatrix();
     Object::updateViewProjectionMatrix();
     for (const std::shared_ptr<Object>& obj : allObjects) {
         obj->updateModelMatrix();
     }
-    camera->updateViewMatrix();
     skybox->setPosition(camera->getPosition());
     skybox->updateModelMatrix();
 }
@@ -695,7 +689,7 @@ bool Engine::createSkybox()
     }
 
     skybox.reset(new Object());
-    skybox->addComponent<Model>(getResourceManager()->getModel("cube.3ds"));
+    skybox->addComponent<Model>(manager.getModel("cube.3ds"));
 
     Material* material = manager.createMaterial();
     GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);

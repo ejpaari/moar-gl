@@ -33,9 +33,9 @@ private:
     static int height;
 
     GLuint framebuffer;
-    GLuint renderedTexture;
-    GLuint quadVAO;
-    GLuint quadBuffer;
+    GLuint renderedTexture = 0;
+    GLuint quadVAO = 0;
+    GLuint quadBuffer = 0;
     std::vector<GLuint> inputTextures;
 };
 

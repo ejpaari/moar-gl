@@ -108,10 +108,14 @@ void MyApp::handleInput(GLFWwindow* window)
         camera->setHDREnabled(true);
     }
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-        resetCamera(1);
+        if (!engine->loadLevel(engine->getResourceManager()->getLevelPath() + "droid.lvl")) {
+            std::cerr << "WARNING: Level loading failed\n";
+        }
     }
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-        resetCamera(2);
+        if (!engine->loadLevel(engine->getResourceManager()->getLevelPath() + "sponza.lvl")) {
+            std::cerr << "WARNING: Level loading failed\n";
+        }
     }
 
     camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());

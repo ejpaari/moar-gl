@@ -9,7 +9,7 @@ unsigned int Mesh::idCounter = 0;
 Mesh::Mesh() :
     id(++idCounter)
 {
-    glGenVertexArrays(1, &VAO);
+    glGenVertexArrays(1, &VAO);    
     glBindVertexArray(VAO);
 }
 
