@@ -1,9 +1,9 @@
 # ambient color
-# skybox textures
+# default texture
 
 general
 0.1 0.1 0.1
-sb_px.png sb_nx.png sb_py.png sb_ny.png sb_pz.png sb_nz.png
+white.png
 
 # object name
 # position
@@ -41,6 +41,6 @@ name light1
 component model
 sphere.3ds
 component light
-1.0 0.8 0.6 2.2
+1.0 0.8 0.6 8.2
 point
 1

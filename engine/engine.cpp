@@ -166,22 +166,17 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << e.what() << "\n";
         return false;
     }
-    glEnable(GL_MULTISAMPLE);
 
     int windowWidth = 800;
     int windowHeight = 600;
     try {
         windowWidth = pt.get<int>("Window.width");
-        windowHeight = pt.get<int>("Window.height");
-        window = glfwCreateWindow(windowWidth, windowHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
+        windowHeight = pt.get<int>("Window.height");        
     } catch (boost::property_tree::ptree_error& e) {
         std::cerr << "WARNING: Could not load window info from the .ini-file\n";
         std::cerr << e.what() << "\n";
     }
-    if (window == NULL) {
-        std::cerr << "ERROR: Failed to create window\n";
-        return false;
-    }
+
     renderSettings.windowWidth = windowWidth;
     renderSettings.windowHeight = windowHeight;
 
@@ -194,8 +189,23 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "WARNING: Could not load window position from the .ini-file\n";
         std::cerr << e.what() << "\n";
     }
-    glfwMakeContextCurrent(window);
+
+    window = glfwCreateWindow(windowWidth, windowHeight, pt.get<std::string>("Window.title").c_str(), NULL, NULL);
+    if (!window) {
+        std::cerr << "ERROR: Failed to create window\n";
+        return false;
+    }
+
+    auto inputFunc = [] (GLFWwindow* w, int key, int scancode, int action, int mods)
+    {
+        static_cast<Input*>(glfwGetWindowUserPointer(w))->handleInput(w, key, scancode, action, mods);
+    };
+
+    glfwMakeContextCurrent(window);    
     glfwSetWindowPos(window, windowPosX, windowPosY);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetWindowUserPointer(window, &input);
+    glfwSetKeyCallback(window, inputFunc);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -212,10 +222,6 @@ bool Engine::init(const std::string& settingsFile)
         glDebugMessageCallback(debugCallbackFunction, nullptr);
     }
 #endif
-
-    printInfo(windowWidth, windowHeight);
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     try {
         double sensitivity = pt.get<double>("Input.sensitivity");
@@ -296,14 +302,18 @@ bool Engine::init(const std::string& settingsFile)
     glBufferData(GL_UNIFORM_BUFFER, transformationBufferSize, 0, GL_DYNAMIC_DRAW);
     Object::transformationBlockBuffer = transformationBuffer;
 
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+
+    printInfo(windowWidth, windowHeight);
 
 #ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
 #endif
 
     resetLevel();
+
     return true;
 }
 
@@ -313,11 +323,11 @@ void Engine::execute()
     double x = 0.0;
     double y = 0.0;
     while (app->isRunning()) {
-        glfwPollEvents();
         glfwGetCursorPos(window, &x, &y);
         input.setCursorPosition(x, y);
         time.update();        
         app->handleInput(window);
+        input.reset();
         app->update();
 
         updateObjectContainers();
@@ -370,7 +380,8 @@ Object* Engine::createObject(const std::string& name)
 
 bool Engine::loadLevel(const std::string& level)
 {
-    std::ifstream ifs(level.c_str());
+    std::string lvl = manager.getLevelPath() + level;
+    std::ifstream ifs(lvl.c_str());
     if (!ifs) {
         std::cerr << "WARNING: Could not open level file: " << level << "\n";
         return false;
@@ -396,6 +407,13 @@ bool Engine::loadLevel(const std::string& level)
             } else if (word == "general") {
                 ifs >> x >> y >> z;
                 renderSettings.ambientColor = glm::vec3(x, y, z);
+                ifs >> word;
+                Material* material = manager.createMaterial();
+                material->setTexture(manager.getTexture(word), Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
+                material->setShaderType(Shader::DIFFUSE);
+                Object::setMeshDefaultMaterial(material);
+                word.clear();
+            } else if (word == "skybox") {
                 std::vector<std::string> skyboxTextures(6, "");
                 for (int i = 0; i < 6; ++i) {
                     ifs >> skyboxTextures[i];
@@ -464,11 +482,6 @@ void Engine::resetLevel()
     lights.resize(Light::Type::NUM_TYPES);
     allObjects.clear();
     manager.clear();
-
-    Material* material = manager.createMaterial();
-    material->setTexture(manager.getTexture("white.png"), Material::TextureType::DIFFUSE, GL_TEXTURE_2D);
-    material->setShaderType(Shader::DIFFUSE);
-    Object::setMeshDefaultMaterial(material);
 }
 
 void Engine::render()
@@ -660,8 +673,10 @@ void Engine::updateObjects()
     for (const std::shared_ptr<Object>& obj : allObjects) {
         obj->updateModelMatrix();
     }
-    skybox->setPosition(camera->getPosition());
-    skybox->updateModelMatrix();
+    if (skybox) {
+        skybox->setPosition(camera->getPosition());
+        skybox->updateModelMatrix();
+    }
 }
 
 void Engine::printInfo(int windowWidth, int windowHeight)

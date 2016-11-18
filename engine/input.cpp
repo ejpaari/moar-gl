@@ -40,4 +40,32 @@ float Input::getMovementSpeed() const
     return movementSpeed;
 }
 
+bool Input::isKeyPressed(int key)
+{
+    return keys[key].pressed;
+}
+
+bool Input::isKeyDown(int key)
+{
+    return keys[key].down;
+}
+
+void Input::handleInput(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
+{
+    if (action == GLFW_PRESS) {
+        keys[key].down = true;
+        keys[key].pressed = true;
+    }
+    if (action == GLFW_RELEASE) {
+        keys[key].down = false;
+    }    
+}
+
+void Input::reset()
+{
+    for (auto& kv : keys) {
+        kv.second.pressed = false;
+    }
+}
+
 } // moar

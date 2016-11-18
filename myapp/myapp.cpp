@@ -10,6 +10,11 @@
 MyApp::MyApp() :
     drawCount(&moar::G_DRAW_COUNT)
 {
+    levelInfos = {
+        {"droid.lvl", std::vector<glm::vec3>{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-2.0f, 1.0f, 1.0f)}, 0},
+        {"sponza.lvl",std::vector<glm::vec3>{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-2.0f, 1.0f, 1.0f)}, 0}
+    };
+    currentLevelInfo = &levelInfos[0];
 }
 
 MyApp::~MyApp()
@@ -22,38 +27,13 @@ void MyApp::start()
     input = engine->getInput();
     renderSettings = engine->getRenderSettings();
     time = engine->getTime();
-    if (!engine->loadLevel(engine->getResourceManager()->getLevelPath() + "droid.lvl")) {
+    if (!engine->loadLevel(currentLevelInfo->filename)) {
         std::cerr << "WARNING: Level loading failed\n";
     }
 
-//#define MONKEY
-//#define MOVE
-//#define DIR_LIGHT
 //#define POSTPROC
 #define HDR_BLOOM
 //#define GUI
-
-#ifdef MONKEY
-    monkey = engine->createObject();
-    monkey->setShadowReceiver(false);
-    monkey->addComponent<moar::Model>(engine->getResourceManager()->getModel("monkey.3ds"));
-    moar::Material* m = engine->getResourceManager()->createMaterial();
-    m->setTexture(engine->getResourceManager()->getTexture("spnza_bricks_a_diff.tga"), moar::Material::DIFFUSE, GL_TEXTURE_2D);
-    m->setTexture(engine->getResourceManager()->getTexture("spnza_bricks_a_spec.tga"), moar::Material::SPECULAR, GL_TEXTURE_2D);
-//    m->setTexture(engine->getResourceManager()->getTexture("brickwork_nmap.png"), moar::Material::NORMAL, GL_TEXTURE_2D);
-//    m->setTexture(engine->getResourceManager()->getTexture("brickwork_bmap.png"), moar::Material::BUMP, GL_TEXTURE_2D);
-    int shaderType =
-            moar::Shader::DIFFUSE |
-            moar::Shader::SPECULAR;
-//            moar::Shader::NORMAL |
-//            moar::Shader::BUMP;
-    m->setShaderType(shaderType);
-    for (auto& mo : monkey->getMeshObjects()) {
-        mo.material = m;
-    }
-    monkey->setScale(glm::vec3(0.5f, 0.5f, 0.5f));
-    monkey->setPosition(glm::vec3(-2.0f, 0.5f, 0.0f));
-#endif
 
 #ifdef POSTPROC
     offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
@@ -67,59 +47,70 @@ void MyApp::start()
 #endif
 
     initGUI();
-    resetCamera(1);
 }
 
 void MyApp::handleInput(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+    if (input->isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         return;
-    } else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)  {
+    } else {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if (input->isKeyPressed(GLFW_KEY_ESCAPE)) {
         quit();
     }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if (input->isKeyDown(GLFW_KEY_W)) {
         camera->move(camera->getForward() * input->getMovementSpeed() * time->getDelta());
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    if (input->isKeyDown(GLFW_KEY_S)) {
         camera->move(-camera->getForward() * input->getMovementSpeed() * time->getDelta());
     }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    if (input->isKeyDown(GLFW_KEY_A)) {
         camera->move(camera->getLeft() * input->getMovementSpeed() * time->getDelta());
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if (input->isKeyDown(GLFW_KEY_D)) {
         camera->move(-camera->getLeft() * input->getMovementSpeed() * time->getDelta());
     }
-    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
-        camera->setBloomIterations(0);
+
+    if (input->isKeyPressed(GLFW_KEY_B)) {
+        int iterations = camera->getBloomIterations() + 4;
+        iterations = iterations > 30 ? 0 : iterations;
+        camera->setBloomIterations(iterations);
     }
-    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
-        camera->setBloomIterations(12);
+    if (input->isKeyPressed(GLFW_KEY_H)) {
+        camera->setHDREnabled(!camera->isHDREnabled());
     }
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
-        camera->setHDREnabled(false);
-    }
-    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
-        camera->setHDREnabled(true);
-    }
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-        if (!engine->loadLevel(engine->getResourceManager()->getLevelPath() + "droid.lvl")) {
-            std::cerr << "WARNING: Level loading failed\n";
-        }
-    }
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-        if (!engine->loadLevel(engine->getResourceManager()->getLevelPath() + "sponza.lvl")) {
-            std::cerr << "WARNING: Level loading failed\n";
-        }
+
+    if (input->isKeyPressed(GLFW_KEY_R)) {
+        unsigned int& i = currentLevelInfo->positionIndex;
+        i = i == currentLevelInfo->cameraPositions.size() - 1 ? 0 : i + 1;
+        camera->setPosition(currentLevelInfo->cameraPositions[i]);
     }
 
     camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());
     camera->rotate(moar::Object::LEFT, input->getCursorDeltaY() * boost::math::constants::degree<double>());
+
+    bool loadLevel = true;
+    try {
+        if (input->isKeyPressed(GLFW_KEY_1)) {
+            currentLevelInfo = &levelInfos.at(0);
+        } else if (input->isKeyPressed(GLFW_KEY_2)) {
+            currentLevelInfo = &levelInfos.at(1);
+        } else {
+            loadLevel = false;
+        }
+    } catch (std::exception& e) {
+        std::cerr << "WARNING: Invalid level\n";
+        loadLevel = false;
+    }
+
+    if (loadLevel) {
+        if (!engine->loadLevel(currentLevelInfo->filename)) {
+            std::cerr << "WARNING: Level loading failed\n";
+        }
+    }
 }
 
 void MyApp::update()
@@ -156,22 +147,4 @@ void MyApp::initGUI()
     TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
     TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
 #endif
-}
-
-void MyApp::resetCamera(int spot)
-{
-    switch(spot) {
-    case 1: {
-        camera->setPosition(glm::vec3(0.0f, 0.5f, 0.5f));
-        camera->setRotation(glm::vec3(0.0f, 0.9f, 0.0f));
-        break;
-    }
-    case 2: {
-        camera->setPosition(glm::vec3(1.8f, 0.9f, -1.5f));
-        camera->setRotation(glm::vec3(0.0f, -1.2f, 0.0f));
-        break;
-    }
-    default: {
-    }
-    }
 }

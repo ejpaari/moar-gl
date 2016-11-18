@@ -2,7 +2,12 @@
 # skybox textures
 
 general
-0.05 0.05 0.05
+0.1 0.1 0.1
+brick.png
+
+# skybox textures
+
+skybox
 sb_px.png sb_nx.png sb_py.png sb_ny.png sb_pz.png sb_nz.png
 
 # object name
@@ -33,7 +38,7 @@ name light1
 component model
 sphere.3ds
 component light
-1.0 0.8 0.6 1.2
+1.0 0.8 0.6 2.2
 point
 1
 
@@ -45,6 +50,6 @@ name light1
 component model
 sphere.3ds
 component light
-1.0 0.8 0.6 1.2
+1.0 0.8 0.6 2.2
 point
 1

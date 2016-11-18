@@ -10,8 +10,6 @@
 #include "../engine/time.h"
 #include "../engine/light.h"
 
-#include <glm/glm.hpp>
-#include <AntTweakBar.h>
 #include <string>
 
 class MyApp : public moar::Application
@@ -25,8 +23,13 @@ public:
     virtual void update() final;
 
 private:
+    struct LevelInfo {
+      std::string filename;
+      std::vector<glm::vec3> cameraPositions;
+      unsigned int positionIndex;
+    };                  
+
     void initGUI();
-    void resetCamera(int spot);
 
     moar::Camera* camera = nullptr;
     moar::Input* input = nullptr;
@@ -41,6 +44,9 @@ private:
     moar::Object* light4 = nullptr;
     moar::Object* light5 = nullptr;
     moar::Object* monkey = nullptr;
+    
+    std::vector<LevelInfo> levelInfos;
+    LevelInfo* currentLevelInfo = nullptr;
 
     int fps = 0;
     int fpsCounter = 0;

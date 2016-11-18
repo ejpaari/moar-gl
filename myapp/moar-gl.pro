@@ -82,7 +82,7 @@ HEADERS += \
     ../engine/postframebuffer.h
 
 # GLFW
-unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL
+unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -ldl
 
 INCLUDEPATH += $$PWD/../glfw/include/
 DEPENDPATH += $$PWD/../glfw/include/

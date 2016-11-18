@@ -4,7 +4,7 @@
 
 namespace
 {
-
+#ifdef ANT
 void mouseButtonCallback(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
 {
     TwEventMouseButtonGLFW(button, action);
@@ -24,7 +24,7 @@ void charCallback(GLFWwindow* /*window*/, unsigned int codepoint)
 {
     TwEventCharGLFW(codepoint, GLFW_PRESS);
 }
-
+#endif
 } // anonymous
 
 namespace moar
@@ -34,8 +34,9 @@ GUI::GUI()
 {
 }
 
-bool GUI::init(GLFWwindow* window)
+bool GUI::init(GLFWwindow* /*window*/)
 {
+#ifdef ANT
     int ok = TwInit(TW_OPENGL_CORE, NULL);
     if (ok == 0) {
         return false;
@@ -48,18 +49,22 @@ bool GUI::init(GLFWwindow* window)
     glfwSetCursorPosCallback(window, cursorPosCallback);
     glfwSetKeyCallback(window, keyCallback);
     glfwSetCharCallback(window, charCallback);
-
+#endif
     return true;
 }
 
 void GUI::render()
 {
+#ifdef ANT
     TwDraw();
+#endif
 }
 
 void GUI::uninit()
 {
+#ifdef ANT
     TwTerminate();
+#endif
 }
 
 } // moar
