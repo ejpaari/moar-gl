@@ -33,7 +33,6 @@ void MyApp::start()
 
 //#define POSTPROC
 #define HDR_BLOOM
-//#define GUI
 
 #ifdef POSTPROC
     offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
@@ -45,8 +44,6 @@ void MyApp::start()
     camera->setHDREnabled(true);
     camera->setBloomIterations(12);
 #endif
-
-    initGUI();
 }
 
 void MyApp::handleInput(GLFWwindow* window)
@@ -136,15 +133,5 @@ void MyApp::update()
 
 #ifdef POSTPROC
     offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
-#endif
-}
-
-void MyApp::initGUI()
-{
-#ifdef GUI
-    bar = TwNewBar("GUI");
-    TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
-    TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
-    TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
 #endif
 }

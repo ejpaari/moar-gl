@@ -29,14 +29,11 @@ private:
       unsigned int positionIndex;
     };                  
 
-    void initGUI();
-
     moar::Camera* camera = nullptr;
     moar::Input* input = nullptr;
     moar::RenderSettings* renderSettings = nullptr;
     moar::Time* time = nullptr;
     moar::Postprocess* offset = nullptr;
-    TwBar* bar = nullptr;
 
     moar::Object* light1 = nullptr;
     moar::Object* light2 = nullptr;
