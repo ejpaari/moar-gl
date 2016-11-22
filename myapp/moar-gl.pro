@@ -107,6 +107,13 @@ unix:!macx: LIBS += -L$$PWD/../assimp/lib/ -lassimp
 INCLUDEPATH += $$PWD/../assimp/include
 DEPENDPATH += $$PWD/../assimp/include
 
+
+# AntTweakBar
+unix:!macx: LIBS += -L/usr/lib/ -lAntTweakBar
+
+INCLUDEPATH += /usr/include/AntTweakBar
+DEPENDPATH += /usr/include/AntTweakBar
+
 # Boost
 #unix:!macx: LIBS += -L/usr/local/lib/boost/ -lboost_system -lboost_filesystem
 

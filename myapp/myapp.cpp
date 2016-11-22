@@ -31,19 +31,17 @@ void MyApp::start()
         std::cerr << "WARNING: Level loading failed\n";
     }
 
-//#define POSTPROC
-#define HDR_BLOOM
+    initGUI();
 
+//#define POSTPROC
 #ifdef POSTPROC
     offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
     offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
     camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 #endif
 
-#ifdef HDR_BLOOM
     camera->setHDREnabled(true);
-    camera->setBloomIterations(12);
-#endif
+    camera->setBloomIterations(4);
 }
 
 void MyApp::handleInput(GLFWwindow* window)
@@ -134,4 +132,15 @@ void MyApp::update()
 #ifdef POSTPROC
     offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
 #endif
+}
+
+void MyApp::initGUI()
+{
+    bar = TwNewBar("GUI");
+    TwDefine(" GUI size='300 100' ");
+    TwDefine(" GUI valueswidth=140 ");
+    TwDefine(" GUI refresh=0.5 ");
+    TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
+    TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
+    TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
 }

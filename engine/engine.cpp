@@ -122,7 +122,6 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-    gui.uninit();
     glDeleteBuffers(1, &Object::transformationBlockBuffer);
     glDeleteBuffers(1, &Light::lightBlockBuffer);
     glfwTerminate();
@@ -196,16 +195,16 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    auto inputFunc = [] (GLFWwindow* w, int key, int scancode, int action, int mods)
+    auto key = [] (GLFWwindow* w, int key, int scancode, int action, int mods)
     {
-        static_cast<Input*>(glfwGetWindowUserPointer(w))->handleInput(w, key, scancode, action, mods);
+        static_cast<Input*>(glfwGetWindowUserPointer(w))->handleKey(w, key, scancode, action, mods);
     };
 
     glfwMakeContextCurrent(window);    
     glfwSetWindowPos(window, windowPosX, windowPosY);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetWindowUserPointer(window, &input);
-    glfwSetKeyCallback(window, inputFunc);
+    glfwSetKeyCallback(window, key);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -223,6 +222,8 @@ bool Engine::init(const std::string& settingsFile)
     }
 #endif
 
+    printInfo(windowWidth, windowHeight);
+
     try {
         double sensitivity = pt.get<double>("Input.sensitivity");
         float movementSpeed = pt.get<double>("Input.movementSpeed");
@@ -237,6 +238,8 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "ERROR: Failed to initialize AntTweakBar\n";
         return false;
     }
+
+    input.setGUI(&gui);
 
     std::string shaderInfoFile = "";
     try {
@@ -305,8 +308,6 @@ bool Engine::init(const std::string& settingsFile)
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-
-    printInfo(windowWidth, windowHeight);
 
 #ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";

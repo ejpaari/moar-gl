@@ -1,6 +1,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "gui.h"
+
 #include <GLFW/glfw3.h>
 
 #include <map>
@@ -36,8 +38,9 @@ public:
     bool isKeyDown(int key);
 
 private:
-    void handleInput(GLFWwindow* window, int key, int scancode, int action, int mods);
+    void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
     void reset();
+    void setGUI(GUI* gui);
 
     double x = 0.0;
     double y = 0.0;
@@ -46,6 +49,7 @@ private:
     double sensitivity = 0.0;
     float movementSpeed = 0.0;
     std::map<int, KeyStatus> keys;
+    GUI* gui = nullptr;
 };
 
 } // moar

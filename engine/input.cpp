@@ -50,7 +50,7 @@ bool Input::isKeyDown(int key)
     return keys[key].down;
 }
 
-void Input::handleInput(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
+void Input::handleKey(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
 {
     if (action == GLFW_PRESS) {
         keys[key].down = true;
@@ -58,7 +58,10 @@ void Input::handleInput(GLFWwindow* /*window*/, int key, int /*scancode*/, int a
     }
     if (action == GLFW_RELEASE) {
         keys[key].down = false;
-    }    
+    }
+    if (gui) {
+        gui->keyCallback(key, action);
+    }
 }
 
 void Input::reset()
@@ -66,6 +69,11 @@ void Input::reset()
     for (auto& kv : keys) {
         kv.second.pressed = false;
     }
+}
+
+void Input::setGUI(GUI* gui)
+{
+    this->gui = gui;
 }
 
 } // moar

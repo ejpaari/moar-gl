@@ -27,7 +27,9 @@ private:
       std::string filename;
       std::vector<glm::vec3> cameraPositions;
       unsigned int positionIndex;
-    };                  
+    };
+
+    void initGUI();
 
     moar::Camera* camera = nullptr;
     moar::Input* input = nullptr;
@@ -41,6 +43,8 @@ private:
     moar::Object* light4 = nullptr;
     moar::Object* light5 = nullptr;
     moar::Object* monkey = nullptr;
+
+    TwBar* bar = nullptr;
     
     std::vector<LevelInfo> levelInfos;
     LevelInfo* currentLevelInfo = nullptr;

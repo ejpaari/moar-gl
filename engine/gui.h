@@ -10,6 +10,7 @@ class GUI
 {
 public:
     GUI();
+    ~GUI();
     GUI(const GUI&) = delete;
     GUI(GUI&&) = delete;
     GUI& operator=(const GUI&) = delete;
@@ -17,7 +18,7 @@ public:
 
     bool init(GLFWwindow* window);
     void render();
-    void uninit();
+    void keyCallback(int key, int action);
 };
 
 } // moar
