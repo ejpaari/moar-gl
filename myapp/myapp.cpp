@@ -1,5 +1,4 @@
 #include "myapp.h"
-#include "../engine/common/globals.h"
 #include "../engine/model.h"
 #include "../engine/material.h"
 
@@ -7,14 +6,28 @@
 #include <cmath>
 #include <memory>
 
-MyApp::MyApp() :
-    drawCount(&moar::G_DRAW_COUNT)
+MyApp::MyApp()
 {
     levelInfos = {
-        {"droid.lvl", std::vector<glm::vec3>{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-2.0f, 1.0f, 1.0f)}, 0},
-        {"sponza.lvl",std::vector<glm::vec3>{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-2.0f, 1.0f, 1.0f)}, 0}
+        {"droid.lvl",
+         std::vector<glm::vec3>{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.58f, 0.37f, -0.3f)},
+         std::vector<glm::vec3>{glm::vec3(-0.5f, -5.5f, 0.0f), glm::vec3(-0.1f, -4.2f, 0.0f)},
+         0},
+        {"sponza.lvl",
+         std::vector<glm::vec3>{glm::vec3(-0.3f, 2.2f, 0.4f), glm::vec3(0.0f, 0.4f, -0.8f)},
+         std::vector<glm::vec3>{glm::vec3(-0.5f, -4.9f, 0.0f), glm::vec3(0.3f, -4.4f, 0.0f)},
+         0}
     };
-    currentLevelInfo = &levelInfos[0];
+    if (levelInfos.empty()) {
+        std::cerr << "WARNING: Empty level infos\n";
+    } else {
+        currentLevelInfo = &levelInfos[0];
+    }
+    for (auto& info : levelInfos) {
+        if (info.cameraPositions.size() != info.cameraRotations.size()) {
+            std::cerr << "WARNING: Level info camera positions and camera rotations sizes mismatch\n";
+        }
+    }
 }
 
 MyApp::~MyApp()
@@ -42,6 +55,14 @@ void MyApp::start()
 
     camera->setHDREnabled(true);
     camera->setBloomIterations(4);
+}
+
+void MyApp::levelLoaded()
+{
+    if (currentLevelInfo) {
+        currentLevelInfo->positionIndex = 0;
+        resetCamera();
+    }
 }
 
 void MyApp::handleInput(GLFWwindow* window)
@@ -79,9 +100,7 @@ void MyApp::handleInput(GLFWwindow* window)
     }
 
     if (input->isKeyPressed(GLFW_KEY_R)) {
-        unsigned int& i = currentLevelInfo->positionIndex;
-        i = i == currentLevelInfo->cameraPositions.size() - 1 ? 0 : i + 1;
-        camera->setPosition(currentLevelInfo->cameraPositions[i]);
+        resetCamera();
     }
 
     camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());
@@ -110,14 +129,11 @@ void MyApp::handleInput(GLFWwindow* window)
 
 void MyApp::update()
 {
-    timeCounter += time->getDelta();
-    if (timeCounter < 1.0) {
-        ++fpsCounter;
-    } else {
-        fps = fpsCounter;
-        timeCounter = 0.0;
-        fpsCounter = 0;
-    }
+    fps = static_cast<unsigned int>(1.0f / time->getDelta());
+    drawCount = engine->getDrawCount();
+    position = camera->getPosition();
+    rotation = camera->getRotation();
+
 #ifdef MOVE
     float t = time->getTime();
     float sint = static_cast<float>(sin(t));
@@ -127,7 +143,6 @@ void MyApp::update()
     light4->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
     light5->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.03f));
 #endif
-    position = camera->getPosition();
 
 #ifdef POSTPROC
     offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
@@ -141,6 +156,20 @@ void MyApp::initGUI()
     TwDefine(" GUI valueswidth=140 ");
     TwDefine(" GUI refresh=0.5 ");
     TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
-    TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, drawCount, "");
+    TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, &drawCount, "");
     TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
+    TwAddVarRO(bar, "rotation", TW_TYPE_DIR3F, &rotation, "");
+}
+
+void MyApp::resetCamera()
+{
+    if (currentLevelInfo) {
+        unsigned int index = currentLevelInfo->positionIndex;
+        if (index >= currentLevelInfo->cameraPositions.size() || index >= currentLevelInfo->cameraRotations.size()) {
+            index = 0;
+        }
+        camera->setPosition(currentLevelInfo->cameraPositions[index]);
+        camera->setRotation(currentLevelInfo->cameraRotations[index]);
+        currentLevelInfo->positionIndex = ++index;
+    }
 }

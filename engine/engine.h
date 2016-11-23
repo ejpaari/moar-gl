@@ -50,6 +50,8 @@ public:
     Object* createObject(const std::string& name = "");
     bool loadLevel(const std::string& level);
 
+    unsigned int getDrawCount() const;
+
 private:
     void resetLevel();
     void render();

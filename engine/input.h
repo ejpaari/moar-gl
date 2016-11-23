@@ -40,6 +40,7 @@ public:
 private:
     void handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
     void reset();
+    void resetCursorDelta();
     void setGUI(GUI* gui);
 
     double x = 0.0;

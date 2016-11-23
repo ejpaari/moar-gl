@@ -323,27 +323,32 @@ void Engine::execute()
     app->start();
     double x = 0.0;
     double y = 0.0;
+    glfwGetCursorPos(window, &x, &y);
+    input.setCursorPosition(x, y);
+    input.resetCursorDelta();
+
     while (app->isRunning()) {
         glfwGetCursorPos(window, &x, &y);
         input.setCursorPosition(x, y);
-        time.update();        
+
+        time.update();
         app->handleInput(window);
         input.reset();
         app->update();
 
         updateObjectContainers();
         updateObjects();
+
+        G_DRAW_COUNT = 0;
         render();
         gui.render();
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwPollEvents();        
 
         if (glfwWindowShouldClose(window)) {
             app->quit();
         }
-
-        G_DRAW_COUNT = 0;
     }
 }
 
@@ -473,7 +478,13 @@ bool Engine::loadLevel(const std::string& level)
         return false;
     }
     G_COMPONENT_CHANGED = true;
+    app->levelLoaded();
     return true;
+}
+
+unsigned int Engine::getDrawCount() const
+{
+    return G_DRAW_COUNT;
 }
 
 void Engine::resetLevel()

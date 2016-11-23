@@ -71,6 +71,12 @@ void Input::reset()
     }
 }
 
+void Input::resetCursorDelta()
+{
+    deltaX = 0.0;
+    deltaY = 0.0;
+}
+
 void Input::setGUI(GUI* gui)
 {
     this->gui = gui;

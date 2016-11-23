@@ -22,6 +22,7 @@ public:
     Application& operator=(Application&&) = delete;
 
     virtual void start() = 0;
+    virtual void levelLoaded() = 0;
     virtual void handleInput(GLFWwindow* window) = 0;
     virtual void update() = 0;
     virtual void quit();

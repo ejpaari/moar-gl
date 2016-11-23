@@ -19,17 +19,20 @@ public:
     virtual ~MyApp() final;
 
     virtual void start() final;
+    virtual void levelLoaded() final;
     virtual void handleInput(GLFWwindow* window) final;
     virtual void update() final;
 
 private:
     struct LevelInfo {
-      std::string filename;
-      std::vector<glm::vec3> cameraPositions;
-      unsigned int positionIndex;
+        std::string filename;
+        std::vector<glm::vec3> cameraPositions;
+        std::vector<glm::vec3> cameraRotations;
+        unsigned int positionIndex;
     };
 
     void initGUI();
+    void resetCamera();
 
     moar::Camera* camera = nullptr;
     moar::Input* input = nullptr;
@@ -49,11 +52,10 @@ private:
     std::vector<LevelInfo> levelInfos;
     LevelInfo* currentLevelInfo = nullptr;
 
-    int fps = 0;
-    int fpsCounter = 0;
-    unsigned int* drawCount;
+    unsigned int fps = 0;
+    unsigned int drawCount = 0;
     glm::vec3 position;
-    double timeCounter = 0.0;
+    glm::vec3 rotation;
 };
 
 #endif // MYAPP_H
