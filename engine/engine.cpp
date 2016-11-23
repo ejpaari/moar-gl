@@ -483,6 +483,7 @@ void Engine::resetLevel()
     lights.resize(Light::Type::NUM_TYPES);
     allObjects.clear();
     manager.clear();
+    skybox.reset();
 }
 
 void Engine::render()
