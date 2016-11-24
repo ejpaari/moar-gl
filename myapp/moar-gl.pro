@@ -7,25 +7,13 @@
 
 TARGET = moar-gl
 
-CONFIG += console
-CONFIG -= app_bundle
 CONFIG += c++11
-DEFINES += DEBUG
-
-#QMAKE_CXXFLAGS_DEBUG *= -pg
-#QMAKE_LFLAGS_DEBUG *= -pg
-#CONFIG += debug
-
-TEMPLATE = app
 
 copydata.commands = $(COPY_DIR) $$PWD/settings.ini $$OUT_PWD
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)
 QMAKE_EXTRA_TARGETS += first copydata
-
-DISTFILES += \
-    settings.ini
 
 SOURCES += \
     main.cpp \
@@ -82,7 +70,8 @@ HEADERS += \
     ../engine/postframebuffer.h
 
 # GLFW
-unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3 -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -ldl
+unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3
+unix:!macx: LIBS += -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -ldl
 
 INCLUDEPATH += $$PWD/../glfw/include/
 DEPENDPATH += $$PWD/../glfw/include/
@@ -90,32 +79,32 @@ DEPENDPATH += $$PWD/../glfw/include/
 unix:!macx: PRE_TARGETDEPS += $$PWD/../glfw/src/libglfw3.a
 
 # GLEW
-unix:!macx: LIBS += -L/usr/lib/x86_64-linux-gnu/ -lGLEW
+unix:!macx: LIBS += -lGLEW
 
 INCLUDEPATH += /usr/include/GL
 DEPENDPATH += /usr/include/GL
 
 # SOIL
-unix:!macx: LIBS += -L/usr/lib/ -lSOIL
+unix:!macx: LIBS += -lSOIL
 
 INCLUDEPATH += /usr/include/SOIL
 DEPENDPATH += /usr/include/SOIL
 
 # Assimp
-unix:!macx: LIBS += -L$$PWD/../assimp/lib/ -lassimp
+unix:!macx: LIBS += -lassimp
 
 INCLUDEPATH += $$PWD/../assimp/include
 DEPENDPATH += $$PWD/../assimp/include
 
 
 # AntTweakBar
-unix:!macx: LIBS += -L/usr/lib/ -lAntTweakBar
+unix:!macx: LIBS += -lAntTweakBar
 
 INCLUDEPATH += /usr/include/AntTweakBar
 DEPENDPATH += /usr/include/AntTweakBar
 
 # Boost
-#unix:!macx: LIBS += -L/usr/local/lib/boost/ -lboost_system -lboost_filesystem
+#unix:!macx: LIBS += -lboost_system -lboost_filesystem
 
 #INCLUDEPATH += /usr/local/include/boost/
 #DEPENDPATH += /usr/local/include/boost/

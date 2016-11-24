@@ -37,4 +37,4 @@ Makefile*
 html/
 gmon.out
 gprof.png
-
+settings.ini
