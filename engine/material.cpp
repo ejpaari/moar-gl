@@ -45,7 +45,7 @@ void Material::setTexture(GLuint texture, TextureType type, GLenum target)
     textures.push_back(materialTex);
 }
 
-void Material::setUniform(const std::string& name, std::function<void ()> func, GLuint location)
+void Material::setCustomUniform(const std::string& name, std::function<void ()> func, GLuint location)
 {
     CustomUniform uniform;
     uniform.func = func;

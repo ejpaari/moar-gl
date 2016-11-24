@@ -17,6 +17,7 @@ public:
     GUI& operator=(GUI&&) = delete;
 
     bool init(GLFWwindow* window);
+    void uninit();
     void render();
     void keyCallback(int key, int action);
 };

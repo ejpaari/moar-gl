@@ -34,7 +34,7 @@ public:
 
     void setShaderType(int shaderType);
     void setTexture(GLuint texture, TextureType type, GLenum target);
-    void setUniform(const std::string& name, std::function<void()> func, GLuint location);
+    void setCustomUniform(const std::string& name, std::function<void()> func, GLuint location);
 
     int getShaderType() const;
     int getId() const;

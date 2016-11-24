@@ -122,6 +122,7 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+    gui.uninit(); // Must be called before terminating the API context.
     glDeleteBuffers(1, &Object::transformationBlockBuffer);
     glDeleteBuffers(1, &Light::lightBlockBuffer);
     glfwTerminate();
@@ -157,7 +158,7 @@ bool Engine::init(const std::string& settingsFile)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-#ifdef DEBUG
+#ifndef QT_NO_DEBUG
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
     } catch (boost::property_tree::ptree_error& e) {
@@ -212,7 +213,7 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "ERROR: " << glewGetErrorString(err) << "\n";
         return false;
     }
-#ifdef DEBUG
+#ifndef QT_NO_DEBUG
     if (glDebugMessageCallback) {
         glEnable(GL_DEBUG_OUTPUT);        
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -309,7 +310,7 @@ bool Engine::init(const std::string& settingsFile)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-#ifdef DEBUG
+#ifndef QT_NO_DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
 #endif
 
@@ -660,16 +661,17 @@ void Engine::updateObjectContainers()
             }
         }
     }
+
+    auto noLightComponent = [] (Object* obj) { return !obj->hasComponent<Light>(); };
     for (auto& objs : lights) {
-        objs.erase(std::remove_if(objs.begin(), objs.end(), [] (Object* obj) { return !obj->hasComponent<Light>(); }),
-                objs.end());
+        objs.erase(std::remove_if(objs.begin(), objs.end(), noLightComponent), objs.end());
     }
 
+    auto noParent = [] (Object::MeshObject mo) { return mo.parent == nullptr; };
     for (auto& shaderMeshMap : renderMeshes) {
         for (auto& meshMap : shaderMeshMap.second) {
             std::vector<Object::MeshObject>& meshes = meshMap.second;
-            meshes.erase(std::remove_if(meshes.begin(), meshes.end(), [] (Object::MeshObject mo) { return mo.parent == nullptr; }),
-                    meshes.end());
+            meshes.erase(std::remove_if(meshes.begin(), meshes.end(), noParent), meshes.end());
         }
     }
 

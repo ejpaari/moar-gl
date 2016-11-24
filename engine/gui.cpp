@@ -31,7 +31,6 @@ GUI::GUI()
 
 GUI::~GUI()
 {
-    TwTerminate();
 }
 
 bool GUI::init(GLFWwindow* window)
@@ -48,6 +47,11 @@ bool GUI::init(GLFWwindow* window)
     glfwSetCursorPosCallback(window, cursorPosCallback);
     glfwSetCharCallback(window, charCallback);
     return true;
+}
+
+void GUI::uninit()
+{
+    TwTerminate();
 }
 
 void GUI::render()

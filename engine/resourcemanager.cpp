@@ -385,7 +385,7 @@ bool ResourceManager::loadModel(Model* model, const std::string& file)
             if (aMaterial) {
                 std::unique_ptr<Material> mat(new Material());
                 if (loadMaterial(aMaterial, mat.get())) {
-                    mesh->setDefaultMaterial(mat.get());
+                    mesh->setMaterial(mat.get());
                     auto iter = materials.insert(std::make_pair(mat->getId(), std::move(mat)));
                     if (!iter.second) {
                         std::cerr << "ERROR: Could not insert material\n";

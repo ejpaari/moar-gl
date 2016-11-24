@@ -23,7 +23,7 @@ public:
     Mesh& operator=(const Mesh&) = delete;
     Mesh& operator=(Mesh&&) = delete;
 
-    Material* getDefaultMaterial() const;
+    Material* getMaterial() const;
     unsigned int getId() const;
     glm::vec3 getCenterPoint() const;
     float getBoundingRadius() const;
@@ -36,7 +36,7 @@ private:
     void setTextureCoordinates(const std::vector<glm::vec2>& coords);
     void setNormals(const std::vector<glm::vec3>& normals);
     void setTangents(const std::vector<glm::vec3>& tangents);
-    void setDefaultMaterial(Material* material);
+    void setMaterial(Material* material);
 
     void render() const;
 

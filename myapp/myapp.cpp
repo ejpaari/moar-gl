@@ -46,15 +46,15 @@ void MyApp::start()
 
     initGUI();
 
+    camera->setHDREnabled(true);
+    camera->setBloomIterations(4);
+
 //#define POSTPROC
 #ifdef POSTPROC
     offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
     offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
     camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
 #endif
-
-    camera->setHDREnabled(true);
-    camera->setBloomIterations(4);
 }
 
 void MyApp::levelLoaded()

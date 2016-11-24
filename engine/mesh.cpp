@@ -23,7 +23,7 @@ Mesh::~Mesh()
     glDeleteVertexArrays(1, &VAO);
 }
 
-Material* Mesh::getDefaultMaterial() const
+Material* Mesh::getMaterial() const
 {
     return material;
 }
@@ -71,7 +71,7 @@ void Mesh::setTangents(const std::vector<glm::vec3>& tangents)
     setBufferData<glm::vec3>(tangentBuffer, tangents, TANGENT_LOCATION, 3);
 }
 
-void Mesh::setDefaultMaterial(Material* material)
+void Mesh::setMaterial(Material* material)
 {
     this->material = material;
 }
