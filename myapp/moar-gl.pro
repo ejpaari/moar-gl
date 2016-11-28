@@ -7,7 +7,11 @@
 
 TARGET = moar-gl
 
-CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11
+TEMPLATE = app
+CONFIG += console
+CONFIG -= app_bundle
+CONFIG -= qt
 
 copydata.commands = $(COPY_DIR) $$PWD/settings.ini $$OUT_PWD
 first.depends = $(first) copydata
@@ -69,14 +73,16 @@ HEADERS += \
     ../engine/depthmappoint.h \
     ../engine/postframebuffer.h
 
+INCLUDEPATH += $$PWD/../external/glm/
+
 # GLFW
-unix:!macx: LIBS += -L$$PWD/../glfw/src/ -lglfw3
-unix:!macx: LIBS += -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -ldl
+unix:!macx: LIBS += -L$$PWD/../external/glfw/src/ -lglfw3
+unix:!macx: LIBS += -lX11 -lXrandr -lXinerama -lXi -lXxf86vm -lXcursor -lGL -ldl -pthread
 
-INCLUDEPATH += $$PWD/../glfw/include/
-DEPENDPATH += $$PWD/../glfw/include/
+INCLUDEPATH += $$PWD/../external/glfw/include/
+DEPENDPATH += $$PWD/../external/glfw/include/
 
-unix:!macx: PRE_TARGETDEPS += $$PWD/../glfw/src/libglfw3.a
+unix:!macx: PRE_TARGETDEPS += $$PWD/../external/glfw/src/libglfw3.a
 
 # GLEW
 unix:!macx: LIBS += -lGLEW
@@ -93,8 +99,8 @@ DEPENDPATH += /usr/include/SOIL
 # Assimp
 unix:!macx: LIBS += -lassimp
 
-INCLUDEPATH += $$PWD/../assimp/include
-DEPENDPATH += $$PWD/../assimp/include
+INCLUDEPATH += $$PWD/../external/assimp/include
+DEPENDPATH += $$PWD/../external/assimp/include
 
 
 # AntTweakBar
