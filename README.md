@@ -30,11 +30,9 @@ A simple graphics engine / test framework which utilizes OpenGL 4.x and C++11
 
 1. Clone using "--recursive" to get the submodules
 2. Build / install required tools, libraries and submodules
-3. Build the project
-
-3.1 With Qt / Qt Creator
-
-3.2 By running qmake and building with the Makefile
+3. Build the project (two ways which are essentially the same)
+ * With Qt / Qt Creator Build & Run
+ * By running qmake and building with the Makefile
 
 ### Assets:
 
