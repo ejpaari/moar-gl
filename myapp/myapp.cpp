@@ -46,8 +46,8 @@ void MyApp::start()
 
     initGUI();
 
-    camera->setHDREnabled(true);
-    camera->setBloomIterations(4);
+    camera->setBloomIterations(bloomIterations);
+    camera->setHDREnabled(HDR);
 
 //#define POSTPROC
 #ifdef POSTPROC
@@ -62,6 +62,10 @@ void MyApp::levelLoaded()
     if (currentLevelInfo) {
         currentLevelInfo->positionIndex = 0;
         resetCamera();
+    }
+    if (currentLevelInfo->filename == "sponza.lvl") {
+        light1 = engine->getObjectByName("light1");
+        light2 = engine->getObjectByName("light2");
     }
 }
 
@@ -91,12 +95,13 @@ void MyApp::handleInput(GLFWwindow* window)
     }
 
     if (input->isKeyPressed(GLFW_KEY_B)) {
-        int iterations = camera->getBloomIterations() + 4;
-        iterations = iterations > 30 ? 0 : iterations;
-        camera->setBloomIterations(iterations);
+        bloomIterations = camera->getBloomIterations() + 4;
+        bloomIterations = bloomIterations > 30 ? 0 : bloomIterations;
+        camera->setBloomIterations(bloomIterations);
     }
     if (input->isKeyPressed(GLFW_KEY_H)) {
-        camera->setHDREnabled(!camera->isHDREnabled());
+        HDR = !HDR;
+        camera->setHDREnabled(HDR);
     }
 
     if (input->isKeyPressed(GLFW_KEY_R)) {
@@ -129,20 +134,17 @@ void MyApp::handleInput(GLFWwindow* window)
 
 void MyApp::update()
 {
-    fps = static_cast<unsigned int>(1.0f / time->getDelta());
+    FPS = static_cast<unsigned int>(1.0f / time->getDelta());
     drawCount = engine->getDrawCount();
     position = camera->getPosition();
     rotation = camera->getRotation();
 
-#ifdef MOVE
-    float t = time->getTime();
-    float sint = static_cast<float>(sin(t));
-    light1->setPosition(glm::vec3(1.5 + sin(t * 0.1), 1.8 + (sint * 0.3), 0.0f));
-    light2->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.5), 0.0f));
-    light3->setPosition(glm::vec3(-1.5 - sin(t * 0.1), 1.8 + (sint * 0.4), 0.0f));
-    light4->setPosition(glm::vec3(-1.5 + sin(t * 0.3), 1.7 + (sint * 0.3), 0.0f));
-    light5->move(glm::vec3(0.0f, sin(1.5f * t) * 0.01f, sint * 0.03f));
-#endif
+    if (light1 && light2) {
+        float t = time->getTime();
+        float sint = static_cast<float>(sin(t));
+        light1->setPosition(glm::vec3(-1.5 + sin(t * 0.2), 1.8 + (sint * 0.15), 0.0f));
+        light2->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.12), 0.0f));
+    }
 
 #ifdef POSTPROC
     offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
@@ -152,13 +154,15 @@ void MyApp::update()
 void MyApp::initGUI()
 {
     bar = TwNewBar("GUI");
-    TwDefine(" GUI size='300 100' ");
+    TwDefine(" GUI size='300 130' ");
     TwDefine(" GUI valueswidth=140 ");
     TwDefine(" GUI refresh=0.5 ");
-    TwAddVarRO(bar, "fps", TW_TYPE_INT32, &fps, "");
-    TwAddVarRO(bar, "draw count", TW_TYPE_UINT32, &drawCount, "");
-    TwAddVarRO(bar, "position", TW_TYPE_DIR3F, &position, "");
-    TwAddVarRO(bar, "rotation", TW_TYPE_DIR3F, &rotation, "");
+    TwAddVarRO(bar, "FPS", TW_TYPE_INT32, &FPS, "");
+    TwAddVarRO(bar, "Draw count", TW_TYPE_UINT32, &drawCount, "");
+    TwAddVarRO(bar, "Position", TW_TYPE_DIR3F, &position, "");
+    TwAddVarRO(bar, "Rotation", TW_TYPE_DIR3F, &rotation, "");
+    TwAddVarRO(bar, "Bloom", TW_TYPE_UINT32, &bloomIterations, "");
+    TwAddVarRO(bar, "HDR", TW_TYPE_BOOLCPP, &HDR, "");
 }
 
 void MyApp::resetCamera()

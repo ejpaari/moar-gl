@@ -1,6 +1,6 @@
 # moar-gl
 
-A simple graphics engine / test framework which utilizes OpenGL 4.x and C++11
+A simple graphics engine / sandbox which utilizes OpenGL 4.x and C++11
 
 ### Features:
 - Multi-pass forward rendering with ambient pass
@@ -26,7 +26,7 @@ A simple graphics engine / test framework which utilizes OpenGL 4.x and C++11
 - GLFW
 - Assimp
 
-### Installation
+### Setup
 
 1. Clone using "--recursive" to get the submodules
 2. Build / install required tools, libraries and submodules

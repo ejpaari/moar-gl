@@ -75,7 +75,7 @@ float calcPointShadow(samplerCube depthTex, vec3 vertexPos_World, vec3 lightPos_
 {
   vec3 vertexToLight = vertexPos_World - lightPos_World;
   float currentDepth = length(vertexToLight);
-  float bias = 0.05;
+  float bias = 0.02;
 
   float shadow = 0.0;
   vec2 texelSize = 2.0 * length(vertexToLight) / textureSize(depthTex, 0);

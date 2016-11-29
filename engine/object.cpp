@@ -73,6 +73,11 @@ unsigned int Object::getId() const
     return id;
 }
 
+std::string Object::getName() const
+{
+    return name;
+}
+
 glm::vec3 Object::getPosition() const
 {
     return position;

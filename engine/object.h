@@ -58,6 +58,7 @@ public:
     virtual void setScale(const glm::vec3& scale);
 
     unsigned int getId() const;
+    std::string getName() const;
     glm::vec3 getPosition() const;
     glm::vec3 getRotation() const;
     glm::vec3 getScale() const;

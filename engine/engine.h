@@ -46,6 +46,7 @@ public:
     Input* getInput();
     RenderSettings* getRenderSettings();
     Time* getTime();
+    Object* getObjectByName(const std::string& name) const;
 
     Object* createObject(const std::string& name = "");
     bool loadLevel(const std::string& level);

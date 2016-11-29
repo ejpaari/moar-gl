@@ -42,20 +42,19 @@ private:
 
     moar::Object* light1 = nullptr;
     moar::Object* light2 = nullptr;
-    moar::Object* light3 = nullptr;
-    moar::Object* light4 = nullptr;
-    moar::Object* light5 = nullptr;
-    moar::Object* monkey = nullptr;
 
     TwBar* bar = nullptr;
     
     std::vector<LevelInfo> levelInfos;
     LevelInfo* currentLevelInfo = nullptr;
 
-    unsigned int fps = 0;
+    unsigned int FPS = 0;
     unsigned int drawCount = 0;
     glm::vec3 position;
     glm::vec3 rotation;
+
+    int bloomIterations = 0;
+    bool HDR = true;
 };
 
 #endif // MYAPP_H

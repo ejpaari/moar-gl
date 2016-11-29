@@ -378,6 +378,16 @@ Time*Engine::getTime()
     return &time;
 }
 
+Object* Engine::getObjectByName(const std::string& name) const
+{
+    for (auto obj : allObjects) {
+        if (obj->getName() == name) {
+            return obj.get();
+        }
+    }
+    return nullptr;
+}
+
 Object* Engine::createObject(const std::string& name)
 {
     std::shared_ptr<Object> obj(new Object(name));
