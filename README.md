@@ -2,7 +2,7 @@
 
 A simple graphics engine / sandbox which utilizes OpenGL 4.x and C++11. The emphasis is on implementing and learning graphic features. Other features (such as multiple cameras) are implemented when needed.
 
-### Grahpic features:
+### Graphic features:
 - Multi-pass forward rendering with ambient pass
 - Diffuse, normal, bump and specular mapping
 - Real-time hard shadows
