@@ -123,8 +123,6 @@ Engine::Engine()
 Engine::~Engine()
 {
     gui.uninit(); // Must be called before terminating the API context.
-    glDeleteBuffers(1, &Object::transformationBlockBuffer);
-    glDeleteBuffers(1, &Light::lightBlockBuffer);
     glfwTerminate();
 }
 
@@ -267,48 +265,12 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "WARNING: Failed to load render settings\n";
     }
 
-    depthMapDir.setSize(renderSettings.windowWidth, renderSettings.windowHeight);
-    if (!depthMapDir.init()) {
+    if (!renderer.init(&renderSettings, &manager)) {
+        std::cerr << "ERROR: Failed to initialize renderer\n";
         return false;
     }
+    renderer.setCamera(camera.get());
 
-    depthMapPoint.setSize(1024, 1024);
-    if (!depthMapPoint.init()) {
-        return false;
-    }
-
-    Framebuffer::setSize(renderSettings.windowWidth, renderSettings.windowHeight);
-    PostFramebuffer::setSize(renderSettings.windowWidth, renderSettings.windowHeight);
-    bool framebuffersInitialized =
-            fb.init(2) &&
-            postBuffer1.init() &&
-            postBuffer2.init() &&
-            blitBuffer1.init() &&
-            blitBuffer2.init();
-    if (!framebuffersInitialized) {
-        std::cerr << "ERROR: Framebuffer status is incomplete\n";
-        return false;
-    }
-
-    passthrough = Postprocess("passthrough", manager.getShader("passthrough")->getProgram(), 0);
-
-    GLuint lightBuffer;
-    glGenBuffers(1, &lightBuffer);
-    glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
-    GLsizeiptr lightBufferSize = 16 + 16 + 16;
-    glBufferData(GL_UNIFORM_BUFFER, lightBufferSize, 0, GL_DYNAMIC_DRAW);
-    Light::lightBlockBuffer = lightBuffer;
-
-    GLuint transformationBuffer;
-    glGenBuffers(1, &transformationBuffer);
-    glBindBuffer(GL_UNIFORM_BUFFER, transformationBuffer);
-    GLsizeiptr transformationBufferSize = 4 * sizeof(*Object::projection);
-    glBufferData(GL_UNIFORM_BUFFER, transformationBufferSize, 0, GL_DYNAMIC_DRAW);
-    Object::transformationBlockBuffer = transformationBuffer;
-
-    glEnable(GL_MULTISAMPLE);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
 
 #ifndef QT_NO_DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
@@ -337,11 +299,10 @@ void Engine::execute()
         input.reset();
         app->update();
 
-        updateObjectContainers();
         updateObjects();
 
         G_DRAW_COUNT = 0;
-        render();
+        renderer.render(allObjects, skybox.get());
         gui.render();
 
         glfwSwapBuffers(window);
@@ -500,195 +461,10 @@ unsigned int Engine::getDrawCount() const
 
 void Engine::resetLevel()
 {
-    renderMeshes.clear();
-    lights.clear();
-    lights.resize(Light::Type::NUM_TYPES);
+    renderer.clear();
     allObjects.clear();
     manager.clear();
     skybox.reset();
-}
-
-void Engine::render()
-{
-    fb.bind();
-    objectsInFrustum.clear();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    Object::setViewMatrixUniform();
-
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LESS);
-    glDisable(GL_BLEND);
-    shader = renderSettings.ambientShader;
-    glUseProgram(renderSettings.ambientShader->getProgram());
-    glUniform3f(AMBIENT_LOCATION, renderSettings.ambientColor.x, renderSettings.ambientColor.y, renderSettings.ambientColor.z);
-    for (auto& shaderMeshMap : renderMeshes) {
-        for (auto& meshMap : shaderMeshMap .second) {
-            manager.getMaterial(meshMap.first)->setUniforms(shader);
-            for (auto& meshObject : meshMap.second) {
-                if (!objectInsideFrustum(meshObject)) {
-                   continue;
-                }
-                meshObject.parent->setUniforms(shader);
-                meshObject.mesh->render();
-                objectsInFrustum.insert(meshObject.mesh->getId());
-            }
-        }
-    }
-
-    glEnable(GL_BLEND);
-    glDepthFunc(GL_LEQUAL);
-    glBlendFunc(GL_ONE, GL_ONE);
-
-    lighting(Light::DIRECTIONAL);
-    lighting(Light::POINT);
-
-    glDisable(GL_BLEND);
-    glDepthFunc(GL_LEQUAL);
-
-    if (skybox) {
-        glCullFace(GL_FRONT);
-        shader = renderSettings.skyboxShader;
-        glUseProgram(shader->getProgram());
-        skybox->setUniforms(shader);
-        for (auto& meshObject : skybox->getMeshObjects()) {
-            meshObject.material->setUniforms(shader);
-            meshObject.mesh->render();
-        }
-        glCullFace(GL_BACK);
-    }
-
-    const std::list<Postprocess>& postprocs = camera->getPostprocesses();
-    GLuint renderedTex = blitBuffer1.blit(fb.getFramebuffer(), 0);
-
-    if (camera->getBloomIterations() > 0) {
-        GLuint bloomTex = blitBuffer2.blit(fb.getFramebuffer(), 1);
-        glUseProgram(manager.getShader("bloom_blur")->getProgram());
-        GLboolean horizontal = true;
-        for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
-            glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
-            setPostFramebuffer();
-            bloomTex = postBuffer->draw(std::vector<GLuint>(1, bloomTex));
-            horizontal = !horizontal;
-        }
-        glUseProgram(manager.getShader("bloom_blend")->getProgram());
-        renderedTex = blitBuffer2.draw(std::vector<GLuint>{renderedTex, bloomTex});
-    }
-
-    if (camera->isHDREnabled()) {
-        glUseProgram(manager.getShader("hdr")->getProgram());
-        setPostFramebuffer();
-        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
-    }
-
-    for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
-        iter->bind();
-        setPostFramebuffer();
-        renderedTex = postBuffer->draw(std::vector<GLuint>(1, renderedTex));
-    }
-
-    passthrough.bind();
-    setPostFramebuffer();
-    postBuffer->setInputTextures(std::vector<GLuint>(1, renderedTex));
-    postBuffer->activate();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
-void Engine::lighting(Light::Type lightType)
-{
-    DepthMap* depthMap = nullptr;
-    if (lightType == Light::DIRECTIONAL) {
-        depthMap = &depthMapDir;
-    } else {
-        depthMap = &depthMapPoint;
-    }
-
-    for (auto& light : lights[lightType]) {
-        shader = manager.getShader(Shader::DEPTH, lightType);
-        glUseProgram(shader->getProgram());
-        Light* lightComp = light->getComponent<Light>();
-        bool shadowingEnabled = lightComp->isShadowingEnabled();
-        lightComp->setUniforms(light->getPosition(), light->getForward());
-        depthMap->bind(light->getPosition(), light->getForward());
-        if (shadowingEnabled) {
-            for (auto& shaderMeshMap : renderMeshes) {
-                for (auto& meshMap : shaderMeshMap.second) {
-                    for (auto& meshObject : meshMap.second) {
-                        if (meshObject.parent->isShadowCaster()) {
-                            meshObject.parent->setUniforms(shader);
-                            meshObject.mesh->render();
-                        }
-                    }
-                }
-            }
-        }
-
-        fb.bind();
-
-        for (auto& shaderMeshMap : renderMeshes) {
-            shader = manager.getShader(shaderMeshMap.first, lightType);
-            glUseProgram(shader->getProgram());
-            if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
-                glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-            }
-            depthMap->activate();
-            for (auto& meshMap : shaderMeshMap.second) {
-                manager.getMaterial(meshMap.first)->setUniforms(shader);
-                for (auto& meshObject : meshMap.second) {
-                    if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
-                        continue;
-                    }
-                    meshObject.parent->setUniforms(shader);
-                    meshObject.mesh->render();
-                }
-            }
-        }
-    }
-}
-
-void Engine::updateObjectContainers()
-{
-    if (!G_COMPONENT_CHANGED) {
-        return;
-    }
-
-    for (const auto obj : allObjects) {
-        for (auto& meshObject : obj->getMeshObjects()) {
-            int shaderType = meshObject.material->getShaderType();
-            MaterialId materialId = meshObject.material->getId();
-            std::vector<Object::MeshObject>& meshes = renderMeshes[shaderType][materialId];
-            if (std::find(meshes.begin(), meshes.end(), meshObject) == meshes.end()) {
-                meshes.push_back(meshObject);
-            }
-        }
-        if (obj->hasComponent<Light>()) {
-            Light::Type type = obj->getComponent<Light>()->getLightType();
-            std::vector<Object*>& objs = lights[type];
-            if (std::find(objs.begin(), objs.end(), obj.get()) == objs.end()) {
-                lights[type].push_back(obj.get());
-            }
-        }
-    }
-
-    auto noLightComponent = [] (Object* obj) { return !obj->hasComponent<Light>(); };
-    for (auto& objs : lights) {
-        objs.erase(std::remove_if(objs.begin(), objs.end(), noLightComponent), objs.end());
-    }
-
-    auto noParent = [] (Object::MeshObject mo) { return mo.parent == nullptr; };
-    for (auto& shaderMeshMap : renderMeshes) {
-        for (auto& meshMap : shaderMeshMap.second) {
-            std::vector<Object::MeshObject>& meshes = meshMap.second;
-            meshes.erase(std::remove_if(meshes.begin(), meshes.end(), noParent), meshes.end());
-        }
-    }
-
-#if DEBUG
-    manager.checkMissingTextures();
-#endif
-    G_COMPONENT_CHANGED = false;
 }
 
 void Engine::updateObjects()
@@ -742,21 +518,6 @@ bool Engine::createSkybox()
     skybox->setShadowReceiver(false);
 
     return true;
-}
-
-bool Engine::objectInsideFrustum(const Object::MeshObject& mo) const
-{
-    glm::vec3 point = mo.mesh->getCenterPoint();
-    point = glm::vec3((*Object::view) * mo.parent->getModelMatrix() * glm::vec4(point.x, point.y, point.z, 1.0f));
-    glm::vec3 scale = mo.parent->getScale();
-    float scaleMultiplier = std::max(std::max(scale.x, scale.y), scale.z);
-    float radius = mo.mesh->getBoundingRadius() * scaleMultiplier ;
-    return camera->sphereInsideFrustum(point, radius);
-}
-
-void Engine::setPostFramebuffer()
-{
-    postBuffer = postBuffer != &postBuffer1 ? &postBuffer1 : &postBuffer2;
 }
 
 } // moar

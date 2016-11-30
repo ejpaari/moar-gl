@@ -9,7 +9,7 @@ namespace moar
 
 class Light
 {
-    friend class Engine;
+    friend class Renderer;
 
 public:
     enum Type

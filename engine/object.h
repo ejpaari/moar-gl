@@ -20,6 +20,7 @@ namespace moar
 class Object
 {
     friend class Engine;
+    friend class Renderer;
 
 public:
     struct MeshObject

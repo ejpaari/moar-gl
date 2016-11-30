@@ -14,7 +14,7 @@ namespace moar
 
 class Material
 {
-    friend class Engine;
+    friend class Renderer;
 
 public:
     enum TextureType

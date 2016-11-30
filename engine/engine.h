@@ -9,12 +9,7 @@
 #include "time.h"
 #include "camera.h"
 #include "object.h"
-#include "light.h"
-#include "framebuffer.h"
-#include "postframebuffer.h"
-#include "depthmapdir.h"
-#include "depthmappoint.h"
-#include "shader.h"
+#include "renderer.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -55,13 +50,10 @@ public:
 
 private:
     void resetLevel();
-    void render();
-    void lighting(Light::Type lightType);
     void updateObjectContainers();
     void updateObjects();
     void printInfo(int windowWidth, int windowHeight);
-    bool createSkybox();
-    bool objectInsideFrustum(const Object::MeshObject& mo) const;
+    bool createSkybox();    
     void setPostFramebuffer();
 
     std::shared_ptr<Application> app;
@@ -71,29 +63,12 @@ private:
     GUI gui;
     Input input;
     RenderSettings renderSettings;
+    Renderer renderer;
     Time time;
 
-    using MaterialId = int;
-    using ShaderType = int;
-    using MeshMap = std::map<MaterialId, std::vector<Object::MeshObject>>;
-    std::map<ShaderType, MeshMap> renderMeshes;
-    std::vector<std::vector<Object*>> lights;
     std::vector<std::shared_ptr<Object>> allObjects;
     std::shared_ptr<Camera> camera;
-
-    std::shared_ptr<Object> skybox;
-    std::unordered_set<unsigned int> objectsInFrustum;
-
-    DepthMapDirectional depthMapDir;
-    DepthMapPoint depthMapPoint;
-    Framebuffer fb;
-    PostFramebuffer postBuffer1;
-    PostFramebuffer postBuffer2;
-    PostFramebuffer blitBuffer1;
-    PostFramebuffer blitBuffer2;
-    PostFramebuffer* postBuffer = nullptr;
-    const Shader* shader = nullptr;
-    Postprocess passthrough;
+    std::shared_ptr<Object> skybox;    
 };
 
 } // moar

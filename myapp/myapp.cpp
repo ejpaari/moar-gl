@@ -66,6 +66,9 @@ void MyApp::levelLoaded()
     if (currentLevelInfo->filename == "sponza.lvl") {
         light1 = engine->getObjectByName("light1");
         light2 = engine->getObjectByName("light2");
+    } else {
+        light1 = nullptr;
+        light2 = nullptr;
     }
 }
 

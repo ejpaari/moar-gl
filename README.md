@@ -1,13 +1,14 @@
 # moar-gl
 
-A simple graphics engine / sandbox which utilizes OpenGL 4.x and C++11
+A simple graphics engine / sandbox which utilizes OpenGL 4.x and C++11. The emphasis is on implementing and learning graphic features. Other features (such as multiple cameras) are implemented when needed.
 
-### Features:
+### Grahpic features:
 - Multi-pass forward rendering with ambient pass
 - Diffuse, normal, bump and specular mapping
 - Real-time hard shadows
 - Point and directional lighting
-- Bloom & HDR
+- Bloom
+- HDR
 - Custom post-processing shaders
 - Frustum culling (bounding sphere)
 - Skybox
@@ -30,7 +31,7 @@ A simple graphics engine / sandbox which utilizes OpenGL 4.x and C++11
 
 1. Clone using "--recursive" to get the submodules
 2. Build / install required tools, libraries and submodules
-3. Build the project (two ways which are essentially the same)
+3. Build the myapp example project (two ways which are essentially the same)
  * With Qt / Qt Creator Build & Run
  * By running qmake and building with the Makefile
 

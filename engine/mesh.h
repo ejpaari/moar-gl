@@ -13,7 +13,7 @@ namespace moar
 class Mesh
 {
     friend class ResourceManager;
-    friend class Engine;
+    friend class Renderer;
 
 public:
     explicit Mesh();

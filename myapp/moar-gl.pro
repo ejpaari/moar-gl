@@ -44,7 +44,8 @@ SOURCES += \
     ../engine/framebuffer.cpp \
     ../engine/depthmapdir.cpp \
     ../engine/depthmappoint.cpp \
-    ../engine/postframebuffer.cpp
+    ../engine/postframebuffer.cpp \
+    ../engine/renderer.cpp
 
 HEADERS += \
     myapp.h \
@@ -71,7 +72,8 @@ HEADERS += \
     ../engine/framebuffer.h \
     ../engine/depthmapdir.h \
     ../engine/depthmappoint.h \
-    ../engine/postframebuffer.h
+    ../engine/postframebuffer.h \
+    ../engine/renderer.h
 
 INCLUDEPATH += $$PWD/../external/glm/
 
