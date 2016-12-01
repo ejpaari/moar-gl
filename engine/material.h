@@ -4,6 +4,7 @@
 #include "shader.h"
 
 #include <GL/glew.h>
+
 #include <string>
 #include <vector>
 #include <functional>

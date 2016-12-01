@@ -7,10 +7,9 @@
 #include "light.h"
 
 #include <glm/glm.hpp>
-#include <GL/glew.h>
+
 #include <memory>
 #include <vector>
-#include <typeinfo>
 #include <string>
 #include <iostream>
 

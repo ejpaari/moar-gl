@@ -1,8 +1,5 @@
 #include "model.h"
 
-#include <iostream>
-#include <algorithm>
-
 namespace moar
 {
 
@@ -14,7 +11,7 @@ Model::~Model()
 {
 }
 
-const std::vector<std::unique_ptr<Mesh> >& Model::getMeshes() const
+const std::vector<std::unique_ptr<Mesh>>& Model::getMeshes() const
 {
     return meshes;
 }

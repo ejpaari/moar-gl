@@ -5,8 +5,6 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <utility>
-#include <assert.h>
 
 namespace moar
 {

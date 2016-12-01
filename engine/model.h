@@ -3,9 +3,6 @@
 
 #include "mesh.h"
 
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <string>
 #include <vector>
 #include <memory>
 

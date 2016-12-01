@@ -76,7 +76,7 @@ Postprocess* Camera::addPostprocess(const std::string& name, GLuint shader, int 
 {
     for (auto& p : postprocs) {
         if (p.getName() == name) {
-            std::cerr << "WARNING: Post process effect already exist: " << name << "\n";
+            std::cerr << "WARNING: Post process effect already exists: " << name << "\n";
             return nullptr;
         }
     }

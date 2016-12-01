@@ -16,6 +16,7 @@
 #include <unordered_set>
 #include <map>
 #include <vector>
+#include <memory>
 
 namespace moar
 {
@@ -32,12 +33,12 @@ public:
 
     bool init(const RenderSettings* settings, ResourceManager* manager);
     void setCamera(const Camera* camera);
-    void render(const std::vector<std::shared_ptr<Object>>& objects, Object* skybox = nullptr);
+    void render(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void clear();
 
 private:
     void lighting(Light::Type lightType);
-    void updateObjectContainers(const std::vector<std::shared_ptr<Object>>& objects);
+    void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);
     bool objectInsideFrustum(const Object::MeshObject& mo) const;
     void setPostFramebuffer();
 

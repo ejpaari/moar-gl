@@ -74,7 +74,7 @@ void Renderer::setCamera(const Camera* camera)
     this->camera = camera;
 }
 
-void Renderer::render(const std::vector<std::shared_ptr<Object>>& objects, Object* skybox)
+void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
 {
     if (!camera) {
         std::cerr << "WARNING: Camera not set for renderer\n";
@@ -226,13 +226,13 @@ void Renderer::lighting(Light::Type lightType)
     }
 }
 
-void Renderer::updateObjectContainers(const std::vector<std::shared_ptr<Object>>& objects)
+void Renderer::updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects)
 {
     if (!G_COMPONENT_CHANGED) {
         return;
     }
 
-    for (const auto obj : objects) {
+    for (const auto& obj : objects) {
         for (auto& meshObject : obj->getMeshObjects()) {
             int shaderType = meshObject.material->getShaderType();
             MaterialId materialId = meshObject.material->getId();

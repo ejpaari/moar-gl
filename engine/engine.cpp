@@ -21,7 +21,9 @@ namespace
 void APIENTRY debugCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei /*length*/,
                                     const GLchar* message, void* /*userParam*/)
 {
-    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
+        return;
+    }
 
     std::cerr << "OpenGL debug callback function\n";
     std::cerr << "    Message: "<< message << "\n";
@@ -302,7 +304,7 @@ void Engine::execute()
         updateObjects();
 
         G_DRAW_COUNT = 0;
-        renderer.render(allObjects, skybox.get());
+        renderer.render(objects, skybox.get());
         gui.render();
 
         glfwSwapBuffers(window);
@@ -341,7 +343,7 @@ Time*Engine::getTime()
 
 Object* Engine::getObjectByName(const std::string& name) const
 {
-    for (auto obj : allObjects) {
+    for (const auto& obj : objects) {
         if (obj->getName() == name) {
             return obj.get();
         }
@@ -351,9 +353,8 @@ Object* Engine::getObjectByName(const std::string& name) const
 
 Object* Engine::createObject(const std::string& name)
 {
-    std::shared_ptr<Object> obj(new Object(name));
-    allObjects.push_back(obj);
-    return obj.get();
+    objects.emplace_back(new Object(name));
+    return objects.back().get();
 }
 
 bool Engine::loadLevel(const std::string& level)
@@ -462,7 +463,7 @@ unsigned int Engine::getDrawCount() const
 void Engine::resetLevel()
 {
     renderer.clear();
-    allObjects.clear();
+    objects.clear();
     manager.clear();
     skybox.reset();
 }
@@ -471,7 +472,7 @@ void Engine::updateObjects()
 {
     camera->updateViewMatrix();
     Object::updateViewProjectionMatrix();
-    for (const std::shared_ptr<Object>& obj : allObjects) {
+    for (auto& obj : objects) {
         obj->updateModelMatrix();
     }
     if (skybox) {

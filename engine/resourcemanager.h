@@ -10,12 +10,10 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
 #include <GL/glew.h>
 
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 #include <memory>
 #include <functional>

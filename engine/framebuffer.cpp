@@ -14,7 +14,6 @@ void Framebuffer::setSize(int width, int height)
 
 Framebuffer::Framebuffer()
 {
-
 }
 
 Framebuffer::~Framebuffer()

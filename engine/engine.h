@@ -11,12 +11,10 @@
 #include "object.h"
 #include "renderer.h"
 
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <string>
 #include <vector>
-#include <map>
-#include <unordered_set>
 #include <memory>
 
 namespace moar
@@ -50,11 +48,9 @@ public:
 
 private:
     void resetLevel();
-    void updateObjectContainers();
     void updateObjects();
     void printInfo(int windowWidth, int windowHeight);
-    bool createSkybox();    
-    void setPostFramebuffer();
+    bool createSkybox();
 
     std::shared_ptr<Application> app;
 
@@ -66,9 +62,9 @@ private:
     Renderer renderer;
     Time time;
 
-    std::vector<std::shared_ptr<Object>> allObjects;
-    std::shared_ptr<Camera> camera;
-    std::shared_ptr<Object> skybox;    
+    std::vector<std::unique_ptr<Object>> objects;
+    std::unique_ptr<Camera> camera;
+    std::unique_ptr<Object> skybox;
 };
 
 } // moar
