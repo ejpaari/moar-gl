@@ -305,6 +305,7 @@ void Engine::execute()
 
         G_DRAW_COUNT = 0;
         renderer.render(objects, skybox.get());
+        //renderer.renderDeferred(objects, skybox.get());
         gui.render();
 
         glfwSwapBuffers(window);

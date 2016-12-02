@@ -91,7 +91,7 @@ void Material::checkMissingTextures() const
 }
 
 void Material::setUniforms(const Shader* shader)
-{
+{    
     for (unsigned int i = 0; i < textures.size(); ++i) {
         if (shader->hasUniform(textures[i].info->location)) {
             glActiveTexture(textures[i].info->unit);

@@ -84,7 +84,11 @@ GLuint Shader::getProgram() const
 
 bool Shader::hasUniform(GLuint location) const
 {
-    return uniforms[location];
+    try {
+        return uniforms.test(location);
+    } catch (std::out_of_range& e) {
+        return false;
+    }
 }
 
 bool Shader::compileShader(GLuint shader, const std::string& filename, const std::string& defines)

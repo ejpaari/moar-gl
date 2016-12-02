@@ -35,9 +35,9 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     }
 
     Framebuffer::setSize(renderSettings->windowWidth, renderSettings->windowHeight);
-    PostFramebuffer::setSize(renderSettings->windowWidth, renderSettings->windowHeight);
     bool framebuffersInitialized =
-            fb.init(2) &&
+            multisampleBuffer.init(2) &&
+            gBuffer.init() &&
             postBuffer1.init() &&
             postBuffer2.init() &&
             blitBuffer1.init() &&
@@ -81,17 +81,19 @@ void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Objec
         return;
     }
     updateObjectContainers(objects);
-    fb.bind();
+    multisampleBuffer.bind();
     objectsInFrustum.clear();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     Object::setViewMatrixUniform();
 
+    glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glDisable(GL_BLEND);
+
     shader = renderSettings->ambientShader;
-    glUseProgram(renderSettings->ambientShader->getProgram());
+    glUseProgram(shader->getProgram());
     glUniform3f(AMBIENT_LOCATION, renderSettings->ambientColor.x, renderSettings->ambientColor.y, renderSettings->ambientColor.z);
     for (auto& shaderMeshMap : renderMeshes) {
         for (auto& meshMap : shaderMeshMap .second) {
@@ -115,7 +117,6 @@ void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Objec
     lighting(Light::POINT);
 
     glDisable(GL_BLEND);
-    glDepthFunc(GL_LEQUAL);
 
     if (skybox) {
         glCullFace(GL_FRONT);
@@ -129,11 +130,14 @@ void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Objec
         glCullFace(GL_BACK);
     }
 
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
-    GLuint renderedTex = blitBuffer1.blit(fb.getFramebuffer(), 0);
+    GLuint renderedTex = blitBuffer1.blit(multisampleBuffer.getFramebuffer(), 0);
 
     if (camera->getBloomIterations() > 0) {
-        GLuint bloomTex = blitBuffer2.blit(fb.getFramebuffer(), 1);
+        GLuint bloomTex = blitBuffer2.blit(multisampleBuffer.getFramebuffer(), 1);
         glUseProgram(resourceManager->getShader("bloom_blur")->getProgram());
         GLboolean horizontal = true;
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
@@ -162,6 +166,53 @@ void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Objec
     setPostFramebuffer();
     postBuffer->setInputTextures(std::vector<GLuint>(1, renderedTex));
     postBuffer->activate();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objects, Object* /*skybox*/)
+{
+    if (!camera) {
+        std::cerr << "WARNING: Camera not set for renderer\n";
+        return;
+    }
+    updateObjectContainers(objects);
+    objectsInFrustum.clear();
+
+    gBuffer.bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    Object::setViewMatrixUniform();
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glDisable(GL_BLEND);
+
+    shader = resourceManager->getShader("gbuffer");
+    glUseProgram(shader->getProgram());
+    for (auto& shaderMeshMap : renderMeshes) {
+        for (auto& meshMap : shaderMeshMap .second) {
+            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
+            for (auto& meshObject : meshMap.second) {
+                if (!objectInsideFrustum(meshObject)) {
+                   continue;
+                }
+                meshObject.parent->setUniforms(shader);
+                meshObject.mesh->render();
+                objectsInFrustum.insert(meshObject.mesh->getId());
+            }
+        }
+    }
+
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    passthrough.bind();
+    setPostFramebuffer();
+    postBuffer->setInputTextures(std::vector<GLuint>(1, gBuffer.getNormalTexture()));
+    postBuffer->activate();
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -203,7 +254,7 @@ void Renderer::lighting(Light::Type lightType)
             }
         }
 
-        fb.bind();
+        multisampleBuffer.bind();
 
         for (auto& shaderMeshMap : renderMeshes) {
             shader = resourceManager->getShader(shaderMeshMap.first, lightType);

@@ -29,3 +29,6 @@ bloom_blur.frag
 bloom_blend.vert
 bloom_blend.frag
 
+gbuffer.vert
+gbuffer.frag
+

@@ -1,5 +1,5 @@
-layout(location = 0) out vec4 outColor0;
-layout(location = 1) out vec4 outColor1;
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outBloom;
 
 #if defined(DIFFUSE)
 layout (location = 20) uniform sampler2D diffuseTex;
@@ -118,7 +118,7 @@ bool isTransparent(float alpha)
 
 void main()
 {
-  outColor0 = vec4(0.0);
+  outColor = vec4(0.0);
 #if defined(POINT)
   float lightDistance = length(lightPos - vertexPos_World);
   float lightDistSqr = lightDistance * lightDistance;
@@ -176,7 +176,7 @@ void main()
 #endif
   }
 
-  outColor0 += shadow * vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
+  outColor += shadow * vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
 
 #if defined(SPECULAR)
   #if defined(NORMAL)
@@ -189,14 +189,14 @@ void main()
   float spec = clamp(dot(e, r), 0, 1);
   float specular = pow(spec, 10.0f) * texture(specularTex, sampleCoord).r;
   #if defined(POINT)
-    outColor0 += vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
+    outColor += vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
   #else
-    outColor0 += vec4(vec3(specular * lightPower), 1.0);
+    outColor += vec4(vec3(specular * lightPower), 1.0);
   #endif
 #endif
-    float bloom = dot(outColor0.rgb, vec3(1.0));
-    outColor1 = vec4(vec3(0.0), 1.0);
+    float bloom = dot(outColor.rgb, vec3(1.0));
+    outBloom = vec4(vec3(0.0), 1.0);
     if (bloom > 2.0) {
-      outColor1 = vec4(outColor0.rgb, 1.0);
+      outBloom = vec4(outColor.rgb, 1.0);
     }
 }

@@ -4,15 +4,6 @@
 namespace moar
 {
 
-int PostFramebuffer::width = 800;
-int PostFramebuffer::height = 600;
-
-void PostFramebuffer::setSize(int width, int height)
-{
-    PostFramebuffer::width = width;
-    PostFramebuffer::height = height;
-}
-
 PostFramebuffer::PostFramebuffer()
 {
 }
@@ -38,6 +29,7 @@ bool PostFramebuffer::init()
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+
     GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, drawBuffers);
 
@@ -67,12 +59,6 @@ void PostFramebuffer::activate()
         glUniform1i(RENDERED_TEX_LOCATION0 + i, i);
     }
     glBindVertexArray(quadVAO);
-}
-
-void PostFramebuffer::bind() const
-{
-    glViewport(0, 0, width, height);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 
 GLuint PostFramebuffer::draw(const std::vector<GLuint>& textures)

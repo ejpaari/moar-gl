@@ -1,6 +1,8 @@
 #ifndef POSTFRAMEBUFFER_H
 #define POSTFRAMEBUFFER_H
 
+#include "framebuffer.h"
+
 #include <GL/glew.h>
 
 #include <vector>
@@ -8,7 +10,7 @@
 namespace moar
 {
 
-class PostFramebuffer
+class PostFramebuffer : public Framebuffer
 {
 public:
     static void setSize(int width, int height);
@@ -22,18 +24,13 @@ public:
 
     bool init();
     void activate();
-    void bind() const;
     GLuint draw(const std::vector<GLuint>& textures);
     GLuint blit(GLuint blitBuffer, int attachment) const;
 
     void setInputTextures(const std::vector<GLuint>& textures);
     GLuint getFramebuffer() const;
 
-private:
-    static int width;
-    static int height;
-
-    GLuint framebuffer;
+private:    
     GLuint renderedTexture = 0;
     GLuint quadVAO = 0;
     GLuint quadBuffer = 0;

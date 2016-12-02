@@ -7,7 +7,9 @@
 #include "light.h"
 #include "camera.h"
 #include "framebuffer.h"
+#include "multisamplebuffer.h"
 #include "postframebuffer.h"
+#include "gbuffer.h"
 #include "depthmapdir.h"
 #include "depthmappoint.h"
 #include "shader.h"
@@ -34,6 +36,7 @@ public:
     bool init(const RenderSettings* settings, ResourceManager* manager);
     void setCamera(const Camera* camera);
     void render(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
+    void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void clear();
 
 private:
@@ -53,7 +56,8 @@ private:
     const Camera* camera = nullptr;
     DepthMapDirectional depthMapDir;
     DepthMapPoint depthMapPoint;
-    Framebuffer fb;
+    MultisampleBuffer multisampleBuffer;
+    GBuffer gBuffer;
     PostFramebuffer postBuffer1;
     PostFramebuffer postBuffer2;
     PostFramebuffer blitBuffer1;

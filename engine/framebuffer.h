@@ -3,8 +3,6 @@
 
 #include <GL/glew.h>
 
-#include <vector>
-
 namespace moar
 {
 
@@ -20,20 +18,13 @@ public:
     Framebuffer& operator=(const Framebuffer&) = delete;
     Framebuffer& operator=(Framebuffer&&) = delete;
 
-    bool init(int numOutputs);
     void bind() const;
 
-    GLuint getFramebuffer() const;
-    std::vector<GLuint> getOutputTextures() const;
-
-private:
+protected:
     static int width;
     static int height;
 
     GLuint framebuffer;
-    GLuint renderedTexture = 0;
-    GLuint depthRenderbuffer = 0;
-    std::vector<GLuint> outputTextures;
 };
 
 } // moar
