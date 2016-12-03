@@ -5,6 +5,8 @@
 
 #include <GL/glew.h>
 
+#include <vector>
+
 namespace moar
 {
 
@@ -23,6 +25,7 @@ public:
     GLuint getPositionTexture() const;
     GLuint getNormalTexture() const;
     GLuint getColorTexture() const;
+    std::vector<GLuint> getTextures() const;
 
 private:
     GLuint positionTexture = 0;

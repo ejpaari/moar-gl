@@ -40,6 +40,8 @@ extern const GLuint SPEC_TEX_LOCATION;
 
 extern const GLuint RENDERED_TEX_LOCATION0;
 extern const GLuint RENDERED_TEX_LOCATION1;
+extern const GLuint RENDERED_TEX_LOCATION2;
+extern const GLuint RENDERED_TEX_LOCATION3;
 
 extern const GLuint TIME_LOCATION;
 extern const GLuint SCREEN_SIZE_LOCATION;

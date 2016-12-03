@@ -304,8 +304,11 @@ void Engine::execute()
         updateObjects();
 
         G_DRAW_COUNT = 0;
-        renderer.render(objects, skybox.get());
-        //renderer.renderDeferred(objects, skybox.get());
+        if (deferred) {
+            renderer.renderDeferred(objects, skybox.get());
+        } else {
+            renderer.renderForward(objects, skybox.get());
+        }
         gui.render();
 
         glfwSwapBuffers(window);
@@ -454,6 +457,11 @@ bool Engine::loadLevel(const std::string& level)
     G_COMPONENT_CHANGED = true;
     app->levelLoaded();
     return true;
+}
+
+void Engine::setDeferredRendering(bool enabled)
+{
+    deferred = enabled;
 }
 
 unsigned int Engine::getDrawCount() const

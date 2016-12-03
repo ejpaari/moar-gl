@@ -74,23 +74,9 @@ void Renderer::setCamera(const Camera* camera)
     this->camera = camera;
 }
 
-void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
+void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
 {
-    if (!camera) {
-        std::cerr << "WARNING: Camera not set for renderer\n";
-        return;
-    }
-    updateObjectContainers(objects);
-    multisampleBuffer.bind();
-    objectsInFrustum.clear();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    Object::setViewMatrixUniform();
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LESS);
-    glDisable(GL_BLEND);
+    renderSetup(&multisampleBuffer, objects);
 
     shader = renderSettings->ambientShader;
     glUseProgram(shader->getProgram());
@@ -110,7 +96,6 @@ void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Objec
     }
 
     glEnable(GL_BLEND);
-    glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_ONE, GL_ONE);
 
     lighting(Light::DIRECTIONAL);
@@ -130,7 +115,6 @@ void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Objec
         glCullFace(GL_BACK);
     }
 
-    glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
@@ -173,21 +157,7 @@ void Renderer::render(const std::vector<std::unique_ptr<Object>>& objects, Objec
 
 void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objects, Object* /*skybox*/)
 {
-    if (!camera) {
-        std::cerr << "WARNING: Camera not set for renderer\n";
-        return;
-    }
-    updateObjectContainers(objects);
-    objectsInFrustum.clear();
-
-    gBuffer.bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    Object::setViewMatrixUniform();
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_BLEND);
+    renderSetup(&gBuffer, objects);
 
     shader = resourceManager->getShader("gbuffer");
     glUseProgram(shader->getProgram());
@@ -205,14 +175,34 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         }
     }
 
-    glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
-    passthrough.bind();
-    setPostFramebuffer();
-    postBuffer->setInputTextures(std::vector<GLuint>(1, gBuffer.getNormalTexture()));
-    postBuffer->activate();
+    glUseProgram(resourceManager->getShader("deferred_light")->getProgram());
+    for (unsigned int i = 0; i < gBuffer.getTextures().size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, gBuffer.getTextures()[i]);
+        glUniform1i(RENDERED_TEX_LOCATION0 + i, i);
+    }
 
+    setPostFramebuffer();
+    postBuffer->bind();
+    postBuffer->bindVAO();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    for (auto& light : lights[Light::POINT]) {
+        Light* lightComp = light->getComponent<Light>();
+        lightComp->setUniforms(light->getPosition(), light->getForward());
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
+    GLuint renderedTex = postBuffer->getRenderedTexture();
+
+    glDisable(GL_BLEND);
+    passthrough.bind();    
+    setPostFramebuffer();
+    postBuffer->setInputTextures(std::vector<GLuint>(1, renderedTex));
+    postBuffer->activate();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -223,6 +213,24 @@ void Renderer::clear()
     renderMeshes.clear();
     lights.clear();
     lights.resize(Light::Type::NUM_TYPES);
+}
+
+void Renderer::renderSetup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects)
+{
+    if (!camera) {
+        std::cerr << "WARNING: Camera not set for renderer\n";
+        return;
+    }
+    updateObjectContainers(objects);
+    objectsInFrustum.clear();
+    Object::setViewMatrixUniform();
+
+    fb->bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glDisable(GL_BLEND);
 }
 
 void Renderer::lighting(Light::Type lightType)

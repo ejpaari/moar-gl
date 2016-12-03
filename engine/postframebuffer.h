@@ -24,11 +24,13 @@ public:
 
     bool init();
     void activate();
+    void bindVAO();
     GLuint draw(const std::vector<GLuint>& textures);
     GLuint blit(GLuint blitBuffer, int attachment) const;
 
     void setInputTextures(const std::vector<GLuint>& textures);
     GLuint getFramebuffer() const;
+    GLuint getRenderedTexture() const;
 
 private:    
     GLuint renderedTexture = 0;

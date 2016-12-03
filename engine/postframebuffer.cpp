@@ -58,6 +58,11 @@ void PostFramebuffer::activate()
         glBindTexture(GL_TEXTURE_2D, inputTextures[i]);
         glUniform1i(RENDERED_TEX_LOCATION0 + i, i);
     }
+    bindVAO();
+}
+
+void PostFramebuffer::bindVAO()
+{
     glBindVertexArray(quadVAO);
 }
 
@@ -91,6 +96,11 @@ void PostFramebuffer::setInputTextures(const std::vector<GLuint>& textures)
 GLuint PostFramebuffer::getFramebuffer() const
 {
     return framebuffer;
+}
+
+GLuint PostFramebuffer::getRenderedTexture() const
+{
+    return renderedTexture;
 }
 
 } // moar

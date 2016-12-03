@@ -32,3 +32,6 @@ bloom_blend.frag
 gbuffer.vert
 gbuffer.frag
 
+deferred_light.vert
+deferred_light.frag
+

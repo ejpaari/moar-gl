@@ -97,6 +97,10 @@ void MyApp::handleInput(GLFWwindow* window)
         camera->move(-camera->getLeft() * input->getMovementSpeed() * time->getDelta());
     }
 
+    if (input->isKeyPressed(GLFW_KEY_F)) {
+        deferred = !deferred;
+        engine->setDeferredRendering(deferred);
+    }
     if (input->isKeyPressed(GLFW_KEY_B)) {
         bloomIterations = camera->getBloomIterations() + 4;
         bloomIterations = bloomIterations > 30 ? 0 : bloomIterations;
@@ -157,11 +161,12 @@ void MyApp::update()
 void MyApp::initGUI()
 {
     bar = TwNewBar("GUI");
-    TwDefine(" GUI size='300 130' ");
+    TwDefine(" GUI size='300 150' ");
     TwDefine(" GUI valueswidth=140 ");
     TwDefine(" GUI refresh=0.5 ");
     TwAddVarRO(bar, "FPS", TW_TYPE_INT32, &FPS, "");
     TwAddVarRO(bar, "Draw count", TW_TYPE_UINT32, &drawCount, "");
+    TwAddVarRO(bar, "Deferred", TW_TYPE_BOOLCPP, &deferred, "");
     TwAddVarRO(bar, "Position", TW_TYPE_DIR3F, &position, "");
     TwAddVarRO(bar, "Rotation", TW_TYPE_DIR3F, &rotation, "");
     TwAddVarRO(bar, "Bloom", TW_TYPE_UINT32, &bloomIterations, "");

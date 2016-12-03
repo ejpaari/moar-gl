@@ -43,6 +43,7 @@ public:
 
     Object* createObject(const std::string& name = "");
     bool loadLevel(const std::string& level);
+    void setDeferredRendering(bool enabled);
 
     unsigned int getDrawCount() const;
 
@@ -65,6 +66,8 @@ private:
     std::vector<std::unique_ptr<Object>> objects;
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Object> skybox;
+
+    bool deferred = true;
 };
 
 } // moar

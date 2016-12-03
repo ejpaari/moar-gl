@@ -35,11 +35,12 @@ public:
 
     bool init(const RenderSettings* settings, ResourceManager* manager);
     void setCamera(const Camera* camera);
-    void render(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
+    void renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void clear();
 
 private:
+    void renderSetup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
     void lighting(Light::Type lightType);
     void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);
     bool objectInsideFrustum(const Object::MeshObject& mo) const;

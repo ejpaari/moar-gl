@@ -68,5 +68,10 @@ GLuint GBuffer::getColorTexture() const
     return colorTexture;
 }
 
+std::vector<GLuint> GBuffer::getTextures() const
+{
+    return std::vector<GLuint>{colorTexture, normalTexture, positionTexture};
+}
+
 } // moar
 
