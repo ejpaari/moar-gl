@@ -24,7 +24,8 @@ namespace moar
 class ResourceManager
 {
 public:
-    ResourceManager();
+    explicit ResourceManager();
+    ~ResourceManager();
     ResourceManager(const ResourceManager&) = delete;
     ResourceManager(ResourceManager&&) = delete;
     ResourceManager& operator=(const ResourceManager&) = delete;

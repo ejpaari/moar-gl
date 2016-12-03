@@ -15,6 +15,7 @@ class Postprocess
 public:
     explicit Postprocess();
     explicit Postprocess(const std::string& name, GLuint shader, int priority);
+    ~Postprocess();
     Postprocess(const Postprocess&);
     Postprocess(Postprocess&&);
     Postprocess& operator=(Postprocess&);

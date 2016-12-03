@@ -13,7 +13,9 @@ namespace moar
 class PostFramebuffer : public Framebuffer
 {
 public:
-    static void setSize(int width, int height);
+    static void initQuad();
+    static void uninitQuad();
+    static void bindQuadVAO();
 
     explicit PostFramebuffer();
     ~PostFramebuffer();
@@ -23,20 +25,16 @@ public:
     PostFramebuffer& operator=(PostFramebuffer&&) = delete;
 
     bool init();
-    void activate();
-    void bindVAO();
     GLuint draw(const std::vector<GLuint>& textures);
     GLuint blit(GLuint blitBuffer, int attachment) const;
 
-    void setInputTextures(const std::vector<GLuint>& textures);
-    GLuint getFramebuffer() const;
     GLuint getRenderedTexture() const;
 
-private:    
+private:
+    static GLuint quadVAO;
+    static GLuint quadBuffer;
+
     GLuint renderedTexture = 0;
-    GLuint quadVAO = 0;
-    GLuint quadBuffer = 0;
-    std::vector<GLuint> inputTextures;
 };
 
 } // moar

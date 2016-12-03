@@ -12,6 +12,10 @@ ResourceManager::ResourceManager()
 {
 }
 
+ResourceManager::~ResourceManager()
+{
+}
+
 void ResourceManager::setShaderPath(const std::string& path)
 {
     shaderPath = path;

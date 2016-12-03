@@ -9,6 +9,10 @@ Time::Time()
 {
 }
 
+Time::~Time()
+{
+}
+
 void Time::update()
 {
     float t = static_cast<float>(glfwGetTime());

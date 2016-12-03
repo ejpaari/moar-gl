@@ -26,7 +26,7 @@ public:
         BUMP
     };
 
-    Material();
+    explicit Material();
     ~Material();
     Material(const Material&) = delete;
     Material(Material&&) = delete;

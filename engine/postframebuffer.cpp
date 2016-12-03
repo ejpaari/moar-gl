@@ -4,6 +4,38 @@
 namespace moar
 {
 
+GLuint PostFramebuffer::quadVAO = 0;
+GLuint PostFramebuffer::quadBuffer = 0;
+
+void PostFramebuffer::initQuad()
+{
+    GLfloat quadData[] = {
+        -1.0f, -1.0f, 0.0f,   1.0f, -1.0f, 0.0f,   -1.0f,  1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,   1.0f, -1.0f, 0.0f,    1.0f,  1.0f, 0.0f,
+    };
+
+    glGenVertexArrays(1, &quadVAO);
+    glBindVertexArray(quadVAO);
+
+    glGenBuffers(1, &quadBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, quadBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadData), quadData, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(VERTEX_LOCATION);
+}
+
+void PostFramebuffer::uninitQuad()
+{
+    glDeleteVertexArrays(1, &quadVAO);
+    glDeleteBuffers(1, &quadBuffer);
+}
+
+void PostFramebuffer::bindQuadVAO()
+{
+    glBindVertexArray(quadVAO);
+}
+
 PostFramebuffer::PostFramebuffer()
 {
 }
@@ -12,8 +44,6 @@ PostFramebuffer::~PostFramebuffer()
 {
     glDeleteFramebuffers(1, &framebuffer);
     glDeleteTextures(1, &renderedTexture);
-    glDeleteVertexArrays(1, &quadVAO);
-    glDeleteBuffers(1, &quadBuffer);
 }
 
 bool PostFramebuffer::init()
@@ -33,44 +63,19 @@ bool PostFramebuffer::init()
     GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, drawBuffers);
 
-    GLfloat quadData[] = {
-        -1.0f, -1.0f, 0.0f,   1.0f, -1.0f, 0.0f,   -1.0f,  1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f,   1.0f, -1.0f, 0.0f,    1.0f,  1.0f, 0.0f,
-    };
-
-    glGenVertexArrays(1, &quadVAO);
-    glBindVertexArray(quadVAO);
-
-    glGenBuffers(1, &quadBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, quadBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadData), quadData, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(VERTEX_LOCATION);
-
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
-}
-
-void PostFramebuffer::activate()
-{
-    for (unsigned int i = 0; i < inputTextures.size(); ++i) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, inputTextures[i]);
-        glUniform1i(RENDERED_TEX_LOCATION0 + i, i);
-    }
-    bindVAO();
-}
-
-void PostFramebuffer::bindVAO()
-{
-    glBindVertexArray(quadVAO);
 }
 
 GLuint PostFramebuffer::draw(const std::vector<GLuint>& textures)
 {
+    for (unsigned int i = 0; i < textures.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        glUniform1i(RENDERED_TEX_LOCATION0 + i, i);
+    }
+
     bind();
-    setInputTextures(textures);
-    activate();
+    bindQuadVAO();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -86,16 +91,6 @@ GLuint PostFramebuffer::blit(GLuint blitBuffer, int attachment) const
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     return renderedTexture;
-}
-
-void PostFramebuffer::setInputTextures(const std::vector<GLuint>& textures)
-{
-    inputTextures = textures;
-}
-
-GLuint PostFramebuffer::getFramebuffer() const
-{
-    return framebuffer;
 }
 
 GLuint PostFramebuffer::getRenderedTexture() const

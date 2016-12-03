@@ -22,9 +22,6 @@ public:
 
     bool init();
 
-    GLuint getPositionTexture() const;
-    GLuint getNormalTexture() const;
-    GLuint getColorTexture() const;
     std::vector<GLuint> getTextures() const;
 
 private:

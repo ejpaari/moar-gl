@@ -10,6 +10,10 @@ RenderSettings::RenderSettings()
 {    
 }
 
+RenderSettings::~RenderSettings()
+{
+}
+
 bool RenderSettings::loadSettings(const boost::property_tree::ptree& pt, ResourceManager& manager)
 {
     try {

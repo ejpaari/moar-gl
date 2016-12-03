@@ -18,6 +18,7 @@ class RenderSettings
 {
 public:
     explicit RenderSettings();
+    ~RenderSettings();
     RenderSettings(const RenderSettings&) = delete;
     RenderSettings(RenderSettings&&) = delete;
     RenderSettings& operator=(const RenderSettings&) = delete;

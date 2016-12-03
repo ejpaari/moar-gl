@@ -40,7 +40,8 @@ public:
     void clear();
 
 private:
-    void renderSetup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
+    void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
+    void renderPassthrough(GLuint texture);
     void lighting(Light::Type lightType);
     void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);
     bool objectInsideFrustum(const Object::MeshObject& mo) const;
@@ -65,7 +66,6 @@ private:
     PostFramebuffer blitBuffer2;
     PostFramebuffer* postBuffer = nullptr;
     const Shader* shader = nullptr;
-    Postprocess passthrough;
 
     std::unordered_set<unsigned int> objectsInFrustum;
 };

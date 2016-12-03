@@ -16,6 +16,10 @@ Postprocess::Postprocess(const std::string& name, GLuint shader, int priority) :
 {
 }
 
+Postprocess::~Postprocess()
+{
+}
+
 Postprocess::Postprocess(const Postprocess& rhs) :
     name(rhs.name),
     shader(rhs.shader),

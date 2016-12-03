@@ -53,21 +53,6 @@ bool GBuffer::init()
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
-GLuint GBuffer::getPositionTexture() const
-{
-    return positionTexture;
-}
-
-GLuint GBuffer::getNormalTexture() const
-{
-    return normalTexture;
-}
-
-GLuint GBuffer::getColorTexture() const
-{
-    return colorTexture;
-}
-
 std::vector<GLuint> GBuffer::getTextures() const
 {
     return std::vector<GLuint>{colorTexture, normalTexture, positionTexture};

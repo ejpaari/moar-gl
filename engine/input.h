@@ -21,6 +21,7 @@ public:
     };
   
     explicit Input();
+    ~Input();
     Input(const Input&) = delete;
     Input(Input&&) = delete;
     Input& operator=(const Input&) = delete;

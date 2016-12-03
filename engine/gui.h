@@ -9,7 +9,7 @@ namespace moar
 class GUI
 {
 public:
-    GUI();
+    explicit GUI();
     ~GUI();
     GUI(const GUI&) = delete;
     GUI(GUI&&) = delete;

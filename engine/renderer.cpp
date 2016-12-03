@@ -12,6 +12,7 @@ Renderer::~Renderer()
 {
     glDeleteBuffers(1, &Object::transformationBlockBuffer);
     glDeleteBuffers(1, &Light::lightBlockBuffer);
+    PostFramebuffer::uninitQuad();
 }
 
 bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
@@ -35,6 +36,7 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     }
 
     Framebuffer::setSize(renderSettings->windowWidth, renderSettings->windowHeight);
+    PostFramebuffer::initQuad();
     bool framebuffersInitialized =
             multisampleBuffer.init(2) &&
             gBuffer.init() &&
@@ -45,9 +47,7 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     if (!framebuffersInitialized) {
         std::cerr << "ERROR: Framebuffer status is incomplete\n";
         return false;
-    }
-
-    passthrough = Postprocess("passthrough", resourceManager->getShader("passthrough")->getProgram(), 0);
+    }    
 
     GLuint lightBuffer;
     glGenBuffers(1, &lightBuffer);
@@ -76,7 +76,7 @@ void Renderer::setCamera(const Camera* camera)
 
 void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
 {
-    renderSetup(&multisampleBuffer, objects);
+    setup(&multisampleBuffer, objects);
 
     shader = renderSettings->ambientShader;
     glUseProgram(shader->getProgram());
@@ -146,18 +146,12 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
         renderedTex = postBuffer->draw(std::vector<GLuint>(1, renderedTex));
     }
 
-    passthrough.bind();
-    setPostFramebuffer();
-    postBuffer->setInputTextures(std::vector<GLuint>(1, renderedTex));
-    postBuffer->activate();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    renderPassthrough(renderedTex);
 }
 
 void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objects, Object* /*skybox*/)
 {
-    renderSetup(&gBuffer, objects);
+    setup(&gBuffer, objects);
 
     shader = resourceManager->getShader("gbuffer");
     glUseProgram(shader->getProgram());
@@ -186,7 +180,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 
     setPostFramebuffer();
     postBuffer->bind();
-    postBuffer->bindVAO();
+    PostFramebuffer::bindQuadVAO();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (auto& light : lights[Light::POINT]) {
@@ -199,13 +193,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     GLuint renderedTex = postBuffer->getRenderedTexture();
 
     glDisable(GL_BLEND);
-    passthrough.bind();    
-    setPostFramebuffer();
-    postBuffer->setInputTextures(std::vector<GLuint>(1, renderedTex));
-    postBuffer->activate();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    renderPassthrough(renderedTex);
 }
 
 void Renderer::clear()
@@ -215,7 +203,7 @@ void Renderer::clear()
     lights.resize(Light::Type::NUM_TYPES);
 }
 
-void Renderer::renderSetup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects)
+void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects)
 {
     if (!camera) {
         std::cerr << "WARNING: Camera not set for renderer\n";
@@ -231,6 +219,21 @@ void Renderer::renderSetup(const Framebuffer* fb, const std::vector<std::unique_
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_BLEND);
+}
+
+void Renderer::renderPassthrough(GLuint texture)
+{
+    glUseProgram(resourceManager->getShader("passthrough")->getProgram());
+    PostFramebuffer::bindQuadVAO();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(RENDERED_TEX_LOCATION0, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::lighting(Light::Type lightType)
