@@ -11,4 +11,10 @@ const std::vector<TypeMapping> textureTypeMappings =
    {aiTextureType_DISPLACEMENT, Material::BUMP, Shader::BUMP, BUMP_DEFINE}
 };
 
+const std::map<Light::Type, std::string> lightDefineMappings
+{
+    {Light::POINT, POINT_DEFINE},
+    {Light::DIRECTIONAL, DIRECTIONAL_DEFINE}
+};
+
 } // moar

@@ -33,6 +33,14 @@ name floor
 component model
 cube.3ds
 
+name cube
+0.0 0.3 1.0
+0.0 0.0 0.0
+0.15 0.15 0.15
+1 1
+component model
+untitled.obj
+
 name light1
 1.0 2.0 1.0
 0.0 0.0 0.0

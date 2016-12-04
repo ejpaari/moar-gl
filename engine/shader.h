@@ -22,8 +22,7 @@ public:
         SPECULAR = 1 << 1,
         NORMAL = 1 << 2,
         BUMP = 1 << 3,
-        DEPTH = 1 << 4,
-        NUM_TYPES = 1 << 5
+        DEPTH = 1 << 4
     };
 
     explicit Shader();

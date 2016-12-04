@@ -97,8 +97,8 @@ bool ResourceManager::loadShaderFiles(const std::string& path)
     auto addDepthMapShader = [this] (const std::string& name, Light::Type type) {
         auto found = shadersByName.find(name);
         if (found != shadersByName.end()) {
-            ShaderKey key = std::make_pair(Shader::DEPTH, type);
-            shadersByType.insert(std::make_pair(key, found->second));
+            ForwardLightKey key = std::make_pair(Shader::DEPTH, type);
+            forwardLightShadersByType.insert(std::make_pair(key, found->second));
         } else {
             std::cerr << "WARNING: Depth map shader for light type " << type << " not found\n";
         }
@@ -129,7 +129,7 @@ Material* ResourceManager::createMaterial()
     }
 }
 
-const Shader* ResourceManager::getShader(const std::string& name)
+const Shader* ResourceManager::getShaderByName(const std::string& name)
 {
     auto found = shadersByName.find(name);
     if (found != shadersByName.end()) {
@@ -140,11 +140,11 @@ const Shader* ResourceManager::getShader(const std::string& name)
     }
 }
 
-const Shader* ResourceManager::getShader(int shaderType, Light::Type light)
+const Shader* ResourceManager::getForwardLightShader(int shaderType, Light::Type light)
 {
     auto getShaderPtr = [&] () -> Shader* {
-        auto found = shadersByType.find(std::make_pair(shaderType, light));
-        if (found != shadersByType.end()) {
+        auto found = forwardLightShadersByType.find(std::make_pair(shaderType, light));
+        if (found != forwardLightShadersByType.end()) {
             return found->second;
         } else {
             return nullptr;
@@ -155,15 +155,44 @@ const Shader* ResourceManager::getShader(int shaderType, Light::Type light)
     if (s != nullptr) {
         return s;
     } else {
-        if (loadLightShader(shaderType)) {
+        if (loadForwardLightShader(shaderType)) {
             s = getShaderPtr();
             if (s != nullptr) {
                 return s;
             } else {
-                std::cerr << "ERROR: Could not find shader " << shaderType << " with light type " << light << "\n";
+                std::cerr << "ERROR: Could not find forward shader " << shaderType << " with light type " << light << "\n";
             }
         } else {
-            std::cerr << "ERROR: Could not load shader " << shaderType << " with light type " << light << "\n";
+            std::cerr << "ERROR: Could not load forward shader " << shaderType << " with light type " << light << "\n";
+        }
+    }
+    return nullptr;
+}
+
+const Shader* ResourceManager::getGBufferShader(int shaderType)
+{
+    auto getShaderPtr = [&] () -> Shader* {
+        auto found = gBufferShadersByType.find(shaderType);
+        if (found != gBufferShadersByType.end()) {
+            return found->second;
+        } else {
+            return nullptr;
+        }
+    };
+
+    Shader* s = getShaderPtr();
+    if (s != nullptr) {
+        return s;
+    } else {
+        if (loadGBufferShader(shaderType)) {
+            s = getShaderPtr();
+            if (s != nullptr) {
+                return s;
+            } else {
+                std::cerr << "ERROR: Could not find gbuffer shader " << shaderType << "\n";
+            }
+        } else {
+            std::cerr << "ERROR: Could not load gbuffer shader " << shaderType << "\n";
         }
     }
     return nullptr;
@@ -265,14 +294,15 @@ void ResourceManager::checkMissingTextures() const
     }
 }
 
-bool ResourceManager::loadLightShader(int shaderType)
+bool ResourceManager::loadForwardLightShader(int shaderType)
 {
-    std::vector<ShaderKey> keys;
+    std::vector<ForwardLightKey> keys;
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
         keys.push_back(std::make_pair(shaderType, Light::Type(i)));
     }
 
-    if (std::all_of(keys.begin(), keys.end(), [&] (ShaderKey key) { return shadersByType.find(key) != shadersByType.end(); })) {
+    auto keyFound = [&] (ForwardLightKey key) { return forwardLightShadersByType.count(key) > 0; };
+    if (std::all_of(keys.begin(), keys.end(), keyFound)) {
         return true;
     }
 
@@ -283,10 +313,10 @@ bool ResourceManager::loadLightShader(int shaderType)
         }
     }
 
-    std::string path = shaderPath + LIGHT_SHADER;
-    auto createLightingShader = [&] (Light::Type lightType, std::string defines)
+    std::string path = shaderPath + FORWARD_LIGHT_SHADER;
+    auto createForwardLightShader = [&] (Light::Type lightType, std::string defines)
     {
-        defines += lightType == Light::POINT ? POINT_DEFINE : DIRECTIONAL_DEFINE;
+        defines += lightDefineMappings.at(lightType);
         std::unique_ptr<Shader> shader(new Shader());
         bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", defines);
         attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", defines);
@@ -295,22 +325,54 @@ bool ResourceManager::loadLightShader(int shaderType)
             return false;
         }
         if (!shader->linkProgram()) {
-            std::cerr << "WARNING: Failed to link light shader for light type " << lightType << " with mask: " << std::bitset<8>(shaderType) << "\n";
+            std::cerr << "WARNING: Failed to link forward light shader for light type " << lightType << " with mask: " << std::bitset<8>(shaderType) << "\n";
             return false;
         }
 
-        std::cout << "Created light shader for light type " << lightType << " with mask " << std::bitset<8>(shaderType) << "\n";
-        ShaderKey key = std::make_pair(shaderType, lightType);
-        shadersByType.insert(std::make_pair(key, shader.get()));
+        std::cout << "Created forward light shader for light type " << lightType << " with mask " << std::bitset<8>(shaderType) << "\n";
+        ForwardLightKey key = std::make_pair(shaderType, lightType);
+        forwardLightShadersByType.insert(std::make_pair(key, shader.get()));
         shaders.push_back(std::move(shader));
         return true;
     };
 
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
-        if (!createLightingShader(Light::Type(i), ss.str())) {
+        if (!createForwardLightShader(Light::Type(i), ss.str())) {
             return false;
         }
     }
+    return true;
+}
+
+bool ResourceManager::loadGBufferShader(int shaderType)
+{
+    if (gBufferShadersByType.count(shaderType) > 0) {
+        return true;
+    }
+
+    std::stringstream ss;
+    for (const auto& tm : textureTypeMappings) {
+        if (shaderType & tm.shaderType) {
+            ss << tm.shaderDefine;
+        }
+    }
+    std::string defines = ss.str();
+    std::string path = shaderPath + GBUFFER_SHADER;
+    std::unique_ptr<Shader> shader(new Shader());
+    bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", defines);
+    attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", defines);
+
+    if (!attached) {
+        return false;
+    }
+    if (!shader->linkProgram()) {
+        std::cerr << "WARNING: Failed to link gbuffer shader with mask: " << std::bitset<8>(shaderType) << "\n";
+        return false;
+    }
+
+    std::cout << "Created gbuffer shader with mask " << std::bitset<8>(shaderType) << "\n";
+    gBufferShadersByType.insert(std::make_pair(shaderType, shader.get()));
+    shaders.push_back(std::move(shader));
     return true;
 }
 
@@ -440,7 +502,7 @@ bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
         }
     }
 
-    if (!valid || !loadLightShader(shaderType)) {
+    if (!valid || !loadForwardLightShader(shaderType) || !loadGBufferShader(shaderType)) {
         return false;
     }
     material->setShaderType(shaderType);

@@ -58,6 +58,7 @@ private:
     const Camera* camera = nullptr;
     DepthMapDirectional depthMapDir;
     DepthMapPoint depthMapPoint;
+    std::vector<DepthMap*> depthMapPointers;
     MultisampleBuffer multisampleBuffer;
     GBuffer gBuffer;
     PostFramebuffer postBuffer1;

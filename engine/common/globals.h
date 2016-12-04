@@ -16,7 +16,8 @@ extern const std::string SPECULAR_DEFINE;
 extern const std::string NORMAL_DEFINE;
 extern const std::string BUMP_DEFINE;
 
-extern const std::string LIGHT_SHADER;
+extern const std::string FORWARD_LIGHT_SHADER;
+extern const std::string GBUFFER_SHADER;
 
 extern const int TRANSFORMATION_BINDING_POINT;
 extern const int LIGHT_BINDING_POINT;

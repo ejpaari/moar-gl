@@ -40,8 +40,9 @@ public:
 
     Material* createMaterial();
 
-    const Shader* getShader(const std::string& name);
-    const Shader* getShader(int shaderType, Light::Type light);
+    const Shader* getShaderByName(const std::string& name);
+    const Shader* getForwardLightShader(int shaderType, Light::Type light);
+    const Shader* getGBufferShader(int shaderType);
     Model* getModel(const std::string& modelName);
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
@@ -51,17 +52,18 @@ public:
     void checkMissingTextures() const;
 
 private:
-    using ShaderKey = std::pair<int, Light::Type>;
+    using ForwardLightKey = std::pair<int, Light::Type>;
 
-    struct ShaderKeyHash
+    struct ForwardLightHash
     {
-        size_t operator()(const ShaderKey& key) const
+        size_t operator()(const ForwardLightKey& key) const
         {
             return std::hash<std::string>()(std::to_string(key.first) + std::to_string(key.second));
         }
     };
 
-    bool loadLightShader(int shaderType);
+    bool loadForwardLightShader(int shaderType);
+    bool loadGBufferShader(int shaderType);
     bool loadModel(Model* model, const std::string& file);
     bool loadMaterial(aiMaterial* aMaterial, Material* material);
 
@@ -70,7 +72,8 @@ private:
     std::string texturePath;
     std::string levelPath;    
     std::vector<std::unique_ptr<Shader>> shaders;
-    std::unordered_map<ShaderKey, Shader*, ShaderKeyHash> shadersByType;
+    std::unordered_map<ForwardLightKey, Shader*, ForwardLightHash> forwardLightShadersByType;
+    std::unordered_map<int, Shader*> gBufferShadersByType;
     std::unordered_map<std::string, Shader*> shadersByName;
     std::unordered_map<std::string, std::unique_ptr<Model>> models;
     std::unordered_map<std::string, std::unique_ptr<Texture>> textures;

@@ -6,6 +6,9 @@ namespace moar
 
 Renderer::Renderer()
 {
+    depthMapPointers.resize(Light::NUM_TYPES);
+    depthMapPointers[Light::DIRECTIONAL] = &depthMapDir;
+    depthMapPointers[Light::POINT] = &depthMapPoint;
 }
 
 Renderer::~Renderer()
@@ -123,7 +126,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     if (camera->getBloomIterations() > 0) {
         setPostFramebuffer();
         GLuint bloomTex = postBuffer->blit(multisampleBuffer.getFramebuffer(), 1);
-        glUseProgram(resourceManager->getShader("bloom_blur")->getProgram());
+        glUseProgram(resourceManager->getShaderByName("bloom_blur")->getProgram());
         GLboolean horizontal = true;
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
             setPostFramebuffer();
@@ -132,13 +135,13 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
             horizontal = !horizontal;
         }
         setPostFramebuffer();
-        glUseProgram(resourceManager->getShader("bloom_blend")->getProgram());
+        glUseProgram(resourceManager->getShaderByName("bloom_blend")->getProgram());
         renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, bloomTex});;
     }
 
     if (camera->isHDREnabled()) {
         setPostFramebuffer();
-        glUseProgram(resourceManager->getShader("hdr")->getProgram());
+        glUseProgram(resourceManager->getShaderByName("hdr")->getProgram());
         renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
     }
 
@@ -155,9 +158,9 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 {
     setup(&gBuffer, objects);
 
-    shader = resourceManager->getShader("gbuffer");
-    glUseProgram(shader->getProgram());
     for (auto& shaderMeshMap : renderMeshes) {
+        shader = resourceManager->getGBufferShader(shaderMeshMap.first);
+        glUseProgram(shader->getProgram());
         for (auto& meshMap : shaderMeshMap .second) {
             resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
             for (auto& meshObject : meshMap.second) {
@@ -173,7 +176,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 
     glDisable(GL_DEPTH_TEST);
 
-    glUseProgram(resourceManager->getShader("deferred_light")->getProgram());
+    glUseProgram(resourceManager->getShaderByName("deferred_light")->getProgram());
     for (unsigned int i = 0; i < gBuffer.getTextures().size(); ++i) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, gBuffer.getTextures()[i]);
@@ -225,7 +228,7 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
 
 void Renderer::renderPassthrough(GLuint texture)
 {
-    glUseProgram(resourceManager->getShader("passthrough")->getProgram());
+    glUseProgram(resourceManager->getShaderByName("passthrough")->getProgram());
     PostFramebuffer::bindQuadVAO();
 
     glActiveTexture(GL_TEXTURE0);
@@ -240,15 +243,10 @@ void Renderer::renderPassthrough(GLuint texture)
 
 void Renderer::lighting(Light::Type lightType)
 {
-    DepthMap* depthMap = nullptr;
-    if (lightType == Light::DIRECTIONAL) {
-        depthMap = &depthMapDir;
-    } else {
-        depthMap = &depthMapPoint;
-    }
+    DepthMap* depthMap = depthMapPointers[lightType];
 
     for (auto& light : lights[lightType]) {
-        shader = resourceManager->getShader(Shader::DEPTH, lightType);
+        shader = resourceManager->getForwardLightShader(Shader::DEPTH, lightType);
         glUseProgram(shader->getProgram());
         Light* lightComp = light->getComponent<Light>();
         bool shadowingEnabled = lightComp->isShadowingEnabled();
@@ -270,7 +268,7 @@ void Renderer::lighting(Light::Type lightType)
         multisampleBuffer.bind();
 
         for (auto& shaderMeshMap : renderMeshes) {
-            shader = resourceManager->getShader(shaderMeshMap.first, lightType);
+            shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
             glUseProgram(shader->getProgram());
             if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
                 glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());

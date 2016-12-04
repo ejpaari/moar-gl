@@ -23,10 +23,10 @@ bool RenderSettings::loadSettings(const boost::property_tree::ptree& pt, Resourc
         clearColor.a = pt.get<float>("Render.clearColorA");
         glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 
-        skyboxShader = manager.getShader(pt.get<std::string>("Render.skyboxShader"));
+        skyboxShader = manager.getShaderByName(pt.get<std::string>("Render.skyboxShader"));
         skyboxTextures.resize(6);
 
-        ambientShader = manager.getShader(pt.get<std::string>("Render.ambientShader"));
+        ambientShader = manager.getShaderByName(pt.get<std::string>("Render.ambientShader"));
     } catch (boost::property_tree::ptree_error& e) {
         std::cerr << "WARNING: Could not load render settings from the .ini-file\n";
         std::cerr << e.what() << "\n";

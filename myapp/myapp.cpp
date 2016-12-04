@@ -10,8 +10,14 @@ MyApp::MyApp()
 {
     levelInfos = {
         {"droid.lvl",
-         std::vector<glm::vec3>{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.58f, 0.37f, -0.3f)},
-         std::vector<glm::vec3>{glm::vec3(-0.5f, -5.5f, 0.0f), glm::vec3(-0.1f, -4.2f, 0.0f)},
+         std::vector<glm::vec3>{
+             glm::vec3(1.0f, 1.0f, 1.0f),
+             glm::vec3(0.3f, 0.9f, 1.3f),
+             glm::vec3(0.58f, 0.37f, -0.3f)},
+         std::vector<glm::vec3>{
+             glm::vec3(-0.5f, -5.5f, 0.0f),
+             glm::vec3(-0.7f, -5.8f, 0.0f),
+             glm::vec3(-0.1f, -4.2f, 0.0f)},
          0},
         {"sponza.lvl",
          std::vector<glm::vec3>{glm::vec3(-0.3f, 2.2f, 0.4f), glm::vec3(0.0f, 0.4f, -0.8f)},
