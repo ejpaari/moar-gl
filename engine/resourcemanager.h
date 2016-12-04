@@ -35,7 +35,7 @@ public:
     void setModelPath(const std::string& path);
     void setTexturePath(const std::string& path);
     void setLevelPath(const std::string& path);
-    bool loadShaders(const std::string& path);
+    bool loadShaderFiles(const std::string& path);
     void clear();
 
     Material* createMaterial();
@@ -61,14 +61,14 @@ private:
         }
     };
 
-    bool loadShader(int shaderType);
+    bool loadLightShader(int shaderType);
     bool loadModel(Model* model, const std::string& file);
     bool loadMaterial(aiMaterial* aMaterial, Material* material);
 
     std::string shaderPath;
     std::string modelPath;
     std::string texturePath;
-    std::string levelPath;
+    std::string levelPath;    
     std::vector<std::unique_ptr<Shader>> shaders;
     std::unordered_map<ShaderKey, Shader*, ShaderKeyHash> shadersByType;
     std::unordered_map<std::string, Shader*> shadersByName;

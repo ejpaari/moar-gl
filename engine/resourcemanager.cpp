@@ -1,4 +1,6 @@
 #include "resourcemanager.h"
+#include "common/globals.h"
+#include "common/typemappings.h"
 
 #include <iostream>
 #include <fstream>
@@ -36,7 +38,7 @@ void ResourceManager::setLevelPath(const std::string& path)
     levelPath = path;
 }
 
-bool ResourceManager::loadShaders(const std::string& path)
+bool ResourceManager::loadShaderFiles(const std::string& path)
 {
     std::string line = "";
     std::string vertex = "";
@@ -76,15 +78,6 @@ bool ResourceManager::loadShaders(const std::string& path)
                 }
                 std::cout << "Created shader: " << name << "\n";
                 shadersByName.insert(std::make_pair(name, shader.get()));
-
-                if (name == "depthmap_point") {
-                    ShaderKey key = std::make_pair(Shader::DEPTH, Light::POINT);
-                    shadersByType.insert(std::make_pair(key, shader.get()));
-                } else if (name == "depthmap_dir") {
-                    ShaderKey key = std::make_pair(Shader::DEPTH, Light::DIRECTIONAL);
-                    shadersByType.insert(std::make_pair(key, shader.get()));
-                }
-
                 shaders.push_back(std::move(shader));
                 vertex.clear();
                 fragment.clear();
@@ -96,11 +89,23 @@ bool ResourceManager::loadShaders(const std::string& path)
             }
         }
         shaderInfo.close();
-        return true;
     } else {
         std::cerr << "ERROR: Could not open shader info file: " << path << "\n";
         return false;
     }
+
+    auto addDepthMapShader = [this] (const std::string& name, Light::Type type) {
+        auto found = shadersByName.find(name);
+        if (found != shadersByName.end()) {
+            ShaderKey key = std::make_pair(Shader::DEPTH, type);
+            shadersByType.insert(std::make_pair(key, found->second));
+        } else {
+            std::cerr << "WARNING: Depth map shader for light type " << type << " not found\n";
+        }
+    };
+
+    addDepthMapShader("depthmap_point", Light::POINT);
+    addDepthMapShader("depthmap_dir", Light::DIRECTIONAL);
     return true;
 }
 
@@ -150,7 +155,7 @@ const Shader* ResourceManager::getShader(int shaderType, Light::Type light)
     if (s != nullptr) {
         return s;
     } else {
-        if (loadShader(shaderType)) {
+        if (loadLightShader(shaderType)) {
             s = getShaderPtr();
             if (s != nullptr) {
                 return s;
@@ -260,29 +265,22 @@ void ResourceManager::checkMissingTextures() const
     }
 }
 
-bool ResourceManager::loadShader(int shaderType)
+bool ResourceManager::loadLightShader(int shaderType)
 {
-    std::vector<ShaderKey> keys = {
-        std::make_pair(shaderType, Light::POINT),
-        std::make_pair(shaderType, Light::DIRECTIONAL)
-    };
+    std::vector<ShaderKey> keys;
+    for (int i = 0; i < Light::NUM_TYPES; ++i) {
+        keys.push_back(std::make_pair(shaderType, Light::Type(i)));
+    }
 
     if (std::all_of(keys.begin(), keys.end(), [&] (ShaderKey key) { return shadersByType.find(key) != shadersByType.end(); })) {
         return true;
     }
 
     std::stringstream ss;
-    if (shaderType & Shader::DIFFUSE) {
-        ss << DIFFUSE_DEFINE;
-    }
-    if (shaderType & Shader::SPECULAR) {
-        ss << SPECULAR_DEFINE;
-    }
-    if (shaderType & Shader::NORMAL) {
-        ss << NORMAL_DEFINE;
-    }
-    if (shaderType & Shader::BUMP) {
-        ss << BUMP_DEFINE;
+    for (const auto& tm : textureTypeMappings) {
+        if (shaderType & tm.shaderType) {
+            ss << tm.shaderDefine;
+        }
     }
 
     std::string path = shaderPath + LIGHT_SHADER;
@@ -308,7 +306,12 @@ bool ResourceManager::loadShader(int shaderType)
         return true;
     };
 
-    return createLightingShader(Light::POINT, ss.str()) && createLightingShader(Light::DIRECTIONAL, ss.str());
+    for (int i = 0; i < Light::NUM_TYPES; ++i) {
+        if (!createLightingShader(Light::Type(i), ss.str())) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool ResourceManager::loadModel(Model* model, const std::string& file)
@@ -429,13 +432,15 @@ bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
         return true;
     };
 
-    bool valid =
-            loadTexture(aiTextureType_DIFFUSE, Material::DIFFUSE, Shader::DIFFUSE) &&
-            loadTexture(aiTextureType_SPECULAR, Material::SPECULAR, Shader::SPECULAR) &&
-            loadTexture(aiTextureType_HEIGHT, Material::NORMAL, Shader::NORMAL) &&
-            loadTexture(aiTextureType_DISPLACEMENT, Material::BUMP, Shader::BUMP);
+    bool valid = true;
+    for (const auto& tm : textureTypeMappings) {
+        if (!loadTexture(tm.aiType, tm.materialType, tm.shaderType)) {
+            valid = false;
+            break;
+        }
+    }
 
-    if (!valid || !loadShader(shaderType)) {
+    if (!valid || !loadLightShader(shaderType)) {
         return false;
     }
     material->setShaderType(shaderType);

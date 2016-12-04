@@ -74,7 +74,7 @@ private:
 
     int shaderType = Shader::UNDEFINED;
     std::vector<MaterialTexture> textures;
-    std::unordered_map<std::string, CustomUniform> uniforms;
+    std::unordered_map<std::string, CustomUniform> customUniforms;
 
     int id;
 };

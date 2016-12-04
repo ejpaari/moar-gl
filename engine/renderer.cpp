@@ -42,8 +42,7 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
             gBuffer.init() &&
             postBuffer1.init() &&
             postBuffer2.init() &&
-            blitBuffer1.init() &&
-            blitBuffer2.init();
+            blitBuffer.init();
     if (!framebuffersInitialized) {
         std::cerr << "ERROR: Framebuffer status is incomplete\n";
         return false;
@@ -98,8 +97,9 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    lighting(Light::DIRECTIONAL);
-    lighting(Light::POINT);
+    for (int i = 0; i < Light::NUM_TYPES; ++i) {
+        lighting(Light::Type(i));
+    }
 
     glDisable(GL_BLEND);
 
@@ -118,25 +118,27 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     glDisable(GL_DEPTH_TEST);
 
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
-    GLuint renderedTex = blitBuffer1.blit(multisampleBuffer.getFramebuffer(), 0);
+    GLuint renderedTex = blitBuffer.blit(multisampleBuffer.getFramebuffer(), 0);
 
     if (camera->getBloomIterations() > 0) {
-        GLuint bloomTex = blitBuffer2.blit(multisampleBuffer.getFramebuffer(), 1);
+        setPostFramebuffer();
+        GLuint bloomTex = postBuffer->blit(multisampleBuffer.getFramebuffer(), 1);
         glUseProgram(resourceManager->getShader("bloom_blur")->getProgram());
         GLboolean horizontal = true;
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
-            glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
             setPostFramebuffer();
+            glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
             bloomTex = postBuffer->draw(std::vector<GLuint>(1, bloomTex));
             horizontal = !horizontal;
         }
+        setPostFramebuffer();
         glUseProgram(resourceManager->getShader("bloom_blend")->getProgram());
-        renderedTex = blitBuffer2.draw(std::vector<GLuint>{renderedTex, bloomTex});
+        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, bloomTex});;
     }
 
     if (camera->isHDREnabled()) {
-        glUseProgram(resourceManager->getShader("hdr")->getProgram());
         setPostFramebuffer();
+        glUseProgram(resourceManager->getShader("hdr")->getProgram());
         renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
     }
 
@@ -324,11 +326,6 @@ void Renderer::updateObjectContainers(const std::vector<std::unique_ptr<Object>>
             meshes.erase(std::remove_if(meshes.begin(), meshes.end(), noParent), meshes.end());
         }
     }
-
-#ifndef QT_NO_DEBUG
-    resourceManager->checkMissingTextures();
-#endif
-
     G_COMPONENT_CHANGED = false;
 }
 

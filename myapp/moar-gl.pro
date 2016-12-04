@@ -47,7 +47,8 @@ SOURCES += \
     ../engine/postframebuffer.cpp \
     ../engine/renderer.cpp \
     ../engine/gbuffer.cpp \
-    ../engine/multisamplebuffer.cpp
+    ../engine/multisamplebuffer.cpp \
+    ../engine/common/typemappings.cpp
 
 HEADERS += \
     myapp.h \
@@ -77,7 +78,8 @@ HEADERS += \
     ../engine/postframebuffer.h \
     ../engine/renderer.h \
     ../engine/gbuffer.h \
-    ../engine/multisamplebuffer.h
+    ../engine/multisamplebuffer.h \
+    ../engine/common/typemappings.h
 
 INCLUDEPATH += $$PWD/../external/glm/
 

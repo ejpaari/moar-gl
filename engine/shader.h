@@ -23,6 +23,7 @@ public:
         NORMAL = 1 << 2,
         BUMP = 1 << 3,
         DEPTH = 1 << 4,
+        NUM_TYPES = 1 << 5
     };
 
     explicit Shader();

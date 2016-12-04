@@ -255,7 +255,7 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    if (!manager.loadShaders(shaderInfoFile)) {
+    if (!manager.loadShaderFiles(shaderInfoFile)) {
         return false;
     }
 

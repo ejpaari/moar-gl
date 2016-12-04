@@ -62,8 +62,7 @@ private:
     GBuffer gBuffer;
     PostFramebuffer postBuffer1;
     PostFramebuffer postBuffer2;
-    PostFramebuffer blitBuffer1;
-    PostFramebuffer blitBuffer2;
+    PostFramebuffer blitBuffer;
     PostFramebuffer* postBuffer = nullptr;
     const Shader* shader = nullptr;
 

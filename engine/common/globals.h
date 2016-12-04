@@ -7,6 +7,7 @@
 
 namespace moar
 {
+
 extern const std::string GLSL_VERSION;
 extern const std::string POINT_DEFINE;
 extern const std::string DIRECTIONAL_DEFINE;
@@ -56,6 +57,7 @@ const GLint MAX_LOCATION = 64;
 
 extern unsigned int G_DRAW_COUNT;
 extern bool G_COMPONENT_CHANGED;
+
 } // moar
 
 #endif // GLOBALS_H

@@ -1,5 +1,6 @@
 #include "material.h"
 #include "common/globals.h"
+#include "common/typemappings.h"
 
 #include <iostream>
 
@@ -50,7 +51,7 @@ void Material::setCustomUniform(const std::string& name, std::function<void ()> 
     CustomUniform uniform;
     uniform.func = func;
     uniform.location = location;
-    uniforms[name] = uniform;
+    customUniforms[name] = uniform;
 }
 
 int Material::getShaderType() const
@@ -79,14 +80,10 @@ void Material::checkMissingTextures() const
         std::cerr << "WARNING: Texture type " << textureType << " missing from material with id " << id << "\n";
     };
 
-    if (shaderType & Shader::DIFFUSE) {
-        checkTexture(DIFFUSE);
-    }
-    if (shaderType & Shader::NORMAL) {
-        checkTexture(NORMAL);
-    }
-    if (shaderType & Shader::BUMP) {
-        checkTexture(BUMP);
+    for (const auto& tm : textureTypeMappings) {
+        if (shaderType & tm.shaderType) {
+            checkTexture(tm.materialType);
+        }
     }
 }
 
@@ -100,7 +97,7 @@ void Material::setUniforms(const Shader* shader)
         }
     }
 
-    for (auto iter = uniforms.begin(); iter != uniforms.end(); ++iter) {
+    for (auto iter = customUniforms.begin(); iter != customUniforms.end(); ++iter) {
         if (shader->hasUniform(iter->second.location)) {
             iter->second.func();
         }

@@ -2,6 +2,7 @@
 
 namespace moar
 {
+
 const std::string GLSL_VERSION = "#version 440 core\n";
 const std::string POINT_DEFINE = "#define POINT\n";
 const std::string DIRECTIONAL_DEFINE = "#define DIRECTIONAL\n";
@@ -48,4 +49,5 @@ const GLuint LIGHT_SPACE_VP_LOCATION = 51;
 
 unsigned int G_DRAW_COUNT = 0;
 bool G_COMPONENT_CHANGED = false;
+
 } // moar
