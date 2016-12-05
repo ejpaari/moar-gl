@@ -158,7 +158,7 @@ bool Engine::init(const std::string& settingsFile)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, pt.get<int>("OpenGL.minor"));
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-#ifndef QT_NO_DEBUG
+#ifdef DEBUG
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
     } catch (boost::property_tree::ptree_error& e) {
@@ -213,7 +213,7 @@ bool Engine::init(const std::string& settingsFile)
         std::cerr << "ERROR: " << glewGetErrorString(err) << "\n";
         return false;
     }
-#ifndef QT_NO_DEBUG
+#ifdef DEBUG
     if (glDebugMessageCallback) {
         glEnable(GL_DEBUG_OUTPUT);        
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -274,7 +274,7 @@ bool Engine::init(const std::string& settingsFile)
     renderer.setCamera(camera.get());
 
 
-#ifndef QT_NO_DEBUG
+#ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
 #endif
 

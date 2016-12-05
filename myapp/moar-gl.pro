@@ -12,6 +12,7 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
+DEFINES += DEBUG
 
 copydata.commands = $(COPY_DIR) $$PWD/settings.ini $$OUT_PWD
 first.depends = $(first) copydata

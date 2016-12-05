@@ -1,32 +1,17 @@
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
 
-#if defined(DIFFUSE)
 layout (location = 20) uniform sampler2D diffuseTex;
-#endif
-
-#if defined(NORMAL)
 layout (location = 21) uniform sampler2D normalTex;
-#endif
-
-#if defined(BUMP)
 layout (location = 22) uniform sampler2D bumpTex;
-#endif
-
 #if defined(POINT)
 layout (location = 23) uniform samplerCube depthTex;
 #else
 layout (location = 23) uniform sampler2D depthTex;
 #endif
-
-#if defined(SPECULAR)
 layout (location = 24) uniform sampler2D specularTex;
-#endif
-
 layout (location = 42) uniform int receiveShadows;
-#if defined(POINT)
 layout (location = 43) uniform float farPlane;
-#endif
 
 layout (std140) uniform LightBlock {
   vec4 lightColor;
@@ -36,40 +21,23 @@ layout (std140) uniform LightBlock {
 
 in vec2 texCoord;
 
-#if defined(POINT)
 in vec3 vertexPos_World;
-#else
 in vec4 pos_Light;
-#endif
 
-#if defined(DIFFUSE) || defined(SPECULAR)
-#if defined(POINT)
 in vec3 normal_Cam;
 in vec3 lightDir_Cam;
-#else
 in vec3 normal_World;
-#endif
-#endif
 
-#if defined(BUMP) || defined(NORMAL)
 in vec3 N;
 in vec3 T;
 in vec3 B;
 in vec3 lightDir_Tan;
-#endif
 
-#if defined(BUMP) || defined(SPECULAR)
 in vec3 eyeDir_Cam;
-#endif
-
-#if defined(SPECULAR) && defined(NORMAL)
 in vec3 eyeDir_Tan;
-#endif
 
-#if defined(BUMP)
 const float BUMP_DEPTH = 0.025;
 const int NUM_STEPS = 50;
-#endif
 
 float calcPointShadow(samplerCube depthTex, vec3 vertexPos_World, vec3 lightPos_World, float farClipDistance)
 {

@@ -9,12 +9,15 @@ in vec2 texCoord;
 in vec3 vertexPos_World;
 in vec3 normal_World;
 
+in mat3 TBN;
+
 void main()
 {
   outPosition = vertexPos_World;
 #if defined(NORMAL)
-  // Todo: Wrong coordinate system
-  outNormal = texture(normalTex, texCoord).rgb;
+  vec3 normal = texture(normalTex, texCoord).rgb;
+  normal = normalize(normal * 2.0 - 1.0);   
+  outNormal = normalize(TBN * normal); 
 #else
   outNormal = normalize(normal_World);
 #endif

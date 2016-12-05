@@ -1,12 +1,9 @@
 layout (location = 1) in vec3 position;
 layout (location = 2) in vec2 tex;
 layout (location = 3) in vec3 normal;
-#if defined(BUMP) || defined(NORMAL)
 layout (location = 4) in vec3 tangent;
-#endif
-#if defined(DIRECTIONAL)
+
 layout (location = 50) uniform mat4 lightSpaceProj;
-#endif
 
 layout (std140) uniform TransformationBlock {
   mat4 M;
@@ -23,35 +20,20 @@ layout (std140) uniform LightBlock {
 
 out vec2 texCoord;
 
-#if defined(POINT)
 out vec3 vertexPos_World;
-#else
 out vec4 pos_Light;
-#endif
 
-#if defined(DIFFUSE) || defined(SPECULAR)
-#if defined(POINT)
 out vec3 normal_Cam;
 out vec3 lightDir_Cam;
-#else
 out vec3 normal_World;
-#endif
-#endif
 
-#if defined(BUMP) || defined(NORMAL)
 out vec3 N;
 out vec3 T;
 out vec3 B;
 out vec3 lightDir_Tan;
-#endif
 
-#if defined(BUMP) || defined(SPECULAR)
 out vec3 eyeDir_Cam;
-#endif
-
-#if defined(SPECULAR) && defined(NORMAL)
 out vec3 eyeDir_Tan;
-#endif
 
 void main()
 {
@@ -75,13 +57,13 @@ void main()
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
-  N = mat3(MV) * normal;
-  T = mat3(MV) * tangent;
+  N = mat3(M) * normal;
+  T = mat3(M) * tangent;
   B = cross(T, N);
   #if defined(POINT)
-    vec3 L = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
+    vec3 L = lightPos - vertexPos_World;
   #else
-    vec3 L = vec3(V * vec4(-lightForward, 0.0));
+    vec3 L = -lightForward;
   #endif
   lightDir_Tan = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
 #endif
