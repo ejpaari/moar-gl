@@ -147,6 +147,11 @@ void MyApp::handleInput(GLFWwindow* window)
 
 void MyApp::update()
 {
+    moar::Object* cube = engine->getObjectByName("cube");
+    if (cube) {
+        cube->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.6f * time->getDelta());
+    }
+
     FPS = static_cast<unsigned int>(1.0f / time->getDelta());
     drawCount = engine->getDrawCount();
     position = camera->getPosition();

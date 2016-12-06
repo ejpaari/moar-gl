@@ -144,7 +144,7 @@ void Object::setViewMatrixUniform()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLintptr matrixSize = sizeof(modelMatrix);
-    glBufferSubData(GL_UNIFORM_BUFFER, matrixSize, matrixSize, glm::value_ptr(*view));
+    glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
 }
 
 void Object::setUniforms(const Shader* shader)

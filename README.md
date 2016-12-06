@@ -1,9 +1,9 @@
 # moar-gl
 
-A simple graphics engine / sandbox which utilizes OpenGL 4.x and C++11. The emphasis is on implementing and learning graphic features. Other features are implemented if needed.
+A simple graphics engine which utilizes OpenGL 4.x and C++11. The emphasis is on implementing and learning graphic features. Other features are implemented if needed.
 
 ### Graphic features:
-- Multi-pass forward rendering with ambient pass
+- Multi-pass forward rendering with MSAA
 - Diffuse, normal, bump and specular mapping
 - Real-time hard shadows
 - Point and directional lighting

@@ -24,8 +24,8 @@ void main()
   normal_World = normalize(vec3(M * vec4(normal, 0.0)));
 
 #if defined(NORMAL)
-  vec3 N = mat3(M) * normal;
-  vec3 T = mat3(M) * tangent;
+  vec3 N = normalize(mat3(M) * normal);
+  vec3 T = normalize(mat3(M) * tangent);
   vec3 B = cross(T, N);
   TBN = mat3(T, B, N);
 #endif

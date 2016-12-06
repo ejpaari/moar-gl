@@ -57,14 +57,15 @@ void main()
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
-  N = mat3(M) * normal;
-  T = mat3(M) * tangent;
+  N = normalize(mat3(M) * normal);
+  T = normalize(mat3(M) * tangent);
   B = cross(T, N);
   #if defined(POINT)
     vec3 L = lightPos - vertexPos_World;
   #else
     vec3 L = -lightForward;
   #endif
+  L = normalize(L);
   lightDir_Tan = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
 #endif
 

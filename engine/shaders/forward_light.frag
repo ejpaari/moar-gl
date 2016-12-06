@@ -162,9 +162,9 @@ void main()
     outColor += vec4(vec3(specular * lightPower), 1.0);
   #endif
 #endif
-    float bloom = dot(outColor.rgb, vec3(1.0));
-    outBloom = vec4(vec3(0.0), 1.0);
-    if (bloom > 2.0) {
-      outBloom = vec4(outColor.rgb, 1.0);
-    }
+  float bloom = dot(outColor.rgb, vec3(1.0));
+  outBloom = vec4(vec3(0.0), 1.0);
+  if (bloom > 2.0) {
+    outBloom = vec4(outColor.rgb, 1.0);
+  }
 }

@@ -20,10 +20,10 @@ void main()
   float lightDistSqr = lightDistance * lightDistance;
   float lightPower = lightColor.w / lightDistSqr;
 
-  vec4 diffuseColor = texture(diffuseTex, texCoord);
+  vec4 texColor = texture(diffuseTex, texCoord);
   vec3 normal_World = texture(normalTex, texCoord).xyz;
-  vec3 lightDir_World = lightPos - vertexPos_World;
+  vec3 lightDir_World = normalize(lightPos - vertexPos_World);
   float diff = clamp(dot(normal_World, lightDir_World), 0, 1);
   
-  outColor += vec4(lightColor.xyz * diff * lightPower, 1.0) * diffuseColor;
+  outColor += vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
 }
