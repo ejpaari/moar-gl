@@ -2,7 +2,7 @@
 # default texture
 
 general
-0.1 0.1 0.1
+0.0 0.0 0.0
 white.png
 
 # object name
@@ -49,6 +49,6 @@ name light1
 component model
 sphere.3ds
 component light
-1.0 0.8 0.6 8.2
+1.0 0.8 0.6 6.2
 point
 1

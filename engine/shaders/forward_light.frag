@@ -148,10 +148,10 @@ void main()
 
 #if defined(SPECULAR)
   #if defined(NORMAL)
-    vec3 e = eyeDir_Tan;
+  vec3 e = normalize(eyeDir_Tan);
     vec3 r = reflect(-lightDir_Tan, normal_Tan);
   #else
-    vec3 e = eyeDir_Cam;
+    vec3 e = normalize(eyeDir_Cam);
     vec3 r = reflect(-l, n);
   #endif
   float spec = clamp(dot(e, r), 0, 1);

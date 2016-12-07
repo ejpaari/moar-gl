@@ -9,5 +9,6 @@ Ks 0.500000 0.500000 0.500000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd brick.png
-bump brickwork_nmap.png
+map_Kd sponza_column_b_diff.tga
+map_Ks sponza_column_b_spec.tga
+bump sponza_column_b_ddn.tga

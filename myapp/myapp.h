@@ -55,7 +55,7 @@ private:
     glm::vec3 rotation;
 
     int bloomIterations = 0;
-    bool HDR = true;
+    bool HDR = false;
 };
 
 #endif // MYAPP_H
