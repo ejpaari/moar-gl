@@ -24,8 +24,7 @@ in vec2 texCoord;
 in vec3 vertexPos_World;
 in vec4 pos_Light;
 
-in vec3 normal_Cam;
-in vec3 lightDir_Cam;
+in vec3 lightDir_World;
 in vec3 normal_World;
 
 in vec3 N;
@@ -33,7 +32,7 @@ in vec3 T;
 in vec3 B;
 in vec3 lightDir_Tan;
 
-in vec3 eyeDir_Cam;
+in vec3 eyeDir_World;
 in vec3 eyeDir_Tan;
 
 const float BUMP_DEPTH = 0.025;
@@ -86,17 +85,10 @@ bool isTransparent(float alpha)
 
 void main()
 {
-  outColor = vec4(0.0);
-#if defined(POINT)
-  float lightDistance = length(lightPos - vertexPos_World);
-  float lightDistSqr = lightDistance * lightDistance;
-  float lightPower = lightColor.w / lightDistSqr;
-#else
-  float lightPower = lightColor.w;
-#endif
+  outColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 #if defined(BUMP)
-  vec3 dir = -eyeDir_Cam;
+  vec3 dir = -eyeDir_World;
   vec2 step = vec2(dot(dir, normalize(T)), dot(dir, normalize(B)));
   float stepDepth = BUMP_DEPTH / NUM_STEPS;
   float currentDepth = 0.0;
@@ -125,11 +117,10 @@ void main()
   vec3 normal_Tan = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
   float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
 #elif defined(DIFFUSE) || defined(SPECULAR)
-  #if defined(POINT)
-    vec3 n = normalize(normal_Cam);
-    vec3 l = normalize(lightDir_Cam);
+  vec3 n = normalize(normal_World);
+  #if defined(POINT)  
+    vec3 l = normalize(lightDir_World);
   #else
-    vec3 n = normal_World;
     vec3 l = -lightForward;
   #endif
   float diff = clamp(dot(n, l), 0, 1);
@@ -144,27 +135,35 @@ void main()
 #endif
   }
 
-  outColor += shadow * vec4(lightColor.xyz * diff * lightPower, 1.0) * texColor;
+#if defined(POINT)
+  float lightDistance = length(lightPos - vertexPos_World);
+  float lightDistSqr = lightDistance * lightDistance;
+  float lightPower = lightColor.w / lightDistSqr;
+#else
+  float lightPower = lightColor.w;
+#endif
+
+  outColor.rgb += shadow * lightColor.rgb * diff * lightPower * texColor.rgb;
 
 #if defined(SPECULAR)
   #if defined(NORMAL)
   vec3 e = normalize(eyeDir_Tan);
-    vec3 r = reflect(-lightDir_Tan, normal_Tan);
+  vec3 r = reflect(-lightDir_Tan, normal_Tan);
   #else
-    vec3 e = normalize(eyeDir_Cam);
+    vec3 e = normalize(eyeDir_World);
     vec3 r = reflect(-l, n);
   #endif
   float spec = clamp(dot(e, r), 0, 1);
   float specular = pow(spec, 10.0f) * texture(specularTex, sampleCoord).r;
   #if defined(POINT)
-    outColor += vec4(vec3(specular * lightPower / lightDistSqr), 1.0);
+    outColor.rgb += vec3(specular * lightPower / lightDistSqr);
   #else
-    outColor += vec4(vec3(specular * lightPower), 1.0);
+    outColor.rgb += vec3(specular * lightPower);
   #endif
 #endif
   float bloom = dot(outColor.rgb, vec3(1.0));
   outBloom = vec4(vec3(0.0), 1.0);
   if (bloom > 2.0) {
-    outBloom = vec4(outColor.rgb, 1.0);
+    outBloom.rgb = outColor.rgb;
   }
 }

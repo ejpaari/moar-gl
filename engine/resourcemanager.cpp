@@ -97,8 +97,7 @@ bool ResourceManager::loadShaderFiles(const std::string& path)
     auto addDepthMapShader = [this] (const std::string& name, Light::Type type) {
         auto found = shadersByName.find(name);
         if (found != shadersByName.end()) {
-            ForwardLightKey key = std::make_pair(Shader::DEPTH, type);
-            forwardLightShadersByType.insert(std::make_pair(key, found->second));
+            depthMapShadersByType.insert(std::make_pair(type, found->second));
         } else {
             std::cerr << "WARNING: Depth map shader for light type " << type << " not found\n";
         }
@@ -167,6 +166,17 @@ const Shader* ResourceManager::getForwardLightShader(int shaderType, Light::Type
         }
     }
     return nullptr;
+}
+
+const Shader* ResourceManager::getDepthMapShader(Light::Type light)
+{
+    auto found = depthMapShadersByType.find(light);
+    if (found != depthMapShadersByType.end()) {
+        return found->second;
+    } else {
+        std::cerr << "ERROR: Could not find depth map shader for light type " << light << "\n";
+        return nullptr;
+    }
 }
 
 const Shader* ResourceManager::getGBufferShader(int shaderType)

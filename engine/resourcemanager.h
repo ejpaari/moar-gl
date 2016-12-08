@@ -42,6 +42,7 @@ public:
 
     const Shader* getShaderByName(const std::string& name);
     const Shader* getForwardLightShader(int shaderType, Light::Type light);
+    const Shader* getDepthMapShader(Light::Type light);
     const Shader* getGBufferShader(int shaderType);
     Model* getModel(const std::string& modelName);
     GLuint getTexture(const std::string& textureName);
@@ -74,6 +75,7 @@ private:
     std::vector<std::unique_ptr<Shader>> shaders;
     std::unordered_map<ForwardLightKey, Shader*, ForwardLightHash> forwardLightShadersByType;
     std::unordered_map<int, Shader*> gBufferShadersByType;
+    std::unordered_map<int, Shader*> depthMapShadersByType;
     std::unordered_map<std::string, Shader*> shadersByName;
     std::unordered_map<std::string, std::unique_ptr<Model>> models;
     std::unordered_map<std::string, std::unique_ptr<Texture>> textures;

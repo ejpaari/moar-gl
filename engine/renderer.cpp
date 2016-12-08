@@ -248,7 +248,7 @@ void Renderer::lighting(Light::Type lightType)
     DepthMap* depthMap = depthMapPointers[lightType];
 
     for (auto& light : lights[lightType]) {
-        shader = resourceManager->getForwardLightShader(Shader::DEPTH, lightType);
+        shader = resourceManager->getDepthMapShader(lightType);
         glUseProgram(shader->getProgram());
         Light* lightComp = light->getComponent<Light>();
         bool shadowingEnabled = lightComp->isShadowingEnabled();
@@ -272,6 +272,7 @@ void Renderer::lighting(Light::Type lightType)
         for (auto& shaderMeshMap : renderMeshes) {
             shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
             glUseProgram(shader->getProgram());
+            glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
             if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
                 glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
             }

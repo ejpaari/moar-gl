@@ -3,6 +3,7 @@ layout (location = 2) in vec2 tex;
 layout (location = 3) in vec3 normal;
 layout (location = 4) in vec3 tangent;
 
+layout (location = 12) uniform vec3 cameraPos_World;
 layout (location = 50) uniform mat4 lightSpaceProj;
 
 layout (std140) uniform TransformationBlock {
@@ -23,8 +24,7 @@ out vec2 texCoord;
 out vec3 vertexPos_World;
 out vec4 pos_Light;
 
-out vec3 normal_Cam;
-out vec3 lightDir_Cam;
+out vec3 lightDir_World;
 out vec3 normal_World;
 
 out vec3 N;
@@ -32,48 +32,43 @@ out vec3 T;
 out vec3 B;
 out vec3 lightDir_Tan;
 
-out vec3 eyeDir_Cam;
+out vec3 eyeDir_World;
 out vec3 eyeDir_Tan;
 
 void main()
 {
   gl_Position = MVP * vec4(position, 1.0);
   texCoord = tex;
-  vec3 vertexPos_Cam = vec3(MV * vec4(position, 1.0));
-  
-#if defined(POINT)
   vertexPos_World = vec3(M * vec4(position, 1.0));
-#else
+  
+#if defined(DIRECTIONAL)
   pos_Light = lightSpaceProj * M * vec4(position, 1.0);
 #endif
 
 #if defined(DIFFUSE) || defined(SPECULAR)
+  normal_World = normalize(mat3(M) * normal);
   #if defined(POINT)
-    normal_Cam = vec3(MV * vec4(normal, 0.0));
-    lightDir_Cam = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
-  #else
-    normal_World = normalize(vec3(M * vec4(normal, 0.0)));
+    lightDir_World = lightPos - vertexPos_World;
   #endif
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
-  N = normalize(mat3(MV) * normal);
-  T = normalize(mat3(MV) * tangent);
+  N = normalize(mat3(M) * normal);
+  T = normalize(mat3(M) * tangent);
   B = cross(T, N);
   #if defined(POINT)
-    vec3 L = vec3(V * vec4(lightPos, 1.0)) - vertexPos_Cam;
+    vec3 L = lightPos - vertexPos_World;
   #else
-    vec3 L = vec3(V * vec4(-lightForward, 0.0));
+    vec3 L = -lightForward;
   #endif
-  L = normalize(L);
   lightDir_Tan = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
 #endif
 
 #if defined(BUMP) || defined(SPECULAR)
-  eyeDir_Cam = normalize(vec3(0.0) - vertexPos_Cam);
+  eyeDir_World = cameraPos_World - vertexPos_World;
 #endif
 
 #if defined(SPECULAR) && defined(NORMAL)
-  eyeDir_Tan = normalize(vec3(dot(eyeDir_Cam, T), dot(eyeDir_Cam, B), dot(eyeDir_Cam, N)));
+  eyeDir_Tan = normalize(vec3(dot(eyeDir_World, T), dot(eyeDir_World, B), dot(eyeDir_World, N)));
 #endif
 }
