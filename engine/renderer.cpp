@@ -139,11 +139,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
         renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, bloomTex});;
     }
 
-    if (camera->isHDREnabled()) {
-        setPostFramebuffer();
-        glUseProgram(resourceManager->getShaderByName("hdr")->getProgram());
-        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
-    }
+    renderedTex = renderHDR(renderedTex);
 
     for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
         iter->bind();
@@ -197,9 +193,10 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
     }
-    GLuint renderedTex = postBuffer->getRenderedTexture();
-
     glDisable(GL_BLEND);
+
+    GLuint renderedTex = postBuffer->getRenderedTexture();
+    renderedTex = renderHDR(renderedTex);
     renderPassthrough(renderedTex);
 }
 
@@ -226,21 +223,6 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_BLEND);
-}
-
-void Renderer::renderPassthrough(GLuint texture)
-{
-    glUseProgram(resourceManager->getShaderByName("passthrough")->getProgram());
-    PostFramebuffer::bindQuadVAO();
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glUniform1i(RENDERED_TEX_LOCATION0, 0);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::lighting(Light::Type lightType)
@@ -290,6 +272,32 @@ void Renderer::lighting(Light::Type lightType)
         }
     }
 }
+
+GLuint Renderer::renderHDR(GLuint renderedTex)
+{
+    if (camera->isHDREnabled()) {
+        setPostFramebuffer();
+        glUseProgram(resourceManager->getShaderByName("hdr")->getProgram());
+        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
+    }
+    return renderedTex;
+}
+
+void Renderer::renderPassthrough(GLuint texture)
+{
+    glUseProgram(resourceManager->getShaderByName("passthrough")->getProgram());
+    PostFramebuffer::bindQuadVAO();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(RENDERED_TEX_LOCATION0, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
 
 void Renderer::updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects)
 {
