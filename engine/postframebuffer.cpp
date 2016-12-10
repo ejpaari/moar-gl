@@ -1,6 +1,8 @@
 #include "postframebuffer.h"
 #include "common/globals.h"
 
+#include <iostream>
+
 namespace moar
 {
 
@@ -42,11 +44,10 @@ PostFramebuffer::PostFramebuffer()
 
 PostFramebuffer::~PostFramebuffer()
 {
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(1, &renderedTexture);
+    deinit();
 }
 
-bool PostFramebuffer::init()
+bool PostFramebuffer::init(bool enableDepth)
 {
     glGenTextures(1, &renderedTexture);
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
@@ -63,7 +64,22 @@ bool PostFramebuffer::init()
     GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, drawBuffers);
 
+    if (enableDepth) {
+        glGenRenderbuffers(1, &depthRenderbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
+        hasDepth = true;
+    }
+
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
+void PostFramebuffer::deinit()
+{
+    glDeleteFramebuffers(1, &framebuffer);
+    glDeleteTextures(1, &renderedTexture);
+    glDeleteRenderbuffers(1, &depthRenderbuffer);
 }
 
 GLuint PostFramebuffer::draw(const std::vector<GLuint>& textures)
@@ -83,13 +99,24 @@ GLuint PostFramebuffer::draw(const std::vector<GLuint>& textures)
     return renderedTexture;
 }
 
-GLuint PostFramebuffer::blit(GLuint blitBuffer, int attachment) const
+GLuint PostFramebuffer::blitColor(GLuint blitBuffer, int attachment) const
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, blitBuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment);
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    return renderedTexture;
+}
+
+GLuint PostFramebuffer::blitDepth(GLuint blitBuffer) const
+{
+    if (!hasDepth) {
+        std::cerr << "WARNING: Tried to blit depth bit from PostFramebuffer without depth buffer\n";
+    }
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, blitBuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     return renderedTexture;
 }
 

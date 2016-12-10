@@ -9,11 +9,7 @@ GBuffer::GBuffer()
 
 GBuffer::~GBuffer()
 {
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(1, &positionTexture);
-    glDeleteTextures(1, &normalTexture);
-    glDeleteTextures(1, &colorTexture);
-    glDeleteRenderbuffers(1, &depthRenderbuffer);
+    deinit();
 }
 
 bool GBuffer::init()
@@ -51,6 +47,15 @@ bool GBuffer::init()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
 
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
+void GBuffer::deinit()
+{
+    glDeleteFramebuffers(1, &framebuffer);
+    glDeleteTextures(1, &positionTexture);
+    glDeleteTextures(1, &normalTexture);
+    glDeleteTextures(1, &colorTexture);
+    glDeleteRenderbuffers(1, &depthRenderbuffer);
 }
 
 std::vector<GLuint> GBuffer::getTextures() const

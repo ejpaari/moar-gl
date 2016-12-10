@@ -9,9 +9,7 @@ MultisampleBuffer::MultisampleBuffer()
 
 MultisampleBuffer::~MultisampleBuffer()
 {
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(outputTextures.size(), &outputTextures[0]);
-    glDeleteRenderbuffers(1, &depthRenderbuffer);
+    deinit();
 }
 
 bool MultisampleBuffer::init(int numOutputs)
@@ -40,9 +38,11 @@ bool MultisampleBuffer::init(int numOutputs)
     return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
-GLuint MultisampleBuffer::getFramebuffer() const
+void MultisampleBuffer::deinit()
 {
-    return framebuffer;
+    glDeleteFramebuffers(1, &framebuffer);
+    glDeleteTextures(outputTextures.size(), &outputTextures[0]);
+    glDeleteRenderbuffers(1, &depthRenderbuffer);
 }
 
 std::vector<GLuint> MultisampleBuffer::getOutputTextures() const

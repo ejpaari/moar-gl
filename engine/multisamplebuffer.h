@@ -22,8 +22,8 @@ public:
     MultisampleBuffer& operator=(MultisampleBuffer&&) = delete;
 
     bool init(int numOutputs);
+    void deinit();
 
-    GLuint getFramebuffer() const;
     std::vector<GLuint> getOutputTextures() const;
 
 private:

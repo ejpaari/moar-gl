@@ -273,7 +273,6 @@ bool Engine::init(const std::string& settingsFile)
     }
     renderer.setCamera(camera.get());
 
-
 #ifdef DEBUG
     std::cout << "\nTHIS PROGRAM IS EXECUTED WITH THE DEBUG FLAG\n\n";
 #endif
@@ -286,6 +285,12 @@ bool Engine::init(const std::string& settingsFile)
 void Engine::execute()
 {
     app->start();
+
+    if (!renderer.setDeferredRenderPath(deferred)) {
+        std::cerr << "ERROR: Failed to initialize renderer framebuffers\n";
+        return;
+    }
+
     double x = 0.0;
     double y = 0.0;
     glfwGetCursorPos(window, &x, &y);
@@ -304,11 +309,7 @@ void Engine::execute()
         updateObjects();
 
         G_DRAW_COUNT = 0;
-        if (deferred) {
-            renderer.renderDeferred(objects, skybox.get());
-        } else {
-            renderer.renderForward(objects, skybox.get());
-        }
+        renderer.render(objects, skybox.get());
         gui.render();
 
         glfwSwapBuffers(window);
@@ -462,6 +463,10 @@ bool Engine::loadLevel(const std::string& level)
 void Engine::setDeferredRendering(bool enabled)
 {
     deferred = enabled;
+    if (!renderer.setDeferredRenderPath(deferred)) {
+        std::cerr << "ERROR: Failed to initialize renderer framebuffers\n";
+        return;
+    }
 }
 
 unsigned int Engine::getDrawCount() const

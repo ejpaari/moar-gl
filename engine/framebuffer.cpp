@@ -26,4 +26,9 @@ void Framebuffer::bind() const
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 
+GLuint Framebuffer::getFramebuffer() const
+{
+    return framebuffer;
+}
+
 } // moar

@@ -34,19 +34,24 @@ public:
     Renderer& operator=(Renderer&&) = delete;
 
     bool init(const RenderSettings* settings, ResourceManager* manager);
+    bool setDeferredRenderPath(bool enabled);
     void setCamera(const Camera* camera);
-    void renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
-    void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
+    void render(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void clear();
 
 private:
+    void renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
+    void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);    
     void lighting(Light::Type lightType);
+    void renderSkybox(Object* skybox = nullptr);
     GLuint renderHDR(GLuint renderedTex);
     void renderPassthrough(GLuint texture);
     void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);
     bool objectInsideFrustum(const Object::MeshObject& mo) const;
     void setPostFramebuffer();
+
+    bool deferred = true;
 
     using MaterialId = int;
     using ShaderType = int;

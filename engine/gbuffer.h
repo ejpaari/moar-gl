@@ -21,6 +21,7 @@ public:
     GBuffer& operator=(GBuffer&&) = delete;
 
     bool init();
+    void deinit();
 
     std::vector<GLuint> getTextures() const;
 

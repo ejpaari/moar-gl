@@ -40,16 +40,6 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
 
     Framebuffer::setSize(renderSettings->windowWidth, renderSettings->windowHeight);
     PostFramebuffer::initQuad();
-    bool framebuffersInitialized =
-            multisampleBuffer.init(2) &&
-            gBuffer.init() &&
-            postBuffer1.init() &&
-            postBuffer2.init() &&
-            blitBuffer.init();
-    if (!framebuffersInitialized) {
-        std::cerr << "ERROR: Framebuffer status is incomplete\n";
-        return false;
-    }    
 
     GLuint lightBuffer;
     glGenBuffers(1, &lightBuffer);
@@ -71,9 +61,56 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     return true;
 }
 
+bool Renderer::setDeferredRenderPath(bool enabled)
+{
+    if (deferred == enabled) {
+        if (deferred && gBuffer.getFramebuffer() != 0) {
+            return true;
+        } else if (!deferred && multisampleBuffer.getFramebuffer() != 0) {
+            return true;
+        }
+    }
+    deferred = enabled;
+
+    gBuffer.deinit();
+    multisampleBuffer.deinit();
+    postBuffer1.deinit();
+    postBuffer2.deinit();
+    blitBuffer.deinit();
+
+    bool framebuffersInitialized = false;
+    if (deferred) {
+        framebuffersInitialized =
+                gBuffer.init() &&
+                postBuffer1.init(true) &&
+                postBuffer2.init(true);
+    } else {
+        framebuffersInitialized =
+                multisampleBuffer.init(2) &&
+                postBuffer1.init(false) &&
+                postBuffer2.init(false) &&
+                blitBuffer.init(false);
+    }
+
+    if (!framebuffersInitialized) {
+        std::cerr << "ERROR: Framebuffer status is incomplete\n";
+        return false;
+    }
+    return true;
+}
+
 void Renderer::setCamera(const Camera* camera)
 {
     this->camera = camera;
+}
+
+void Renderer::render(const std::vector<std::unique_ptr<Object> >& objects, Object* skybox)
+{
+    if (deferred) {
+        renderDeferred(objects, skybox);
+    } else {
+        renderForward(objects, skybox);
+    }
 }
 
 void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
@@ -105,27 +142,15 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     }
 
     glDisable(GL_BLEND);
-
-    if (skybox) {
-        glCullFace(GL_FRONT);
-        shader = renderSettings->skyboxShader;
-        glUseProgram(shader->getProgram());
-        skybox->setUniforms(shader);
-        for (auto& meshObject : skybox->getMeshObjects()) {
-            meshObject.material->setUniforms(shader);
-            meshObject.mesh->render();
-        }
-        glCullFace(GL_BACK);
-    }
-
+    renderSkybox(skybox);
     glDisable(GL_DEPTH_TEST);
 
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
-    GLuint renderedTex = blitBuffer.blit(multisampleBuffer.getFramebuffer(), 0);
+    GLuint renderedTex = blitBuffer.blitColor(multisampleBuffer.getFramebuffer(), 0);
 
     if (camera->getBloomIterations() > 0) {
         setPostFramebuffer();
-        GLuint bloomTex = postBuffer->blit(multisampleBuffer.getFramebuffer(), 1);
+        GLuint bloomTex = postBuffer->blitColor(multisampleBuffer.getFramebuffer(), 1);
         glUseProgram(resourceManager->getShaderByName("bloom_blur")->getProgram());
         GLboolean horizontal = true;
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
@@ -150,7 +175,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     renderPassthrough(renderedTex);
 }
 
-void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objects, Object* /*skybox*/)
+void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objects, Object* skybox)
 {
     setup(&gBuffer, objects);
 
@@ -193,7 +218,11 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
     }
+
     glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    postBuffer->blitDepth(gBuffer.getFramebuffer());
+    renderSkybox(skybox);
 
     GLuint renderedTex = postBuffer->getRenderedTexture();
     renderedTex = renderHDR(renderedTex);
@@ -270,6 +299,21 @@ void Renderer::lighting(Light::Type lightType)
                 }
             }
         }
+    }
+}
+
+void Renderer::renderSkybox(Object* skybox)
+{
+    if (skybox) {
+        glCullFace(GL_FRONT);
+        shader = renderSettings->skyboxShader;
+        glUseProgram(shader->getProgram());
+        skybox->setUniforms(shader);
+        for (auto& meshObject : skybox->getMeshObjects()) {
+            meshObject.material->setUniforms(shader);
+            meshObject.mesh->render();
+        }
+        glCullFace(GL_BACK);
     }
 }
 

@@ -19,12 +19,13 @@ public:
     Framebuffer& operator=(Framebuffer&&) = delete;
 
     void bind() const;
+    GLuint getFramebuffer() const;
 
 protected:
     static int width;
     static int height;
 
-    GLuint framebuffer;
+    GLuint framebuffer = 0;
 };
 
 } // moar
