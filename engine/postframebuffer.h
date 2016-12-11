@@ -24,19 +24,18 @@ public:
     PostFramebuffer& operator=(const PostFramebuffer&) = delete;
     PostFramebuffer& operator=(PostFramebuffer&&) = delete;
 
-    bool init(bool enableDepth);
+    bool init(GLsizei numOutputs, bool enableDepth);
     void deinit();
     GLuint draw(const std::vector<GLuint>& textures);
     GLuint blitColor(GLuint blitBuffer, int attachment) const;
     GLuint blitDepth(GLuint blitBuffer) const;
 
-    GLuint getRenderedTexture() const;
-
 private:
     static GLuint quadVAO;
     static GLuint quadBuffer;
 
-    GLuint renderedTexture = 0;
+    std::vector<GLuint> renderedTextures;
+    std::vector<GLenum> drawBufferAttachments;
     GLuint depthRenderbuffer = 0;
 
     bool hasDepth = false;

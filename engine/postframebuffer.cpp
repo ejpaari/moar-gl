@@ -47,22 +47,27 @@ PostFramebuffer::~PostFramebuffer()
     deinit();
 }
 
-bool PostFramebuffer::init(bool enableDepth)
+bool PostFramebuffer::init(GLsizei numOutputs, bool enableDepth)
 {
-    glGenTextures(1, &renderedTexture);
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
+    renderedTextures.resize(numOutputs);
+    drawBufferAttachments.resize(numOutputs);
+    glGenTextures(numOutputs, &renderedTextures[0]);
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
 
-    GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, drawBuffers);
+    for (int i = 0; i < numOutputs; ++i) {
+        GLuint texture = renderedTextures[i];
+        GLenum attachment = GL_COLOR_ATTACHMENT0 + i;
+        drawBufferAttachments[i] = attachment;
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture(GL_FRAMEBUFFER, attachment, texture, 0);
+    }
+    glDrawBuffers(numOutputs, &drawBufferAttachments[0]);
 
     if (enableDepth) {
         glGenRenderbuffers(1, &depthRenderbuffer);
@@ -78,7 +83,7 @@ bool PostFramebuffer::init(bool enableDepth)
 void PostFramebuffer::deinit()
 {
     glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(1, &renderedTexture);
+    glDeleteTextures(renderedTextures.size(), &renderedTextures[0]);
     glDeleteRenderbuffers(1, &depthRenderbuffer);
 }
 
@@ -89,6 +94,7 @@ GLuint PostFramebuffer::draw(const std::vector<GLuint>& textures)
         glBindTexture(GL_TEXTURE_2D, textures[i]);
         glUniform1i(RENDERED_TEX_LOCATION0 + i, i);
     }
+    glDrawBuffers(drawBufferAttachments.size(), &drawBufferAttachments[0]);
 
     bind();
     bindQuadVAO();
@@ -96,7 +102,7 @@ GLuint PostFramebuffer::draw(const std::vector<GLuint>& textures)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    return renderedTexture;
+    return renderedTextures[0];
 }
 
 GLuint PostFramebuffer::blitColor(GLuint blitBuffer, int attachment) const
@@ -106,7 +112,7 @@ GLuint PostFramebuffer::blitColor(GLuint blitBuffer, int attachment) const
     glReadBuffer(GL_COLOR_ATTACHMENT0 + attachment);
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    return renderedTexture;
+    return renderedTextures[0];
 }
 
 GLuint PostFramebuffer::blitDepth(GLuint blitBuffer) const
@@ -117,12 +123,7 @@ GLuint PostFramebuffer::blitDepth(GLuint blitBuffer) const
     glBindFramebuffer(GL_READ_FRAMEBUFFER, blitBuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    return renderedTexture;
-}
-
-GLuint PostFramebuffer::getRenderedTexture() const
-{
-    return renderedTexture;
+    return renderedTextures[0];
 }
 
 } // moar

@@ -45,6 +45,7 @@ private:
     void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);    
     void lighting(Light::Type lightType);
     void renderSkybox(Object* skybox = nullptr);
+    GLuint renderBloom(GLuint framebuffer);
     GLuint renderHDR(GLuint renderedTex);
     void renderPassthrough(GLuint texture);
     void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);

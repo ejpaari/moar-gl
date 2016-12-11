@@ -82,14 +82,15 @@ bool Renderer::setDeferredRenderPath(bool enabled)
     if (deferred) {
         framebuffersInitialized =
                 gBuffer.init() &&
-                postBuffer1.init(true) &&
-                postBuffer2.init(true);
+                postBuffer1.init(2, true) &&
+                postBuffer2.init(2, true) &&
+                blitBuffer.init(1, false);
     } else {
         framebuffersInitialized =
                 multisampleBuffer.init(2) &&
-                postBuffer1.init(false) &&
-                postBuffer2.init(false) &&
-                blitBuffer.init(false);
+                postBuffer1.init(1, false) &&
+                postBuffer2.init(1, false) &&
+                blitBuffer.init(1, false);
     }
 
     if (!framebuffersInitialized) {
@@ -145,27 +146,11 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     renderSkybox(skybox);
     glDisable(GL_DEPTH_TEST);
 
-    const std::list<Postprocess>& postprocs = camera->getPostprocesses();
-    GLuint renderedTex = blitBuffer.blitColor(multisampleBuffer.getFramebuffer(), 0);
-
-    if (camera->getBloomIterations() > 0) {
-        setPostFramebuffer();
-        GLuint bloomTex = postBuffer->blitColor(multisampleBuffer.getFramebuffer(), 1);
-        glUseProgram(resourceManager->getShaderByName("bloom_blur")->getProgram());
-        GLboolean horizontal = true;
-        for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
-            setPostFramebuffer();
-            glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
-            bloomTex = postBuffer->draw(std::vector<GLuint>(1, bloomTex));
-            horizontal = !horizontal;
-        }
-        setPostFramebuffer();
-        glUseProgram(resourceManager->getShaderByName("bloom_blend")->getProgram());
-        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, bloomTex});;
-    }
-
+    GLuint renderedTex = 0;
+    renderedTex = renderBloom(multisampleBuffer.getFramebuffer());
     renderedTex = renderHDR(renderedTex);
 
+    const std::list<Postprocess>& postprocs = camera->getPostprocesses();
     for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
         iter->bind();
         setPostFramebuffer();
@@ -208,8 +193,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 
     setPostFramebuffer();
     postBuffer->bind();
-    PostFramebuffer::bindQuadVAO();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    PostFramebuffer::bindQuadVAO();    
 
     for (auto& light : lights[Light::POINT]) {
         Light* lightComp = light->getComponent<Light>();
@@ -221,10 +205,14 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
+
     postBuffer->blitDepth(gBuffer.getFramebuffer());
     renderSkybox(skybox);
 
-    GLuint renderedTex = postBuffer->getRenderedTexture();
+    glDisable(GL_DEPTH_TEST);
+
+    GLuint renderedTex = 0;
+    renderedTex = renderBloom(postBuffer->getFramebuffer());
     renderedTex = renderHDR(renderedTex);
     renderPassthrough(renderedTex);
 }
@@ -315,6 +303,27 @@ void Renderer::renderSkybox(Object* skybox)
         }
         glCullFace(GL_BACK);
     }
+}
+
+GLuint Renderer::renderBloom(GLuint framebuffer)
+{
+    GLuint renderedTex = blitBuffer.blitColor(framebuffer, 0);
+    if (camera->getBloomIterations() > 0) {
+        setPostFramebuffer();
+        GLuint bloomTex = postBuffer->blitColor(framebuffer, 1);
+        glUseProgram(resourceManager->getShaderByName("bloom_blur")->getProgram());
+        GLboolean horizontal = true;
+        for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
+            setPostFramebuffer();
+            glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
+            bloomTex = postBuffer->draw(std::vector<GLuint>(1, bloomTex));
+            horizontal = !horizontal;
+        }
+        setPostFramebuffer();
+        glUseProgram(resourceManager->getShaderByName("bloom_blend")->getProgram());
+        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, bloomTex});;
+    }
+    return renderedTex;
 }
 
 GLuint Renderer::renderHDR(GLuint renderedTex)

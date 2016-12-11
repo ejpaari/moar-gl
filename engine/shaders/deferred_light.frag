@@ -1,4 +1,5 @@
 layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outBloom;
 
 layout (location = 10) uniform vec3 ambient;
 layout (location = 12) uniform vec3 cameraPos;
@@ -37,4 +38,10 @@ void main()
     vec4(ambient * texColor.rgb, 0.0) +
     vec4((lightColor.xyz * diff * lightPower) * texColor.rgb, 0.0) +
     vec4(vec3(specular * lightPower / lightDistSqr), 0.0);
+
+  float bloom = dot(outColor.rgb, vec3(1.0));
+  outBloom = vec4(vec3(0.0), 1.0);
+  if (bloom > 2.0) {
+    outBloom.rgb = outColor.rgb;
+  }
 }
