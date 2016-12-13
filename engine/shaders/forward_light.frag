@@ -123,7 +123,7 @@ void main()
   #else
     vec3 l = -lightForward;
   #endif
-  float diff = clamp(dot(n, l), 0, 1);
+    float diff = clamp(dot(n, l), 0, 1);
 #endif
 
   float shadow = 1.0;

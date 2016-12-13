@@ -1,4 +1,4 @@
-layout(location = 0) out vec4 outColor;
+layout(location = 0) out vec3 outColor;
 
 layout (location = 30) uniform sampler2D renderedTex;
 layout (location = 31) uniform sampler2D bloomImage;
@@ -7,6 +7,5 @@ in vec2 texCoord;
 
 void main()
 {
-  vec3 result = texture(renderedTex, texCoord).rgb + texture(bloomImage, texCoord).rgb;
-  outColor = vec4(result, 1.0);
+  outColor = texture(renderedTex, texCoord).rgb + texture(bloomImage, texCoord).rgb;
 }

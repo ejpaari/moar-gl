@@ -1,5 +1,5 @@
-layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec4 outBloom;
+layout(location = 0) out vec3 outColor;
+layout(location = 1) out vec3 outBloom;
 
 layout (location = 10) uniform vec3 ambient;
 layout (location = 12) uniform vec3 cameraPos;
@@ -18,7 +18,7 @@ in vec2 texCoord;
 void main()
 {
   // Everything is in _World coordinate system unless specified otherwise
-  outColor = vec4(0.0, 0.0, 0.0, 1.0);
+  outColor = vec3(0.0);
   vec3 vertexPos = texture(positionTex, texCoord).xyz;
   float lightDistance = length(lightPos - vertexPos);
   float lightDistSqr = lightDistance * lightDistance;
@@ -35,12 +35,12 @@ void main()
   float specular = pow(spec, 10.0f) * texColor.a;
   
   outColor += 
-    vec4(ambient * texColor.rgb, 0.0) +
-    vec4((lightColor.xyz * diff * lightPower) * texColor.rgb, 0.0) +
-    vec4(vec3(specular * lightPower / lightDistSqr), 0.0);
+    ambient * texColor.rgb +
+    (lightColor.xyz * diff * lightPower) * texColor.rgb +
+    vec3(specular * lightPower / lightDistSqr);
 
   float bloom = dot(outColor.rgb, vec3(1.0));
-  outBloom = vec4(vec3(0.0), 1.0);
+  outBloom = vec3(0.0);
   if (bloom > 2.0) {
     outBloom.rgb = outColor.rgb;
   }
