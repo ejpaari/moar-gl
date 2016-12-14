@@ -57,9 +57,9 @@ void MyApp::start()
 
 //#define POSTPROC
 #ifdef POSTPROC
-    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShader("offset")->getProgram(), 1);
+    offset = camera->addPostprocess("offset", engine->getResourceManager()->getShaderByName("offset")->getProgram(), 1);
     offset->setUniform("screensize", std::bind(glUniform2f, moar::SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight));
-    camera->addPostprocess("invert", engine->getResourceManager()->getShader("invert")->getProgram(), 1);
+    camera->addPostprocess("invert", engine->getResourceManager()->getShaderByName("invert")->getProgram(), 1);
 #endif
 }
 

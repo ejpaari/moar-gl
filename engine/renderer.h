@@ -47,6 +47,7 @@ private:
     void renderSkybox(Object* skybox = nullptr);
     GLuint renderBloom(GLuint framebuffer);
     GLuint renderHDR(GLuint renderedTex);
+    GLuint renderPostprocess(GLuint renderedTex);
     void renderPassthrough(GLuint texture);
     void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);
     bool objectInsideFrustum(const Object::MeshObject& mo) const;

@@ -149,14 +149,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     GLuint renderedTex = 0;
     renderedTex = renderBloom(multisampleBuffer.getFramebuffer());
     renderedTex = renderHDR(renderedTex);
-
-    const std::list<Postprocess>& postprocs = camera->getPostprocesses();
-    for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
-        iter->bind();
-        setPostFramebuffer();
-        renderedTex = postBuffer->draw(std::vector<GLuint>(1, renderedTex));
-    }
-
+    renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
 }
 
@@ -214,6 +207,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     GLuint renderedTex = 0;
     renderedTex = renderBloom(postBuffer->getFramebuffer());
     renderedTex = renderHDR(renderedTex);
+    renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
 }
 
@@ -233,6 +227,11 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
     updateObjectContainers(objects);
     objectsInFrustum.clear();
     Object::setViewMatrixUniform();
+
+    postBuffer1.bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    postBuffer2.bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     fb->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -332,6 +331,17 @@ GLuint Renderer::renderHDR(GLuint renderedTex)
         setPostFramebuffer();
         glUseProgram(resourceManager->getShaderByName("hdr")->getProgram());
         renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
+    }
+    return renderedTex;
+}
+
+GLuint Renderer::renderPostprocess(GLuint renderedTex)
+{
+    const std::list<Postprocess>& postprocs = camera->getPostprocesses();
+    for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
+        iter->bind();
+        setPostFramebuffer();
+        renderedTex = postBuffer->draw(std::vector<GLuint>(1, renderedTex));
     }
     return renderedTex;
 }
