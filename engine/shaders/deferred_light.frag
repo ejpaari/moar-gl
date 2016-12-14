@@ -1,7 +1,6 @@
 layout(location = 0) out vec3 outColor;
 layout(location = 1) out vec3 outBloom;
 
-layout (location = 10) uniform vec3 ambient;
 layout (location = 12) uniform vec3 cameraPos;
 layout (location = 30) uniform sampler2D colorTex;
 layout (location = 31) uniform sampler2D normalTex;
@@ -25,7 +24,7 @@ void main()
   float lightPower = lightColor.w / lightDistSqr;
 
   vec4 texColor = texture(colorTex, texCoord);
-  vec3 normal = texture(normalTex, texCoord).xyz;
+  vec3 normal = texture(normalTex, texCoord).rgb;
   vec3 lightDir = normalize(lightPos - vertexPos);
   float diff = clamp(dot(normal, lightDir), 0, 1);
 
@@ -34,8 +33,7 @@ void main()
   float spec = clamp(dot(e, r), 0, 1);
   float specular = pow(spec, 10.0f) * texColor.a;
   
-  outColor += 
-    ambient * texColor.rgb +
+  outColor +=
     (lightColor.xyz * diff * lightPower) * texColor.rgb +
     vec3(specular * lightPower / lightDistSqr);
 

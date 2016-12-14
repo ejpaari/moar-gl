@@ -21,10 +21,10 @@ void main()
   gl_Position = MVP * vec4(position, 1.0);
   texCoord = tex;
   vertexPos_World = vec3(M * vec4(position, 1.0));
-  normal_World = normalize(vec3(M * vec4(normal, 0.0)));
+  normal_World = normalize(mat3(M) * normal);
 
 #if defined(NORMAL)
-  vec3 N = normalize(mat3(M) * normal);
+  vec3 N = normal_World;
   vec3 T = normalize(mat3(M) * tangent);
   vec3 B = cross(T, N);
   TBN = mat3(T, B, N);

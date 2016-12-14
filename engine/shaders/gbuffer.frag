@@ -16,7 +16,7 @@ void main()
 {
   outPosition = vertexPos_World;
 #if defined(NORMAL)
-  vec3 normal = texture(normalTex, texCoord).rgb * 2.0 - vec3(1.0);
+  vec3 normal = normalize(texture(normalTex, texCoord).rgb * 2.0 - vec3(1.0));
   outNormal = normalize(TBN * normal); 
 #else
   outNormal = normalize(normal_World);

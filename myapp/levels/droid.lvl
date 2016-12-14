@@ -19,6 +19,7 @@ sb_px.png sb_nx.png sb_py.png sb_ny.png sb_pz.png sb_nz.png
 # light
 # color
 # type
+# enable shadows
 
 name droid
 0.0 0.0 0.0

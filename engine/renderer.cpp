@@ -176,7 +176,6 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     glDisable(GL_DEPTH_TEST);
 
     glUseProgram(resourceManager->getShaderByName("deferred_light")->getProgram());
-    glUniform3f(AMBIENT_LOCATION, renderSettings->ambientColor.x, renderSettings->ambientColor.y, renderSettings->ambientColor.z);
     glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
     for (unsigned int i = 0; i < gBuffer.getTextures().size(); ++i) {
         glActiveTexture(GL_TEXTURE0 + i);

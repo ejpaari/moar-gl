@@ -45,15 +45,15 @@ void main()
   pos_Light = lightSpaceProj * M * vec4(position, 1.0);
 #endif
 
-#if defined(DIFFUSE) || defined(SPECULAR)
-  normal_World = normalize(mat3(M) * normal);
+normal_World = normalize(mat3(M) * normal);
+#if defined(DIFFUSE) || defined(SPECULAR)  
   #if defined(POINT)
     lightDir_World = lightPos - vertexPos_World;
   #endif
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
-  N = normalize(mat3(M) * normal);
+  N = normal_World;
   T = normalize(mat3(M) * tangent);
   B = cross(T, N);
   #if defined(POINT)
