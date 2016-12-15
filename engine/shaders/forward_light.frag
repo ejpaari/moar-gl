@@ -30,7 +30,8 @@ in vec3 normal_World;
 in vec3 N;
 in vec3 T;
 in vec3 B;
-in vec3 lightDir_Tan;
+in vec3 lightPos_Tan;
+in vec3 vertexPos_Tan;
 
 in vec3 eyeDir_World;
 in vec3 eyeDir_Tan;
@@ -115,6 +116,7 @@ void main()
 
 #if defined(NORMAL)
   vec3 normal_Tan = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
+  vec3 lightDir_Tan = normalize(lightPos_Tan - vertexPos_Tan);
   float diff = clamp(dot(normal_Tan, lightDir_Tan), 0, 1);
 #elif defined(DIFFUSE) || defined(SPECULAR)
   vec3 n = normalize(normal_World);

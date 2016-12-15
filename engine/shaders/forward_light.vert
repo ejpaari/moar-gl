@@ -30,7 +30,8 @@ out vec3 normal_World;
 out vec3 N;
 out vec3 T;
 out vec3 B;
-out vec3 lightDir_Tan;
+out vec3 lightPos_Tan;
+out vec3 vertexPos_Tan;
 
 out vec3 eyeDir_World;
 out vec3 eyeDir_Tan;
@@ -61,14 +62,16 @@ normal_World = normalize(mat3(M) * normal);
   #else
     vec3 L = -lightForward;
   #endif
-  lightDir_Tan = normalize(vec3(dot(L, T), dot(L, B), dot(L, N)));
+  mat3 TBN = transpose(mat3(T, B, N));
+  lightPos_Tan = TBN * lightPos;
+  vertexPos_Tan = TBN * vertexPos_World;
 #endif
 
 #if defined(BUMP) || defined(SPECULAR)
-  eyeDir_World = cameraPos_World - vertexPos_World;
+  eyeDir_World = normalize(cameraPos_World - vertexPos_World);
 #endif
 
 #if defined(SPECULAR) && defined(NORMAL)
-  eyeDir_Tan = normalize(vec3(dot(eyeDir_World, T), dot(eyeDir_World, B), dot(eyeDir_World, N)));
+  eyeDir_Tan = normalize(TBN * eyeDir_World);
 #endif
 }
