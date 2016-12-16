@@ -3,6 +3,8 @@ layout (location = 2) in vec2 tex;
 layout (location = 3) in vec3 normal;
 layout (location = 4) in vec3 tangent;
 
+layout (location = 12) uniform vec3 cameraPos_World;
+
 layout (std140) uniform TransformationBlock {
   mat4 M;
   mat4 V;
@@ -15,6 +17,9 @@ out vec3 vertexPos_World;
 out vec3 normal_World;
 
 out mat3 TBN;
+out vec3 T;
+out vec3 B;
+out vec3 eyeDir_World;
 
 void main()
 {
@@ -25,9 +30,13 @@ void main()
 
 #if defined(NORMAL)
   vec3 N = normal_World;
-  vec3 T = normalize(mat3(M) * tangent);
-  vec3 B = cross(T, N);
+  T = normalize(mat3(M) * tangent);
+  B = cross(T, N);
   TBN = mat3(T, B, N);
+#endif
+
+#if defined(BUMP)
+  eyeDir_World = normalize(cameraPos_World - vertexPos_World);
 #endif
 
 }

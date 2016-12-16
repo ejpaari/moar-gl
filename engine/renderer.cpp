@@ -83,7 +83,7 @@ bool Renderer::setDeferredRenderPath(bool enabled)
         framebuffersInitialized =
                 gBuffer.init() &&
                 postBuffer1.init(2, true) &&
-                postBuffer2.init(2, true) &&
+                postBuffer2.init(2, false) &&
                 blitBuffer.init(1, false);
     } else {
         framebuffersInitialized =
@@ -118,22 +118,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
 {
     setup(&multisampleBuffer, objects);
 
-    shader = renderSettings->ambientShader;
-    glUseProgram(shader->getProgram());
-    glUniform3f(AMBIENT_LOCATION, renderSettings->ambientColor.x, renderSettings->ambientColor.y, renderSettings->ambientColor.z);
-    for (auto& shaderMeshMap : renderMeshes) {
-        for (auto& meshMap : shaderMeshMap .second) {
-            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
-            for (auto& meshObject : meshMap.second) {
-                if (!objectInsideFrustum(meshObject)) {
-                   continue;
-                }
-                meshObject.parent->setUniforms(shader);
-                meshObject.mesh->render();
-                objectsInFrustum.insert(meshObject.mesh->getId());
-            }
-        }
-    }
+    renderAmbient();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -157,9 +142,15 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 {
     setup(&gBuffer, objects);
 
+    postBuffer = &postBuffer1;
+    postBuffer->bind();
+    renderAmbient();
+    
+    gBuffer.bind();
     for (auto& shaderMeshMap : renderMeshes) {
         shader = resourceManager->getGBufferShader(shaderMeshMap.first);
         glUseProgram(shader->getProgram());
+        glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
         for (auto& meshMap : shaderMeshMap .second) {
             resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
             for (auto& meshObject : meshMap.second) {
@@ -183,22 +174,20 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         glUniform1i(RENDERED_TEX_LOCATION0 + i, i);
     }
 
-    setPostFramebuffer();
     postBuffer->bind();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
     PostFramebuffer::bindQuadVAO();    
 
     for (auto& light : lights[Light::POINT]) {
         Light* lightComp = light->getComponent<Light>();
         lightComp->setUniforms(light->getPosition(), light->getForward());
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
     }
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
-    postBuffer->blitDepth(gBuffer.getFramebuffer());
     renderSkybox(skybox);
 
     glDisable(GL_DEPTH_TEST);
@@ -238,6 +227,26 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_BLEND);
+}
+
+void Renderer::renderAmbient()
+{
+    shader = renderSettings->ambientShader;
+    glUseProgram(shader->getProgram());
+    glUniform3f(AMBIENT_LOCATION, renderSettings->ambientColor.x, renderSettings->ambientColor.y, renderSettings->ambientColor.z);
+    for (auto& shaderMeshMap : renderMeshes) {
+        for (auto& meshMap : shaderMeshMap .second) {
+            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
+            for (auto& meshObject : meshMap.second) {
+                if (!objectInsideFrustum(meshObject)) {
+                   continue;
+                }
+                meshObject.parent->setUniforms(shader);
+                meshObject.mesh->render();
+                objectsInFrustum.insert(meshObject.mesh->getId());
+            }
+        }
+    }
 }
 
 void Renderer::lighting(Light::Type lightType)

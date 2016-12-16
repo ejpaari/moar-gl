@@ -42,9 +42,10 @@ public:
 private:
     void renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
-    void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);    
+    void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
+    void renderAmbient();
     void lighting(Light::Type lightType);
-    void renderSkybox(Object* skybox = nullptr);
+    void renderSkybox(Object* skybox = nullptr);    
     GLuint renderBloom(GLuint framebuffer);
     GLuint renderHDR(GLuint renderedTex);
     GLuint renderPostprocess(GLuint renderedTex);
