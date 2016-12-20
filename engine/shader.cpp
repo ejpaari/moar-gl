@@ -11,6 +11,20 @@
 namespace moar
 {
 
+std::string Shader::commonFragmentShaderCode = "";
+
+void Shader::loadCommonShaderCode(const std::string& fragment)
+{
+    commonFragmentShaderCode.clear();
+    std::ifstream shaderFile(fragment.c_str());
+    if (shaderFile) {
+        commonFragmentShaderCode.append((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
+        shaderFile.close();
+    } else {
+        std::cerr << "WARNING: Could not open common fragment shader file: " << COMMON_FRAGMENT_FILE << "\n";
+    }
+}
+
 Shader::Shader()
 {
     program = glCreateProgram();
@@ -19,18 +33,16 @@ Shader::Shader()
 
 Shader::~Shader()
 {
+    deleteShaders();
     glDeleteProgram(program);
 }
 
 bool Shader::attachShader(GLenum shaderType, const std::string& filename, const std::string& defines)
 {
     GLuint shader = glCreateShader(shaderType);
-    if (!shader || !compileShader(shader, filename, defines)) {
+    std::string common = shaderType == GL_FRAGMENT_SHADER ? commonFragmentShaderCode : "";
+    if (!shader || !compileShader(shader, filename, defines, common)) {
         glDeleteShader(shader);
-        std::cerr << "WARNING: Failed to attach shader " << filename << "\n";
-        if (!defines.empty()) {
-            std::cerr << "with additional defines:\n" << defines << "\n";
-        }
         return false;
     }
 
@@ -45,14 +57,12 @@ bool Shader::linkProgram()
 
     GLint isLinked = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
-    if (isLinked == GL_FALSE)
-    {
+    if (isLinked == GL_FALSE) {
         GLint maxLength = 0;
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
         std::vector<GLchar> infoLog(maxLength);
         glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
         std::copy(infoLog.begin(), infoLog.end(), std::ostream_iterator<GLchar>(std::cerr, ""));
-
         glDeleteProgram(program);;
     }
 
@@ -70,10 +80,7 @@ bool Shader::linkProgram()
         return false;
     }
 
-    for (GLuint shader : shaders) {
-        glDetachShader(program, shader);
-        glDeleteShader(shader);
-    }
+    deleteShaders();
 
     return isLinked;
 }
@@ -92,19 +99,24 @@ bool Shader::hasUniform(GLuint location) const
     }
 }
 
-bool Shader::compileShader(GLuint shader, const std::string& filename, const std::string& defines)
+void Shader::deleteShaders()
 {
-    std::ifstream shaderFile(filename.c_str());
-    std::string shaderCode = GLSL_VERSION + defines;
+    for (GLuint shader : shaders) {
+        glDetachShader(program, shader);
+        glDeleteShader(shader);
+    }
+    shaders.clear();
+}
 
-    if (shaderFile.is_open()) {
-        shaderFile.seekg(0, std::ios::end);
-        shaderCode.reserve(shaderCode.size() + shaderFile.tellg());
-        shaderFile.seekg(0, std::ios::beg);
+bool Shader::compileShader(GLuint shader, const std::string& filename, const std::string& defines, const std::string& common)
+{
+    std::string shaderCode = GLSL_VERSION + defines + common;
+    std::ifstream shaderFile(filename.c_str());
+    if (shaderFile) {
         shaderCode.append((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
         shaderFile.close();
     } else {
-        std::cerr << "ERROR: Could not open shader file: " << filename << "\n";
+        std::cerr << "WARNING: Could not open shader file: " << filename << "\n";
         return false;
     }
 
@@ -112,15 +124,24 @@ bool Shader::compileShader(GLuint shader, const std::string& filename, const std
     glShaderSource(shader, 1, &shaderCodeCstr, NULL);
 
     glCompileShader(shader);
-    GLint status = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-    if (!status) {
-        char buffer[4096];
-        glGetShaderInfoLog(shader, 4096, NULL, buffer);
-        fprintf(stderr, "%s: %s\n", filename.c_str(), buffer);
+    GLint isCompiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+    if (isCompiled == GL_FALSE) {
+        std::cerr << "WARNING: Shader compilation failed for file " << filename << "\n";
+        GLint maxLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+        std::vector<GLchar> infoLog(maxLength);
+        glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+        std::copy(infoLog.begin(), infoLog.end(), std::ostream_iterator<GLchar>(std::cerr, ""));
+        std::string outFile = "failed_shader.out";
+        std::ofstream ofs(outFile.c_str());
+        if (ofs) {
+            ofs << shaderCode;
+            ofs.close();
+            std::cerr << "Shader code written to file: " << outFile << "\n";
+        }
         return false;
     }
-
     return true;
 }
 

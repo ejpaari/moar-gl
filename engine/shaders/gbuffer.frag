@@ -16,14 +16,6 @@ in vec3 T;
 in vec3 B;
 in vec3 eyeDir_World;
 
-const float BUMP_DEPTH = 0.025;
-const int NUM_STEPS = 50;
-
-bool isTransparent(float alpha)
-{
-  return alpha < 0.1;
-}
-
 void main()
 {
   outPosition = vertexPos_World;
@@ -31,7 +23,7 @@ void main()
 #if defined(BUMP)
   vec3 dir = -eyeDir_World;
   vec2 step = vec2(dot(dir, normalize(T)), dot(dir, normalize(B)));
-  float stepDepth = BUMP_DEPTH / NUM_STEPS;
+  float stepDepth = BUMP_DEPTH / NUM_BUMP_STEPS;
   float currentDepth = 0.0;
   float height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
 

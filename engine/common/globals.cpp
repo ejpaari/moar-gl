@@ -4,6 +4,7 @@ namespace moar
 {
 
 const std::string GLSL_VERSION = "#version 440 core\n";
+const std::string COMMON_FRAGMENT_FILE = "common.frag";
 const std::string POINT_DEFINE = "#define POINT\n";
 const std::string DIRECTIONAL_DEFINE = "#define DIRECTIONAL\n";
 const std::string DIFFUSE_DEFINE = "#define DIFFUSE\n";

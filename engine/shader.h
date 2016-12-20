@@ -25,6 +25,8 @@ public:
         DEPTH = 1 << 4
     };
 
+    static void loadCommonShaderCode(const std::string& fragment);
+
     explicit Shader();
     ~Shader();
     Shader(const Shader& rhs) = delete;
@@ -39,7 +41,10 @@ public:
     bool hasUniform(GLuint location) const;
 
 private:
-    bool compileShader(GLuint shader, const std::string& filename, const std::string& defines = "");
+    static std::string commonFragmentShaderCode;
+
+    void deleteShaders();
+    bool compileShader(GLuint shader, const std::string& filename, const std::string& defines = "", const std::string& common = "");
     bool readUniformLocations();
 
     GLuint program;    

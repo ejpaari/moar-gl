@@ -9,6 +9,7 @@ namespace moar
 {
 
 extern const std::string GLSL_VERSION;
+extern const std::string COMMON_FRAGMENT_FILE;
 extern const std::string POINT_DEFINE;
 extern const std::string DIRECTIONAL_DEFINE;
 extern const std::string DIFFUSE_DEFINE;

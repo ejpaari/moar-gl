@@ -21,6 +21,7 @@ ResourceManager::~ResourceManager()
 void ResourceManager::setShaderPath(const std::string& path)
 {
     shaderPath = path;
+    Shader::loadCommonShaderCode(path + "/" + COMMON_FRAGMENT_FILE);
 }
 
 void ResourceManager::setModelPath(const std::string& path)
