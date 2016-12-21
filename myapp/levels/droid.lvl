@@ -2,7 +2,7 @@
 # default texture
 
 general
-0.2 0.2 0.2
+0.0 0.0 0.0
 white.png
 
 skybox
@@ -25,7 +25,7 @@ name droid
 0.0 0.0 0.0
 0.0 0.0 0.0
 0.02 0.02 0.02
-0 0
+1 1
 component model
 attack_droid.obj
 
@@ -33,7 +33,7 @@ name floor
 0.0 0.0 0.0
 0.0 0.0 0.0
 2.0 0.01 2.0
-0 0
+1 1
 component model
 cube.3ds
 
@@ -41,7 +41,7 @@ name cube
 0.0 0.3 1.0
 0.0 0.0 0.0
 0.15 0.15 0.15
-0 0
+1 1
 component model
 untitled.obj
 

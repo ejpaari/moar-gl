@@ -10,7 +10,5 @@ layout (std140) uniform LightBlock {
 
 void main()
 {
-    float lightDistance = length(fragPos.xyz - lightPos);
-    lightDistance = lightDistance / farPlane;
-    gl_FragDepth = lightDistance;
+    gl_FragDepth = length(fragPos.xyz - lightPos) / farPlane;
 }  
