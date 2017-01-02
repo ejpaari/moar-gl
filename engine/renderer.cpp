@@ -124,7 +124,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     glBlendFunc(GL_ONE, GL_ONE);
 
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
-        lighting(Light::Type(i));
+        forwardLighting(Light::Type(i));
     }
 
     glDisable(GL_BLEND);
@@ -172,7 +172,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     DepthMap* depthMap = depthMapPointers[lightType];
     for (auto& light : lights[lightType]) {
         glEnable(GL_DEPTH_TEST);
-        renderDepthmap(lightType, light, depthMap);
+        renderShadowmap(lightType, light, depthMap);
 
         glDisable(GL_DEPTH_TEST);
         PostFramebuffer::bindQuadVAO();
@@ -181,9 +181,10 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
         glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
         depthMap->activate();
-        for (unsigned int i = 0; i < gBuffer.getTextures().size(); ++i) {
+        const std::vector<GLuint>& textures = gBuffer.getTextures();
+        for (unsigned int i = 0; i < textures.size(); ++i) {
             glActiveTexture(GL_TEXTURE0 + i + 1);
-            glBindTexture(GL_TEXTURE_2D, gBuffer.getTextures()[i]);
+            glBindTexture(GL_TEXTURE_2D, textures[i]);
             glUniform1i(RENDERED_TEX_LOCATION0 + i, i + 1);
         }
 
@@ -256,12 +257,12 @@ void Renderer::renderAmbient()
     }
 }
 
-void Renderer::lighting(Light::Type lightType)
+void Renderer::forwardLighting(Light::Type lightType)
 {
     DepthMap* depthMap = depthMapPointers[lightType];
 
     for (auto& light : lights[lightType]) {
-        renderDepthmap(lightType, light, depthMap);
+        renderShadowmap(lightType, light, depthMap);
 
         multisampleBuffer.bind();
 
@@ -287,15 +288,14 @@ void Renderer::lighting(Light::Type lightType)
     }
 }
 
-void Renderer::renderDepthmap(Light::Type lightType, Object* light, DepthMap* depthMap)
+void Renderer::renderShadowmap(Light::Type lightType, Object* light, DepthMap* depthMap)
 {
     shader = resourceManager->getDepthMapShader(lightType);
     glUseProgram(shader->getProgram());
     Light* lightComp = light->getComponent<Light>();
-    bool shadowingEnabled = lightComp->isShadowingEnabled();
     lightComp->setUniforms(light->getPosition(), light->getForward());
     depthMap->bind(light->getPosition(), light->getForward());
-    if (shadowingEnabled) {
+    if (lightComp->isShadowingEnabled()) {
         for (auto& shaderMeshMap : renderMeshes) {
             for (auto& meshMap : shaderMeshMap.second) {
                 for (auto& meshObject : meshMap.second) {

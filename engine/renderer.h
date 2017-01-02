@@ -44,8 +44,8 @@ private:
     void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
     void renderAmbient();
-    void lighting(Light::Type lightType);
-    void renderDepthmap(Light::Type lightType, Object* light, DepthMap* depthMap);
+    void forwardLighting(Light::Type lightType);
+    void renderShadowmap(Light::Type lightType, Object* light, DepthMap* depthMap);
     void renderSkybox(Object* skybox = nullptr);    
     GLuint renderBloom(GLuint framebuffer);
     GLuint renderHDR(GLuint renderedTex);

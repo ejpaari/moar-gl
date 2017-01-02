@@ -28,12 +28,7 @@ bool DepthMap::createFramebuffer(GLuint& framebuffer, GLuint& texture, bool cube
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-        return true;
-    } else {
-        std::cerr << "ERROR: Depth map framebuffer status is incomplete.\n";
-        return false;
-    }
+    return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
 } // moar
