@@ -113,8 +113,14 @@ void ResourceManager::clear()
 {
     textures.clear();
     cubeTextures.clear();
-    models.clear();
     materials.clear();
+    for (auto it = models.begin(); it != models.end(); ) {
+        if (it->first != "lowpoly_sphere.obj") {
+            it = models.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 Material* ResourceManager::createMaterial()
@@ -129,7 +135,7 @@ Material* ResourceManager::createMaterial()
     }
 }
 
-const Shader* ResourceManager::getShaderByName(const std::string& name)
+const Shader* ResourceManager::getShaderByName(const std::string& name) const
 {
     auto found = shadersByName.find(name);
     if (found != shadersByName.end()) {
@@ -169,7 +175,7 @@ const Shader* ResourceManager::getForwardLightShader(int shaderType, Light::Type
     return nullptr;
 }
 
-const Shader* ResourceManager::getDepthMapShader(Light::Type light)
+const Shader* ResourceManager::getDepthMapShader(Light::Type light) const
 {
     auto found = depthMapShadersByType.find(light);
     if (found != depthMapShadersByType.end()) {

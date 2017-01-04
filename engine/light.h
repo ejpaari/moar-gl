@@ -32,15 +32,18 @@ public:
 
     Type getLightType() const;
     bool isShadowingEnabled() const;
+    float getRange() const;
 
 private:
     static GLuint lightBlockBuffer;
 
     void setUniforms(const glm::vec3& position, const glm::vec3& forward);
+    void calculateRange();
 
     Type type = POINT;
     glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 10.0f);
     bool shadowingEnabled = true;
+    float range = 0.0f;
 };
 
 } // moar

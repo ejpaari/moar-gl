@@ -6,6 +6,7 @@ layout (location = 23) uniform samplerCube depthTex;
 layout (location = 30) uniform sampler2D colorTex;
 layout (location = 31) uniform sampler2D normalTex;
 layout (location = 32) uniform sampler2D positionTex;
+layout (location = 41) uniform vec2 screenSize;
 layout (location = 43) uniform float farPlane;
 
 layout (std140) uniform LightBlock {
@@ -14,10 +15,10 @@ layout (std140) uniform LightBlock {
   vec3 lightForward;
 };
 
-in vec2 texCoord;
-
 void main()
 {
+  vec2 texCoord = gl_FragCoord.xy / screenSize;
+
   outColor = vec3(0.0);
   vec3 vertexPos = texture(positionTex, texCoord).xyz;
   float lightDistance = length(lightPos - vertexPos);

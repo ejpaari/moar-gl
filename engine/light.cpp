@@ -5,11 +5,13 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <cmath>
 
 namespace moar
 {
 
-GLuint Light::lightBlockBuffer = 0;
+GLuint Light::lightBlockBuffer = 0; // Initialized by friend class renderer
+constexpr float DIST = 10.0f / static_cast<float>(sqrt(3.0)); // Heuristic
 
 Light::Light()
 {
@@ -33,6 +35,7 @@ void Light::setShadowingEnabled(bool enabled)
 void Light::setColor(const glm::vec4& color)
 {
     this->color = color;
+    calculateRange();
 }
 
 Light::Type Light::getLightType() const
@@ -45,6 +48,11 @@ bool Light::isShadowingEnabled() const
     return shadowingEnabled;
 }
 
+float Light::getRange() const
+{
+    return range;
+}
+
 void Light::setUniforms(const glm::vec3& position, const glm::vec3& forward)
 {
     glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
@@ -55,6 +63,11 @@ void Light::setUniforms(const glm::vec3& position, const glm::vec3& forward)
     offset += 16;
     glBufferSubData(GL_UNIFORM_BUFFER, offset, 12, glm::value_ptr(forward));
     glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
+}
+
+void Light::calculateRange()
+{
+    range = DIST * sqrt(color.w);
 }
 
 } // moar

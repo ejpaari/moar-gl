@@ -18,7 +18,7 @@ const glm::mat4* Object::view = nullptr;
 
 glm::mat4 Object::viewProjection;
 unsigned int Object::idCounter = 0;
-GLuint Object::transformationBlockBuffer = 0;
+GLuint Object::transformationBlockBuffer = 0; // Initialized by friend class renderer
 Material* Object::defaultMaterial = nullptr;
 
 void Object::updateViewProjectionMatrix()

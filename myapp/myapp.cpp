@@ -149,7 +149,7 @@ void MyApp::update()
 {
     moar::Object* cube = engine->getObjectByName("cube");
     if (cube) {
-        cube->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.0f * time->getDelta());
+        cube->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f * time->getDelta());
     }
 
     FPS = static_cast<unsigned int>(1.0f / time->getDelta());

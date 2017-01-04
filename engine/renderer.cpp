@@ -58,6 +58,11 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+
+    lightSphere.reset(new Object);
+    Model* sphereModel = manager->getModel("lowpoly_sphere.obj");
+    lightSphere->addComponent<Model>(sphereModel);
+
     return true;
 }
 
@@ -175,10 +180,11 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         renderShadowmap(lightType, light, depthMap);
 
         glDisable(GL_DEPTH_TEST);
-        PostFramebuffer::bindQuadVAO();
         postBuffer->bind();
-        glUseProgram(resourceManager->getShaderByName("deferred_light")->getProgram());
+        shader = resourceManager->getShaderByName("deferred_light");
+        glUseProgram(shader->getProgram());
         glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+        glUniform2f(SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight);
         glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
         depthMap->activate();
         const std::vector<GLuint>& textures = gBuffer.getTextures();
@@ -190,7 +196,15 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 
         Light* lightComp = light->getComponent<Light>();
         lightComp->setUniforms(light->getPosition(), light->getForward());
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        float r = lightComp->getRange();
+        lightSphere->setScale(glm::vec3(r, r, r));
+        lightSphere->setPosition(light->getPosition());
+        lightSphere->updateModelMatrix();
+        lightSphere->setUniforms(shader);
+        glCullFace(GL_FRONT);
+        lightSphere->getMeshObjects().front().mesh->render();
+        glCullFace(GL_BACK);
     }
 
     glDisable(GL_BLEND);

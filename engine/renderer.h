@@ -62,6 +62,7 @@ private:
     using MeshMap = std::map<MaterialId, std::vector<Object::MeshObject>>;
     std::map<ShaderType, MeshMap> renderMeshes;
     std::vector<std::vector<Object*>> lights;
+    std::unique_ptr<Object> lightSphere;
 
     const RenderSettings* renderSettings = nullptr;
     ResourceManager* resourceManager = nullptr;
