@@ -38,12 +38,8 @@ bool DepthMapPoint::init()
     return status;
 }
 
-void DepthMapPoint::bind(const glm::vec3& lightPos, const glm::vec3& /*lightDir*/)
+void DepthMapPoint::setUniforms(const glm::vec3& lightPos, const glm::vec3& /*lightDir*/)
 {
-    glViewport(0, 0, width, height);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
     lightSpaces[0] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     lightSpaces[1] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     lightSpaces[2] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));

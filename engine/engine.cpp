@@ -379,7 +379,7 @@ bool Engine::loadLevel(const std::string& level)
     Object* obj = nullptr;
     try {
         float x, y, z, w;
-        bool a, b;
+        bool a;
         while (ifs) {
             ifs >> word;
             boost::trim(word);
@@ -415,9 +415,8 @@ bool Engine::loadLevel(const std::string& level)
                 obj->setRotation(glm::vec3(x, y, z));
                 ifs >> x >> y >> z;
                 obj->setScale(glm::vec3(x, y, z));
-                ifs >> a >> b;
+                ifs >> a;
                 obj->setShadowCaster(a);
-                obj->setShadowReceiver(b);
                 word.clear();
             } else if (word == "component") {
                 if (!obj) {
@@ -530,7 +529,6 @@ bool Engine::createSkybox()
     }
 
     skybox->setShadowCaster(false);
-    skybox->setShadowReceiver(false);
 
     return true;
 }

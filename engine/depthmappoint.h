@@ -22,7 +22,7 @@ public:
     DepthMapPoint& operator=(DepthMapPoint&&) = delete;
 
     virtual bool init();
-    virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir = glm::vec3(0.0f, 0.0f, 0.0f));
+    virtual void setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir);
     virtual void activate();
 
 private:

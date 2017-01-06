@@ -1,5 +1,5 @@
-layout(location = 0) out vec4 outPosition;
-layout(location = 1) out vec4 outNormal;
+layout(location = 0) out vec3 outPosition;
+layout(location = 1) out vec3 outNormal;
 layout(location = 2) out vec4 outColor;
 
 layout (location = 12) uniform vec3 cameraPos_World;
@@ -7,7 +7,6 @@ layout (location = 20) uniform sampler2D diffuseTex;
 layout (location = 21) uniform sampler2D normalTex;
 layout (location = 22) uniform sampler2D bumpTex;
 layout (location = 24) uniform sampler2D specularTex;
-layout (location = 42) uniform int receiveShadows;
 layout (location = 43) uniform float farPlane;
 
 in vec2 texCoord;
@@ -44,7 +43,6 @@ void main()
   }
 
   outPosition.xyz = vertexPos_World;
-  outPosition.w = length(vertexPos_World - cameraPos_World) / farPlane;
 
 #if defined(NORMAL)
   vec3 normal = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
@@ -52,11 +50,6 @@ void main()
 #else
   outNormal.xyz = normalize(normal_World);
 #endif
-
-  outNormal.a = 0.0f;
-  if (receiveShadows != 0) {
-    outNormal.a = 1.0f;
-  }
 
 #if defined(SPECULAR)
   outColor.a = texture(specularTex, sampleCoord).r;

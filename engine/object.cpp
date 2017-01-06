@@ -132,11 +132,6 @@ void Object::setShadowCaster(bool caster)
     shadowCaster = caster;
 }
 
-void Object::setShadowReceiver(bool receiver)
-{
-    shadowReceiver = receiver;
-}
-
 bool Object::isShadowCaster() const
 {
     return shadowCaster;
@@ -147,7 +142,7 @@ std::vector<Object::MeshObject>& Object::getMeshObjects()
     return meshObjects;
 }
 
-void Object::setUniforms(const Shader* shader)
+void Object::setUniforms()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
     GLintptr matrixSize = sizeof(modelMatrix);
@@ -155,10 +150,6 @@ void Object::setUniforms(const Shader* shader)
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr(modelViewMatrix));
     glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr(modelViewProjectionMatrix));
     glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
-
-    if (shadowReceiver && shader->hasUniform(RECEIVE_SHADOWS_LOCATION)) {
-        glUniform1i(RECEIVE_SHADOWS_LOCATION, static_cast<int>(shadowReceiver));
-    }
 }
 
 void Object::updateModelMatrix()

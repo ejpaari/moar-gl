@@ -13,6 +13,12 @@ DepthMap::~DepthMap()
 {
 }
 
+void DepthMap::bind()
+{
+    glViewport(0, 0, width, height);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+}
+
 void DepthMap::setSize(int width, int height)
 {
     this->width = width;

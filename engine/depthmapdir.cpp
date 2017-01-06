@@ -37,10 +37,8 @@ bool DepthMapDirectional::init()
     return status;
 }
 
-void DepthMapDirectional::bind(const glm::vec3& lightPos, const glm::vec3& lightDir)
+void DepthMapDirectional::setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    glClear(GL_DEPTH_BUFFER_BIT);
     glm::mat4 viewMatrix = glm::lookAt(lightPos, lightPos + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
     lightSpaceMatrix = projectionMatrix * viewMatrix;
     glUniformMatrix4fv(LIGHT_SPACE_PROJ_LOCATION, 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));

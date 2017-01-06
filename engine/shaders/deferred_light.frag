@@ -35,11 +35,7 @@ void main()
   float spec = clamp(dot(e, r), 0, 1);
   float specular = pow(spec, 10.0f) * texColor.a;
 
-  float shadow = 1.0;
-  bool receiveShadows = texture(normalTex, texCoord).a > 0.0;
-  if (receiveShadows) {
-    shadow = calcPointShadow(depthTex, vertexPos, lightPos, farPlane);
-  }
+  float shadow = calcPointShadow(depthTex, vertexPos, lightPos, farPlane);
   
   outColor +=
     (lightColor.xyz * diff * lightPower) * texColor.rgb +

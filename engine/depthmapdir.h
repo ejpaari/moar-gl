@@ -22,7 +22,7 @@ public:
     DepthMapDirectional& operator=(DepthMapDirectional&&) = delete;
 
     virtual bool init();
-    virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir);
+    virtual void setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir);
     virtual void activate();
 
 private:

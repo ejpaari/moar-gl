@@ -67,7 +67,6 @@ public:
     glm::vec3 getLeft() const;
 
     void setShadowCaster(bool caster);
-    void setShadowReceiver(bool receiver);
     bool isShadowCaster() const;
 
     std::vector<MeshObject>& getMeshObjects();
@@ -101,7 +100,7 @@ private:
     static void setMeshDefaultMaterial(Material* material);
     static void setViewMatrixUniform();
 
-    void setUniforms(const Shader* shader);
+    void setUniforms();
     void updateModelMatrix();
     glm::mat4x4 getModelMatrix() const;
 

@@ -19,6 +19,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <functional>
 
 namespace moar
 {
@@ -57,6 +58,7 @@ private:
     void setPostFramebuffer();
 
     bool deferred = true;
+    std::function<void(const std::vector<std::unique_ptr<Object>>&, Object* skybox)> renderFunction;
 
     using MaterialId = int;
     using ShaderType = int;

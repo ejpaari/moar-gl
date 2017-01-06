@@ -18,7 +18,8 @@ public:
     DepthMap& operator=(DepthMap&&) = delete;
 
     virtual bool init() = 0;
-    virtual void bind(const glm::vec3& lightPos, const glm::vec3& lightDir) = 0;
+    virtual void bind();
+    virtual void setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir) = 0;
     virtual void activate() = 0;
 
     void setSize(int width, int height);

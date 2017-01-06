@@ -157,12 +157,12 @@ void MyApp::update()
     position = camera->getPosition();
     rotation = camera->getRotation();
 
-    if (light1 && light2) {
-        float t = time->getTime();
-        float sint = static_cast<float>(sin(t));
-        light1->setPosition(glm::vec3(-1.5 + sin(t * 0.2), 1.8 + (sint * 0.15), 0.0f));
-        light2->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.12), 0.0f));
-    }
+//    if (light1 && light2) {
+//        float t = time->getTime();
+//        float sint = static_cast<float>(sin(t));
+//        light1->setPosition(glm::vec3(-1.5 + sin(t * 0.2), 1.8 + (sint * 0.15), 0.0f));
+//        light2->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.12), 0.0f));
+//    }
 
 #ifdef POSTPROC
     offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));

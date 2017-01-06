@@ -4,6 +4,18 @@
 namespace moar
 {
 
+namespace
+{
+
+void enableBlending()
+{
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+}
+
+} // anonymous
+
 Renderer::Renderer()
 {
     depthMapPointers.resize(Light::NUM_TYPES);
@@ -56,8 +68,6 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     Object::transformationBlockBuffer = transformationBuffer;
 
     glEnable(GL_MULTISAMPLE);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
 
     lightSphere.reset(new Object);
     Model* sphereModel = manager->getModel("lowpoly_sphere.obj");
@@ -90,12 +100,18 @@ bool Renderer::setDeferredRenderPath(bool enabled)
                 postBuffer1.init(2, true) &&
                 postBuffer2.init(2, false) &&
                 blitBuffer.init(1, false);
+        renderFunction = [&](const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
+            this->renderDeferred(objects, skybox);
+        };
     } else {
         framebuffersInitialized =
                 multisampleBuffer.init(2) &&
                 postBuffer1.init(1, false) &&
                 postBuffer2.init(1, false) &&
                 blitBuffer.init(1, false);
+        renderFunction = [&](const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
+            this->renderForward(objects, skybox);
+        };
     }
 
     if (!framebuffersInitialized) {
@@ -112,19 +128,17 @@ void Renderer::setCamera(const Camera* camera)
 
 void Renderer::render(const std::vector<std::unique_ptr<Object> >& objects, Object* skybox)
 {
-    if (deferred) {
-        renderDeferred(objects, skybox);
-    } else {
-        renderForward(objects, skybox);
-    }
+    renderFunction(objects, skybox);
 }
 
 void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
-{
+{    
     setup(&multisampleBuffer, objects);
-    renderAmbient();
 
-    glEnable(GL_BLEND);
+    glDisable(GL_STENCIL_TEST);
+
+    renderAmbient();
+    enableBlending();
 
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
         forwardLighting(Light::Type(i));
@@ -134,6 +148,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
 
     renderSkybox(skybox);
 
+    glCullFace(GL_BACK);
     glDisable(GL_DEPTH_TEST);
 
     GLuint renderedTex = blitBuffer.blitColor(multisampleBuffer.getFramebuffer(), 0);
@@ -163,14 +178,14 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
                 if (!objectInsideFrustum(meshObject)) {
                    continue;
                 }
-                meshObject.parent->setUniforms(shader);
+                meshObject.parent->setUniforms();
                 meshObject.mesh->render();
                 objectsInFrustum.insert(meshObject.mesh->getId());
             }
         }
     }
 
-    glEnable(GL_BLEND);
+    enableBlending();
 
     Light::Type lightType = Light::POINT;
     DepthMap* depthMap = depthMapPointers[lightType];
@@ -206,7 +221,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         glDisable(GL_DEPTH_TEST);
 
         lightComponent->setUniforms(light->getPosition(), light->getForward());
-        lightSphere->setUniforms(shader);
+        lightSphere->setUniforms();
         lightSphere->getMeshObjects().front().mesh->render();
     }
 
@@ -259,6 +274,8 @@ void Renderer::renderAmbient()
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     shader = renderSettings->ambientShader;
     glUseProgram(shader->getProgram());
@@ -270,7 +287,7 @@ void Renderer::renderAmbient()
                 if (!objectInsideFrustum(meshObject)) {
                    continue;
                 }
-                meshObject.parent->setUniforms(shader);
+                meshObject.parent->setUniforms();
                 meshObject.mesh->render();
                 objectsInFrustum.insert(meshObject.mesh->getId());
             }
@@ -285,7 +302,6 @@ void Renderer::forwardLighting(Light::Type lightType)
         renderShadowmap(lightType, light, depthMap);
 
         multisampleBuffer.bind();
-
         for (auto& shaderMeshMap : renderMeshes) {
             shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
             glUseProgram(shader->getProgram());
@@ -300,7 +316,7 @@ void Renderer::forwardLighting(Light::Type lightType)
                     if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
                         continue;
                     }
-                    meshObject.parent->setUniforms(shader);
+                    meshObject.parent->setUniforms();
                     meshObject.mesh->render();
                 }
             }
@@ -312,19 +328,22 @@ void Renderer::renderShadowmap(Light::Type lightType, Object* light, DepthMap* d
 {
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
+    glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     shader = resourceManager->getDepthMapShader(lightType);
     glUseProgram(shader->getProgram());
     Light* lightComp = light->getComponent<Light>();
     lightComp->setUniforms(light->getPosition(), light->getForward());
-    depthMap->bind(light->getPosition(), light->getForward());
+    depthMap->bind();
+    depthMap->setUniforms(light->getPosition(), light->getForward());
+    glClear(GL_DEPTH_BUFFER_BIT);
     if (lightComp->isShadowingEnabled()) {
         for (auto& shaderMeshMap : renderMeshes) {
             for (auto& meshMap : shaderMeshMap.second) {
                 for (auto& meshObject : meshMap.second) {
                     if (meshObject.parent->isShadowCaster()) {
-                        meshObject.parent->setUniforms(shader);
+                        meshObject.parent->setUniforms();
                         meshObject.mesh->render();
                     }
                 }
@@ -346,7 +365,7 @@ void Renderer::stencilPass()
 
     shader = resourceManager->getShaderByName("stencil_pass");
     glUseProgram(shader->getProgram());
-    lightSphere->setUniforms(shader);
+    lightSphere->setUniforms();
     lightSphere->getMeshObjects().front().mesh->render();
 }
 
@@ -357,12 +376,11 @@ void Renderer::renderSkybox(Object* skybox)
         glCullFace(GL_FRONT);
         shader = renderSettings->skyboxShader;
         glUseProgram(shader->getProgram());
-        skybox->setUniforms(shader);
+        skybox->setUniforms();
         for (auto& meshObject : skybox->getMeshObjects()) {
             meshObject.material->setUniforms(shader);
             meshObject.mesh->render();
         }
-        glCullFace(GL_BACK);
     }
 }
 
