@@ -122,22 +122,22 @@ void Renderer::render(const std::vector<std::unique_ptr<Object> >& objects, Obje
 void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
 {
     setup(&multisampleBuffer, objects);
-
     renderAmbient();
 
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
 
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
         forwardLighting(Light::Type(i));
     }
 
     glDisable(GL_BLEND);
+
     renderSkybox(skybox);
+
     glDisable(GL_DEPTH_TEST);
 
-    GLuint renderedTex = 0;
-    renderedTex = renderBloom(multisampleBuffer.getFramebuffer());
+    GLuint renderedTex = blitBuffer.blitColor(multisampleBuffer.getFramebuffer(), 0);
+    renderedTex = renderBloom(multisampleBuffer.getFramebuffer(), renderedTex);
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
@@ -171,16 +171,21 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     }
 
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
 
     Light::Type lightType = Light::POINT;
     DepthMap* depthMap = depthMapPointers[lightType];
     for (auto& light : lights[lightType]) {
-        glEnable(GL_DEPTH_TEST);
         renderShadowmap(lightType, light, depthMap);
 
-        glDisable(GL_DEPTH_TEST);
+        Light* lightComponent = light->getComponent<Light>();
+        float r = lightComponent->getRange();
+        lightSphere->setScale(glm::vec3(r, r, r));
+        lightSphere->setPosition(light->getPosition());
+        lightSphere->updateModelMatrix();
+
         postBuffer->bind();
+        stencilPass();
+
         shader = resourceManager->getShaderByName("deferred_light");
         glUseProgram(shader->getProgram());
         glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
@@ -194,31 +199,30 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
             glUniform1i(RENDERED_TEX_LOCATION0 + i, i + 1);
         }
 
-        Light* lightComp = light->getComponent<Light>();
-        lightComp->setUniforms(light->getPosition(), light->getForward());
-
-        float r = lightComp->getRange();
-        lightSphere->setScale(glm::vec3(r, r, r));
-        lightSphere->setPosition(light->getPosition());
-        lightSphere->updateModelMatrix();
-        lightSphere->setUniforms(shader);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+        glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
+        glDisable(GL_DEPTH_TEST);
+
+        lightComponent->setUniforms(light->getPosition(), light->getForward());
+        lightSphere->setUniforms(shader);
         lightSphere->getMeshObjects().front().mesh->render();
-        glCullFace(GL_BACK);
     }
 
+    glDisable(GL_STENCIL_TEST);
     glDisable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
 
     renderSkybox(skybox);
 
+    glCullFace(GL_BACK);
     glDisable(GL_DEPTH_TEST);
 
-    GLuint renderedTex = 0;
-    renderedTex = renderBloom(postBuffer->getFramebuffer());
+    GLuint renderedTex = blitBuffer.blitColor(postBuffer->getFramebuffer(), 0);
+    renderedTex = renderBloom(postBuffer->getFramebuffer(), renderedTex);
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
-    renderPassthrough(renderedTex);
+    renderPassthrough(renderedTex);    
 }
 
 void Renderer::clear()
@@ -238,6 +242,8 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
     objectsInFrustum.clear();
     Object::setViewMatrixUniform();
 
+    glDepthMask(GL_TRUE);
+
     postBuffer1.bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     postBuffer2.bind();
@@ -245,14 +251,15 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
 
     fb->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_BLEND);
 }
 
 void Renderer::renderAmbient()
 {
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glDisable(GL_BLEND);
+
     shader = renderSettings->ambientShader;
     glUseProgram(shader->getProgram());
     glUniform3f(AMBIENT_LOCATION, renderSettings->ambientColor.x, renderSettings->ambientColor.y, renderSettings->ambientColor.z);
@@ -274,7 +281,6 @@ void Renderer::renderAmbient()
 void Renderer::forwardLighting(Light::Type lightType)
 {
     DepthMap* depthMap = depthMapPointers[lightType];
-
     for (auto& light : lights[lightType]) {
         renderShadowmap(lightType, light, depthMap);
 
@@ -304,6 +310,10 @@ void Renderer::forwardLighting(Light::Type lightType)
 
 void Renderer::renderShadowmap(Light::Type lightType, Object* light, DepthMap* depthMap)
 {
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glCullFace(GL_BACK);
+
     shader = resourceManager->getDepthMapShader(lightType);
     glUseProgram(shader->getProgram());
     Light* lightComp = light->getComponent<Light>();
@@ -323,9 +333,27 @@ void Renderer::renderShadowmap(Light::Type lightType, Object* light, DepthMap* d
     }
 }
 
-void Renderer::renderSkybox(Object* skybox)
+void Renderer::stencilPass()
 {
+    glDepthMask(GL_FALSE);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glDisable(GL_CULL_FACE);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, 0, 0);
+    glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+    glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+    shader = resourceManager->getShaderByName("stencil_pass");
+    glUseProgram(shader->getProgram());
+    lightSphere->setUniforms(shader);
+    lightSphere->getMeshObjects().front().mesh->render();
+}
+
+void Renderer::renderSkybox(Object* skybox)
+{    
     if (skybox) {
+        glEnable(GL_DEPTH_TEST);
         glCullFace(GL_FRONT);
         shader = renderSettings->skyboxShader;
         glUseProgram(shader->getProgram());
@@ -338,9 +366,8 @@ void Renderer::renderSkybox(Object* skybox)
     }
 }
 
-GLuint Renderer::renderBloom(GLuint framebuffer)
+GLuint Renderer::renderBloom(GLuint framebuffer, GLuint renderedTex)
 {
-    GLuint renderedTex = blitBuffer.blitColor(framebuffer, 0);
     if (camera->getBloomIterations() > 0) {
         setPostFramebuffer();
         GLuint bloomTex = postBuffer->blitColor(framebuffer, 1);
@@ -382,16 +409,15 @@ GLuint Renderer::renderPostprocess(GLuint renderedTex)
 
 void Renderer::renderPassthrough(GLuint texture)
 {
-    glUseProgram(resourceManager->getShaderByName("passthrough")->getProgram());
-    PostFramebuffer::bindQuadVAO();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glUseProgram(resourceManager->getShaderByName("passthrough")->getProgram());
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glUniform1i(RENDERED_TEX_LOCATION0, 0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    PostFramebuffer::bindQuadVAO();
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

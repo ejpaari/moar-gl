@@ -35,3 +35,6 @@ gbuffer.frag
 deferred_light.vert
 deferred_light.frag
 
+stencil_pass.vert
+stencil_pass.frag
+

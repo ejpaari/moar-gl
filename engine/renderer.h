@@ -46,8 +46,9 @@ private:
     void renderAmbient();
     void forwardLighting(Light::Type lightType);
     void renderShadowmap(Light::Type lightType, Object* light, DepthMap* depthMap);
+    void stencilPass();
     void renderSkybox(Object* skybox = nullptr);    
-    GLuint renderBloom(GLuint framebuffer);
+    GLuint renderBloom(GLuint framebuffer, GLuint renderedTex);
     GLuint renderHDR(GLuint renderedTex);
     GLuint renderPostprocess(GLuint renderedTex);
     void renderPassthrough(GLuint texture);

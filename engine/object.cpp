@@ -26,6 +26,18 @@ void Object::updateViewProjectionMatrix()
     viewProjection = (*projection) * (*view);
 }
 
+void Object::setMeshDefaultMaterial(Material* material)
+{
+    defaultMaterial = material;
+}
+
+void Object::setViewMatrixUniform()
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
+    GLintptr matrixSize = sizeof(modelMatrix);
+    glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
+}
+
 Object::Object() :
     id(++idCounter)
 {
@@ -133,18 +145,6 @@ bool Object::isShadowCaster() const
 std::vector<Object::MeshObject>& Object::getMeshObjects()
 {
     return meshObjects;
-}
-
-void Object::setMeshDefaultMaterial(Material* material)
-{
-    defaultMaterial = material;
-}
-
-void Object::setViewMatrixUniform()
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, transformationBlockBuffer);
-    GLintptr matrixSize = sizeof(modelMatrix);
-    glBufferSubData(GL_UNIFORM_BUFFER, 1 * matrixSize, matrixSize, glm::value_ptr(*view));
 }
 
 void Object::setUniforms(const Shader* shader)
