@@ -48,7 +48,7 @@ extern const GLuint RENDERED_TEX_LOCATION3;
 
 extern const GLuint TIME_LOCATION;
 extern const GLuint SCREEN_SIZE_LOCATION;
-extern const GLuint RECEIVE_SHADOWS_LOCATION;
+extern const GLuint ENABLE_SHADOWS_LOCATION;
 extern const GLuint FAR_CLIP_DISTANCE_LOCATION;
 extern const GLuint BLOOM_FILTER_HORIZONTAL;
 
@@ -56,6 +56,8 @@ extern const GLuint LIGHT_SPACE_PROJ_LOCATION;
 extern const GLuint LIGHT_SPACE_VP_LOCATION;
 
 const GLint MAX_LOCATION = 64;
+
+const int MAX_NUM_SHADOWMAPS = 2;
 
 extern unsigned int G_DRAW_COUNT;
 extern bool G_COMPONENT_CHANGED;

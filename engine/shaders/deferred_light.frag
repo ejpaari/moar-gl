@@ -7,6 +7,7 @@ layout (location = 30) uniform sampler2D colorTex;
 layout (location = 31) uniform sampler2D normalTex;
 layout (location = 32) uniform sampler2D positionTex;
 layout (location = 41) uniform vec2 screenSize;
+layout (location = 42) uniform int shadowsEnabled;
 layout (location = 43) uniform float farPlane;
 
 layout (std140) uniform LightBlock {
@@ -34,8 +35,11 @@ void main()
   vec3 r = reflect(-lightDir, normal);
   float spec = clamp(dot(e, r), 0, 1);
   float specular = pow(spec, 10.0f) * texColor.a;
-
-  float shadow = calcPointShadow(depthTex, vertexPos, lightPos, farPlane);
+  
+  float shadow = 1.0;
+  if (shadowsEnabled > 0) {
+    shadow = calcPointShadow(depthTex, vertexPos, lightPos, farPlane);
+  }
   
   outColor +=
     (lightColor.xyz * diff * lightPower) * texColor.rgb +

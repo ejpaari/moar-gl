@@ -1,6 +1,8 @@
 #include "renderer.h"
 #include "common/globals.h"
 
+#include <utility>
+
 namespace moar
 {
 
@@ -18,9 +20,10 @@ void enableBlending()
 
 Renderer::Renderer()
 {
-    depthMapPointers.resize(Light::NUM_TYPES);
-    depthMapPointers[Light::DIRECTIONAL] = &depthMapDir;
-    depthMapPointers[Light::POINT] = &depthMapPoint;
+    for (int i = 0; i < MAX_NUM_SHADOWMAPS; ++i) {
+        depthMapPointers[Light::POINT].push_back(&pointDepthMaps[i]);
+        depthMapPointers[Light::DIRECTIONAL].push_back(&dirDepthMaps[i]);
+    }
 }
 
 Renderer::~Renderer()
@@ -40,14 +43,19 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
         return false;
     }
 
-    depthMapDir.setSize(renderSettings->windowWidth, renderSettings->windowHeight);
-    if (!depthMapDir.init()) {
-        return false;
-    }
+    lightSphere.reset(new Object);
+    Model* sphereModel = manager->getModel("lowpoly_sphere.obj");
+    lightSphere->addComponent<Model>(sphereModel);
 
-    depthMapPoint.setSize(1024, 1024);
-    if (!depthMapPoint.init()) {
-        return false;
+    for (int i = 0; i < MAX_NUM_SHADOWMAPS; ++i) {
+        pointDepthMaps[i].setSize(1024, 1024);
+        if (!pointDepthMaps[i].init()) {
+            return false;
+        }
+        dirDepthMaps[i].setSize(800, 600);
+        if (!dirDepthMaps[i].init()) {
+            return false;
+        }
     }
 
     Framebuffer::setSize(renderSettings->windowWidth, renderSettings->windowHeight);
@@ -68,10 +76,6 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     Object::transformationBlockBuffer = transformationBuffer;
 
     glEnable(GL_MULTISAMPLE);
-
-    lightSphere.reset(new Object);
-    Model* sphereModel = manager->getModel("lowpoly_sphere.obj");
-    lightSphere->addComponent<Model>(sphereModel);
 
     return true;
 }
@@ -132,12 +136,19 @@ void Renderer::render(const std::vector<std::unique_ptr<Object> >& objects, Obje
 }
 
 void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
-{    
+{
     setup(&multisampleBuffer, objects);
 
     glDisable(GL_STENCIL_TEST);
 
     renderAmbient();
+
+    for (int type = 0; type < Light::Type::NUM_TYPES; ++type) {
+        for (unsigned int light = 0; light < MAX_NUM_SHADOWMAPS && light < closestLights[type].size(); ++light) {
+            renderShadowmap(Light::Type(type), closestLights[type][light], depthMapPointers[type][light]);
+        }
+    }
+
     enableBlending();
 
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
@@ -165,7 +176,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     postBuffer = &postBuffer1;
     postBuffer->bind();
     renderAmbient();
-    
+
     gBuffer.bind();
     for (auto& shaderMeshMap : renderMeshes) {
         shader = resourceManager->getGBufferShader(shaderMeshMap.first);
@@ -185,33 +196,45 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         }
     }
 
+    for (int type = 0; type < Light::Type::NUM_TYPES; ++type) {
+        for (unsigned int light = 0; light < MAX_NUM_SHADOWMAPS && light < closestLights[type].size(); ++light) {
+            renderShadowmap(Light::Type(type), closestLights[type][light], depthMapPointers[type][light]);
+        }
+    }
+
+    postBuffer->bind();
     enableBlending();
-
     Light::Type lightType = Light::POINT;
-    DepthMap* depthMap = depthMapPointers[lightType];
-    for (auto& light : lights[lightType]) {
-        renderShadowmap(lightType, light, depthMap);
 
+    shader = resourceManager->getShaderByName("deferred_light");
+    glUseProgram(shader->getProgram());
+    glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+    glUniform2f(SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight);
+    glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
+    const std::vector<GLuint>& textures = gBuffer.getTextures();
+    for (unsigned int i = 0; i < textures.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i + 1);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        glUniform1i(RENDERED_TEX_LOCATION0 + i, i + 1);
+    }
+
+    for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
+        Object* light = closestLights[lightType][lightNum];
         Light* lightComponent = light->getComponent<Light>();
         float r = lightComponent->getRange();
         lightSphere->setScale(glm::vec3(r, r, r));
         lightSphere->setPosition(light->getPosition());
         lightSphere->updateModelMatrix();
 
-        postBuffer->bind();
         stencilPass();
 
         shader = resourceManager->getShaderByName("deferred_light");
         glUseProgram(shader->getProgram());
-        glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-        glUniform2f(SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight);
-        glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-        depthMap->activate();
-        const std::vector<GLuint>& textures = gBuffer.getTextures();
-        for (unsigned int i = 0; i < textures.size(); ++i) {
-            glActiveTexture(GL_TEXTURE0 + i + 1);
-            glBindTexture(GL_TEXTURE_2D, textures[i]);
-            glUniform1i(RENDERED_TEX_LOCATION0 + i, i + 1);
+        if (lightNum < MAX_NUM_SHADOWMAPS) {
+            glUniform1i(ENABLE_SHADOWS_LOCATION, 1);
+            depthMapPointers[lightType][lightNum]->activate();
+        } else {
+            glUniform1i(ENABLE_SHADOWS_LOCATION, 0);
         }
 
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -237,7 +260,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     renderedTex = renderBloom(postBuffer->getFramebuffer(), renderedTex);
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
-    renderPassthrough(renderedTex);    
+    renderPassthrough(renderedTex);
 }
 
 void Renderer::clear()
@@ -297,11 +320,12 @@ void Renderer::renderAmbient()
 
 void Renderer::forwardLighting(Light::Type lightType)
 {
-    DepthMap* depthMap = depthMapPointers[lightType];
-    for (auto& light : lights[lightType]) {
-        renderShadowmap(lightType, light, depthMap);
+    multisampleBuffer.bind();
+    for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
+        Object* light = closestLights[lightType][lightNum];
+        Light* lightComp = light->getComponent<Light>();
+        lightComp->setUniforms(light->getPosition(), light->getForward());
 
-        multisampleBuffer.bind();
         for (auto& shaderMeshMap : renderMeshes) {
             shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
             glUseProgram(shader->getProgram());
@@ -309,7 +333,14 @@ void Renderer::forwardLighting(Light::Type lightType)
             if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
                 glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
             }
-            depthMap->activate();
+
+            if (lightNum < MAX_NUM_SHADOWMAPS) {
+                glUniform1i(ENABLE_SHADOWS_LOCATION, 1);
+                depthMapPointers[lightType][lightNum]->activate();
+            } else {
+                glUniform1i(ENABLE_SHADOWS_LOCATION, 0);
+            }
+
             for (auto& meshMap : shaderMeshMap.second) {
                 resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
                 for (auto& meshObject : meshMap.second) {
@@ -354,6 +385,7 @@ void Renderer::renderShadowmap(Light::Type lightType, Object* light, DepthMap* d
 
 void Renderer::stencilPass()
 {
+    glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glDisable(GL_CULL_FACE);
@@ -370,7 +402,7 @@ void Renderer::stencilPass()
 }
 
 void Renderer::renderSkybox(Object* skybox)
-{    
+{
     if (skybox) {
         glEnable(GL_DEPTH_TEST);
         glCullFace(GL_FRONT);
@@ -439,9 +471,22 @@ void Renderer::renderPassthrough(GLuint texture)
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-
 void Renderer::updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects)
 {
+    glm::vec3 camPos = camera->getPosition();
+    for (int i = 0; i < Light::Type::NUM_TYPES; ++i) {
+        closestLights[i].clear();
+        std::map<float, Object*> lightsByDistance;
+        for (const auto light : lights[i]) {
+            glm::vec3 temp = camPos - light->getPosition();
+            float distance = glm::dot(temp, temp);
+            lightsByDistance.emplace(distance, light);
+        }
+        for (const auto& kv : lightsByDistance) {
+            closestLights[i].push_back(kv.second);
+        }
+    }
+
     if (!G_COMPONENT_CHANGED) {
         return;
     }

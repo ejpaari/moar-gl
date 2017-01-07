@@ -10,6 +10,7 @@ layout (location = 23) uniform samplerCube depthTex;
 layout (location = 23) uniform sampler2D depthTex;
 #endif
 layout (location = 24) uniform sampler2D specularTex;
+layout (location = 42) uniform int shadowsEnabled;
 layout (location = 43) uniform float farPlane;
 
 layout (std140) uniform LightBlock {
@@ -79,11 +80,14 @@ void main()
     float diff = clamp(dot(n, l), 0, 1);
 #endif
 
+  float shadow = 1.0;
+  if (shadowsEnabled > 0) {
 #if defined(POINT)
-    float shadow = calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane);
+    shadow = calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane);
 #else
-    float shadow = calcDirShadow(depthTex, pos_Light);
+    shadow = calcDirShadow(depthTex, pos_Light);
 #endif
+  }
 
 #if defined(POINT)
   float lightDistance = length(lightPos - vertexPos_World);
