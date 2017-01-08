@@ -146,6 +146,17 @@ const Shader* ResourceManager::getShaderByName(const std::string& name) const
     }
 }
 
+GLuint ResourceManager::getShaderProgramByName(const std::string& name) const
+{
+    auto found = shadersByName.find(name);
+    if (found != shadersByName.end()) {
+        return found->second->getProgram();
+    } else {
+        std::cerr << "ERROR: Could not find shader: " << name << "\n";
+        return 0;
+    }
+}
+
 const Shader* ResourceManager::getForwardLightShader(int shaderType, Light::Type light)
 {
     auto getShaderPtr = [&] () -> Shader* {

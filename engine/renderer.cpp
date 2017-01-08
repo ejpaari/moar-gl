@@ -2,6 +2,7 @@
 #include "common/globals.h"
 
 #include <utility>
+#include <algorithm>
 
 namespace moar
 {
@@ -48,11 +49,11 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     lightSphere->addComponent<Model>(sphereModel);
 
     for (int i = 0; i < MAX_NUM_SHADOWMAPS; ++i) {
-        pointDepthMaps[i].setSize(1024, 1024);
+        pointDepthMaps[i].setSize(renderSettings->pointShadowMapSize, renderSettings->pointShadowMapSize);
         if (!pointDepthMaps[i].init()) {
             return false;
         }
-        dirDepthMaps[i].setSize(800, 600);
+        dirDepthMaps[i].setSize(renderSettings->directionalShadowMapWidth, renderSettings->directionalShadowMapHeight);
         if (!dirDepthMaps[i].init()) {
             return false;
         }
@@ -142,13 +143,7 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     glDisable(GL_STENCIL_TEST);
 
     renderAmbient();
-
-    for (int type = 0; type < Light::Type::NUM_TYPES; ++type) {
-        for (unsigned int light = 0; light < MAX_NUM_SHADOWMAPS && light < closestLights[type].size(); ++light) {
-            renderShadowmap(Light::Type(type), closestLights[type][light], depthMapPointers[type][light]);
-        }
-    }
-
+    renderShadowmaps();
     enableBlending();
 
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
@@ -196,18 +191,13 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
         }
     }
 
-    for (int type = 0; type < Light::Type::NUM_TYPES; ++type) {
-        for (unsigned int light = 0; light < MAX_NUM_SHADOWMAPS && light < closestLights[type].size(); ++light) {
-            renderShadowmap(Light::Type(type), closestLights[type][light], depthMapPointers[type][light]);
-        }
-    }
+    renderShadowmaps();
 
     postBuffer->bind();
     enableBlending();
     Light::Type lightType = Light::POINT;
 
-    shader = resourceManager->getShaderByName("deferred_light");
-    glUseProgram(shader->getProgram());
+    glUseProgram(resourceManager->getShaderProgramByName("deferred_light"));
     glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
     glUniform2f(SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight);
     glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
@@ -228,21 +218,14 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 
         stencilPass();
 
-        shader = resourceManager->getShaderByName("deferred_light");
-        glUseProgram(shader->getProgram());
-        if (lightNum < MAX_NUM_SHADOWMAPS) {
-            glUniform1i(ENABLE_SHADOWS_LOCATION, 1);
-            depthMapPointers[lightType][lightNum]->activate();
-        } else {
-            glUniform1i(ENABLE_SHADOWS_LOCATION, 0);
-        }
-
+        glUseProgram(resourceManager->getShaderProgramByName("deferred_light"));
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         glDisable(GL_DEPTH_TEST);
 
+        activateShadowMap(lightNum, lightType);
         lightComponent->setUniforms(light->getPosition(), light->getForward());
         lightSphere->setUniforms();
         lightSphere->getMeshObjects().front().mesh->render();
@@ -321,33 +304,28 @@ void Renderer::renderAmbient()
 void Renderer::forwardLighting(Light::Type lightType)
 {
     multisampleBuffer.bind();
-    for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
-        Object* light = closestLights[lightType][lightNum];
-        Light* lightComp = light->getComponent<Light>();
-        lightComp->setUniforms(light->getPosition(), light->getForward());
+    for (auto& shaderMeshMap : renderMeshes) {
+        shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
+        glUseProgram(shader->getProgram());
+        glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+        if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
+            glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
+        }
+        for (auto& meshMap : shaderMeshMap.second) {
+            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
+            for (auto& meshObject : meshMap.second) {
+                if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
+                    continue;
+                }
+                meshObject.parent->setUniforms();
 
-        for (auto& shaderMeshMap : renderMeshes) {
-            shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
-            glUseProgram(shader->getProgram());
-            glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-            if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
-                glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-            }
+                for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
+                    Object* light = closestLights[lightType][lightNum];
+                    Light* lightComp = light->getComponent<Light>();
+                    lightComp->setUniforms(light->getPosition(), light->getForward());
 
-            if (lightNum < MAX_NUM_SHADOWMAPS) {
-                glUniform1i(ENABLE_SHADOWS_LOCATION, 1);
-                depthMapPointers[lightType][lightNum]->activate();
-            } else {
-                glUniform1i(ENABLE_SHADOWS_LOCATION, 0);
-            }
+                    activateShadowMap(lightNum, lightType);
 
-            for (auto& meshMap : shaderMeshMap.second) {
-                resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
-                for (auto& meshObject : meshMap.second) {
-                    if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
-                        continue;
-                    }
-                    meshObject.parent->setUniforms();
                     meshObject.mesh->render();
                 }
             }
@@ -355,32 +333,50 @@ void Renderer::forwardLighting(Light::Type lightType)
     }
 }
 
-void Renderer::renderShadowmap(Light::Type lightType, Object* light, DepthMap* depthMap)
+void Renderer::renderShadowmaps()
 {
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    shader = resourceManager->getDepthMapShader(lightType);
-    glUseProgram(shader->getProgram());
-    Light* lightComp = light->getComponent<Light>();
-    lightComp->setUniforms(light->getPosition(), light->getForward());
-    depthMap->bind();
-    depthMap->setUniforms(light->getPosition(), light->getForward());
-    glClear(GL_DEPTH_BUFFER_BIT);
-    if (lightComp->isShadowingEnabled()) {
-        for (auto& shaderMeshMap : renderMeshes) {
-            for (auto& meshMap : shaderMeshMap.second) {
-                for (auto& meshObject : meshMap.second) {
-                    if (meshObject.parent->isShadowCaster()) {
-                        meshObject.parent->setUniforms();
-                        meshObject.mesh->render();
+    for (int type = 0; type < Light::Type::NUM_TYPES; ++type) {
+        shader = resourceManager->getDepthMapShader(Light::Type(type));
+        glUseProgram(shader->getProgram());
+        int numShadowmaps = std::min(MAX_NUM_SHADOWMAPS, static_cast<int>(closestLights[type].size()));
+        for (int lightNum = 0; lightNum < numShadowmaps; ++lightNum) {
+            Object* light = closestLights[type][lightNum];
+            Light* lightComp = light->getComponent<Light>();
+            lightComp->setUniforms(light->getPosition(), light->getForward());
+            DepthMap* depthMap = depthMapPointers[type][lightNum];
+            depthMap->bind();
+            depthMap->setUniforms(light->getPosition(), light->getForward());
+            glClear(GL_DEPTH_BUFFER_BIT);
+            if (lightComp->isShadowingEnabled()) {
+                for (auto& shaderMeshMap : renderMeshes) {
+                    for (auto& meshMap : shaderMeshMap.second) {
+                        for (auto& meshObject : meshMap.second) {
+                            if (meshObject.parent->isShadowCaster()) {
+                                meshObject.parent->setUniforms();
+                                meshObject.mesh->render();
+                            }
+                        }
                     }
                 }
             }
         }
     }
+}
+
+void Renderer::activateShadowMap(int lightNum, Light::Type lightType)
+{
+    if (lightNum < MAX_NUM_SHADOWMAPS) {
+        glUniform1i(ENABLE_SHADOWS_LOCATION, 1);
+        depthMapPointers[lightType][lightNum]->activate();
+    } else {
+        glUniform1i(ENABLE_SHADOWS_LOCATION, 0);
+    }
+
 }
 
 void Renderer::stencilPass()
@@ -395,8 +391,7 @@ void Renderer::stencilPass()
     glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
     glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 
-    shader = resourceManager->getShaderByName("stencil_pass");
-    glUseProgram(shader->getProgram());
+    glUseProgram(resourceManager->getShaderProgramByName("stencil_pass"));
     lightSphere->setUniforms();
     lightSphere->getMeshObjects().front().mesh->render();
 }
@@ -421,7 +416,7 @@ GLuint Renderer::renderBloom(GLuint framebuffer, GLuint renderedTex)
     if (camera->getBloomIterations() > 0) {
         setPostFramebuffer();
         GLuint bloomTex = postBuffer->blitColor(framebuffer, 1);
-        glUseProgram(resourceManager->getShaderByName("bloom_blur")->getProgram());
+        glUseProgram(resourceManager->getShaderProgramByName("bloom_blur"));
         GLboolean horizontal = true;
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
             setPostFramebuffer();
@@ -430,7 +425,7 @@ GLuint Renderer::renderBloom(GLuint framebuffer, GLuint renderedTex)
             horizontal = !horizontal;
         }
         setPostFramebuffer();
-        glUseProgram(resourceManager->getShaderByName("bloom_blend")->getProgram());
+        glUseProgram(resourceManager->getShaderProgramByName("bloom_blend"));
         renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, bloomTex});;
     }
     return renderedTex;
@@ -440,7 +435,7 @@ GLuint Renderer::renderHDR(GLuint renderedTex)
 {
     if (camera->isHDREnabled()) {
         setPostFramebuffer();
-        glUseProgram(resourceManager->getShaderByName("hdr")->getProgram());
+        glUseProgram(resourceManager->getShaderProgramByName("hdr"));
         renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
     }
     return renderedTex;
@@ -462,7 +457,7 @@ void Renderer::renderPassthrough(GLuint texture)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(resourceManager->getShaderByName("passthrough")->getProgram());
+    glUseProgram(resourceManager->getShaderProgramByName("passthrough"));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glUniform1i(RENDERED_TEX_LOCATION0, 0);

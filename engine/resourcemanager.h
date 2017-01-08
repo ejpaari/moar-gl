@@ -41,6 +41,7 @@ public:
     Material* createMaterial();
 
     const Shader* getShaderByName(const std::string& name) const;
+    GLuint getShaderProgramByName(const std::string& name) const;
     const Shader* getForwardLightShader(int shaderType, Light::Type light);
     const Shader* getDepthMapShader(Light::Type light) const;
     const Shader* getGBufferShader(int shaderType);

@@ -47,7 +47,8 @@ private:
     void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
     void renderAmbient();
     void forwardLighting(Light::Type lightType);
-    void renderShadowmap(Light::Type lightType, Object* light, DepthMap* depthMap);
+    void renderShadowmaps();
+    void activateShadowMap(int lightNum, Light::Type lightType);
     void stencilPass();
     void renderSkybox(Object* skybox = nullptr);
     GLuint renderBloom(GLuint framebuffer, GLuint renderedTex);

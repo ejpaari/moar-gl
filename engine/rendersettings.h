@@ -38,6 +38,10 @@ public:
     int windowWidth = 800;
     int windowHeight = 600;
 
+    int directionalShadowMapWidth = 1024;
+    int directionalShadowMapHeight = 768;
+    int pointShadowMapSize = 512;
+
 private:
     bool loaded = false;
 };

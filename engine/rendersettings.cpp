@@ -27,6 +27,10 @@ bool RenderSettings::loadSettings(const boost::property_tree::ptree& pt, Resourc
         skyboxTextures.resize(6);
 
         ambientShader = manager.getShaderByName(pt.get<std::string>("Render.ambientShader"));
+
+        directionalShadowMapWidth = pt.get<int>("Render.directionalShadowMapWidth");
+        directionalShadowMapHeight = pt.get<int>("Render.directionalShadowMapHeight");
+        pointShadowMapSize = pt.get<int>("Render.pointShadowMapSize");
     } catch (boost::property_tree::ptree_error& e) {
         std::cerr << "WARNING: Could not load render settings from the .ini-file\n";
         std::cerr << e.what() << "\n";
