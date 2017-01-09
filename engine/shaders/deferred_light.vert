@@ -7,7 +7,14 @@ layout (std140) uniform TransformationBlock {
   mat4 MVP;
 };
 
+out vec2 texCoord;
+
 void main()
 {
+#if defined(POINT)
   gl_Position = MVP * vec4(position, 1.0);
+#else
+  texCoord = (position.xy + vec2(1,1)) / 2.0;
+  gl_Position = vec4(position, 1.0);
+#endif
 }

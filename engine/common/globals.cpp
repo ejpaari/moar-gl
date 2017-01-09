@@ -13,6 +13,7 @@ const std::string NORMAL_DEFINE = "#define NORMAL\n";
 const std::string BUMP_DEFINE = "#define BUMP\n";
 
 const std::string FORWARD_LIGHT_SHADER = "forward_light";
+const std::string DEFERRED_LIGHT_SHADER = "deferred_light";
 const std::string GBUFFER_SHADER = "gbuffer";
 
 const int TRANSFORMATION_BINDING_POINT = 1;

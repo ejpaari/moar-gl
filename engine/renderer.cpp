@@ -136,6 +136,13 @@ void Renderer::render(const std::vector<std::unique_ptr<Object> >& objects, Obje
     renderFunction(objects, skybox);
 }
 
+void Renderer::clear()
+{
+    renderMeshes.clear();
+    lights.clear();
+    lights.resize(Light::Type::NUM_TYPES);
+}
+
 void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox)
 {
     setup(&multisampleBuffer, objects);
@@ -195,41 +202,8 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 
     postBuffer->bind();
     enableBlending();
-    Light::Type lightType = Light::POINT;
-
-    glUseProgram(resourceManager->getShaderProgramByName("deferred_light"));
-    glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-    glUniform2f(SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight);
-    glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-    const std::vector<GLuint>& textures = gBuffer.getTextures();
-    for (unsigned int i = 0; i < textures.size(); ++i) {
-        glActiveTexture(GL_TEXTURE0 + i + 1);
-        glBindTexture(GL_TEXTURE_2D, textures[i]);
-        glUniform1i(RENDERED_TEX_LOCATION0 + i, i + 1);
-    }
-
-    for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
-        Object* light = closestLights[lightType][lightNum];
-        Light* lightComponent = light->getComponent<Light>();
-        float r = lightComponent->getRange();
-        lightSphere->setScale(glm::vec3(r, r, r));
-        lightSphere->setPosition(light->getPosition());
-        lightSphere->updateModelMatrix();
-
-        stencilPass();
-
-        glUseProgram(resourceManager->getShaderProgramByName("deferred_light"));
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-        glDisable(GL_DEPTH_TEST);
-
-        activateShadowMap(lightNum, lightType);
-        lightComponent->setUniforms(light->getPosition(), light->getForward());
-        lightSphere->setUniforms();
-        lightSphere->getMeshObjects().front().mesh->render();
-    }
+    deferredPointLighting();
+    deferredDirectionalLighting();
 
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_BLEND);
@@ -244,13 +218,6 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
-}
-
-void Renderer::clear()
-{
-    renderMeshes.clear();
-    lights.clear();
-    lights.resize(Light::Type::NUM_TYPES);
 }
 
 void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects)
@@ -301,38 +268,6 @@ void Renderer::renderAmbient()
     }
 }
 
-void Renderer::forwardLighting(Light::Type lightType)
-{
-    multisampleBuffer.bind();
-    for (auto& shaderMeshMap : renderMeshes) {
-        shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
-        glUseProgram(shader->getProgram());
-        glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-        if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
-            glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-        }
-        for (auto& meshMap : shaderMeshMap.second) {
-            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
-            for (auto& meshObject : meshMap.second) {
-                if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
-                    continue;
-                }
-                meshObject.parent->setUniforms();
-
-                for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
-                    Object* light = closestLights[lightType][lightNum];
-                    Light* lightComp = light->getComponent<Light>();
-                    lightComp->setUniforms(light->getPosition(), light->getForward());
-
-                    activateShadowMap(lightNum, lightType);
-
-                    meshObject.mesh->render();
-                }
-            }
-        }
-    }
-}
-
 void Renderer::renderShadowmaps()
 {
     glEnable(GL_DEPTH_TEST);
@@ -365,6 +300,105 @@ void Renderer::renderShadowmaps()
                 }
             }
         }
+    }
+}
+
+void Renderer::forwardLighting(Light::Type lightType)
+{
+    multisampleBuffer.bind();
+    for (auto& shaderMeshMap : renderMeshes) {
+        shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
+        glUseProgram(shader->getProgram());
+        glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+        if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
+            glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
+        }
+        for (auto& meshMap : shaderMeshMap.second) {
+            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
+            for (auto& meshObject : meshMap.second) {
+                if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
+                    continue;
+                }
+                meshObject.parent->setUniforms();
+
+                for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
+                    Object* light = closestLights[lightType][lightNum];
+                    Light* lightComp = light->getComponent<Light>();
+                    lightComp->setUniforms(light->getPosition(), light->getForward());
+
+                    activateShadowMap(lightNum, lightType);
+
+                    meshObject.mesh->render();
+                }
+            }
+        }
+    }
+}
+
+void Renderer::deferredPointLighting()
+{
+    shader = resourceManager->getDeferredLightShader(Light::Type::POINT);
+    glUseProgram(shader->getProgram());
+    setGBufferTextures();
+
+    const std::vector<Object*>& lights = closestLights[Light::Type::POINT];
+    for (unsigned int lightNum = 0; lightNum < lights.size(); ++lightNum) {
+        Object* light = lights[lightNum];
+        Light* lightComponent = light->getComponent<Light>();
+        float r = lightComponent->getRange();
+        lightSphere->setScale(glm::vec3(r, r, r));
+        lightSphere->setPosition(light->getPosition());
+        lightSphere->updateModelMatrix();
+
+        stencilPass();
+
+        glUseProgram(shader->getProgram());
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        glDisable(GL_DEPTH_TEST);
+
+        activateShadowMap(lightNum, Light::Type::POINT);
+        lightComponent->setUniforms(light->getPosition(), light->getForward());
+        lightSphere->setUniforms();
+        lightSphere->getMeshObjects().front().mesh->render();
+    }
+}
+
+void Renderer::deferredDirectionalLighting()
+{
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_DEPTH_TEST);
+
+    shader = resourceManager->getDeferredLightShader(Light::Type::DIRECTIONAL);
+    glUseProgram(shader->getProgram());
+    setGBufferTextures();
+    PostFramebuffer::bindQuadVAO();
+
+    const std::vector<Object*>& lights = closestLights[Light::Type::DIRECTIONAL];
+    for (unsigned int lightNum = 0; lightNum < lights.size(); ++lightNum) {
+        activateShadowMap(lightNum, Light::Type::DIRECTIONAL);
+        Object* light = lights[lightNum];
+        Light* lightComponent = light->getComponent<Light>();
+        lightComponent->setUniforms(light->getPosition(), light->getForward());
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+}
+
+void Renderer::setGBufferTextures()
+{
+    glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+    glUniform2f(SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight);
+    glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
+    const std::vector<GLuint>& textures = gBuffer.getTextures();
+    for (unsigned int i = 0; i < textures.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i + 1);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        glUniform1i(RENDERED_TEX_LOCATION0 + i, i + 1);
     }
 }
 
@@ -469,16 +503,16 @@ void Renderer::renderPassthrough(GLuint texture)
 void Renderer::updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects)
 {
     glm::vec3 camPos = camera->getPosition();
-    for (int i = 0; i < Light::Type::NUM_TYPES; ++i) {
-        closestLights[i].clear();
+    for (int type = 0; type < Light::Type::NUM_TYPES; ++type) {
+        closestLights[type].clear();
         std::map<float, Object*> lightsByDistance;
-        for (const auto light : lights[i]) {
+        for (const auto light : lights[type]) {
             glm::vec3 temp = camPos - light->getPosition();
             float distance = glm::dot(temp, temp);
             lightsByDistance.emplace(distance, light);
         }
         for (const auto& kv : lightsByDistance) {
-            closestLights[i].push_back(kv.second);
+            closestLights[type].push_back(kv.second);
         }
     }
 

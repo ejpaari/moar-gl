@@ -186,6 +186,35 @@ const Shader* ResourceManager::getForwardLightShader(int shaderType, Light::Type
     return nullptr;
 }
 
+const Shader* ResourceManager::getDeferredLightShader(Light::Type light)
+{
+    auto getShaderPtr = [&] () -> Shader* {
+        auto found = deferredLightShadersByType.find(light);
+        if (found != deferredLightShadersByType.end()) {
+            return found->second;
+        } else {
+            return nullptr;
+        }
+    };
+
+    Shader* s = getShaderPtr();
+    if (s != nullptr) {
+        return s;
+    } else {
+        if (loadDeferredLightShader(light)) {
+            s = getShaderPtr();
+            if (s != nullptr) {
+                return s;
+            } else {
+                std::cerr << "ERROR: Could not find deferred shader with light type " << light << "\n";
+            }
+        } else {
+            std::cerr << "ERROR: Could not load deferred shader with light type " << light << "\n";
+        }
+    }
+    return nullptr;
+}
+
 const Shader* ResourceManager::getDepthMapShader(Light::Type light) const
 {
     auto found = depthMapShadersByType.find(light);
@@ -369,6 +398,32 @@ bool ResourceManager::loadForwardLightShader(int shaderType)
             return false;
         }
     }
+    return true;
+}
+
+bool ResourceManager::loadDeferredLightShader(Light::Type light)
+{
+    if (deferredLightShadersByType.count(light) > 0) {
+        return true;
+    }
+
+    std::string defines = light == Light::Type::POINT ? POINT_DEFINE : DIRECTIONAL_DEFINE;
+    std::string path = shaderPath + DEFERRED_LIGHT_SHADER;
+    std::unique_ptr<Shader> shader(new Shader());
+    bool attached = shader->attachShader(GL_VERTEX_SHADER, path + ".vert", defines);
+    attached = attached && shader->attachShader(GL_FRAGMENT_SHADER, path + ".frag", defines);
+
+    if (!attached) {
+        return false;
+    }
+    if (!shader->linkProgram()) {
+        std::cerr << "WARNING: Failed to link deferred light shader with light: " << light << "\n";
+        return false;
+    }
+
+    std::cout << "Created deferred light shader with light: " << light << "\n";
+    deferredLightShadersByType.insert(std::make_pair(light, shader.get()));
+    shaders.push_back(std::move(shader));
     return true;
 }
 
