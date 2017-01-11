@@ -36,7 +36,7 @@ void main()
 #endif
 
 #if defined(BUMP)
-  eyeDir_World = normalize(cameraPos_World - vertexPos_World);
+  eyeDir_World = cameraPos_World - vertexPos_World;
 #endif
 
 }

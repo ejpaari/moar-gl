@@ -24,17 +24,14 @@ out vec2 texCoord;
 out vec3 vertexPos_World;
 out vec4 pos_Light;
 
-out vec3 lightDir_World;
+out vec3 pointLightDir_World;
 out vec3 normal_World;
 
-out vec3 N;
+out mat3 TBN;
 out vec3 T;
 out vec3 B;
-out vec3 lightPos_Tan;
-out vec3 vertexPos_Tan;
 
 out vec3 eyeDir_World;
-out vec3 eyeDir_Tan;
 
 void main()
 {
@@ -47,31 +44,18 @@ void main()
 #endif
 
 normal_World = normalize(mat3(M) * normal);
-#if defined(DIFFUSE) || defined(SPECULAR)  
-  #if defined(POINT)
-    lightDir_World = lightPos - vertexPos_World;
-  #endif
+#if defined(POINT)
+  pointLightDir_World = lightPos - vertexPos_World;
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
-  N = normal_World;
+  vec3 N = normal_World;
   T = normalize(mat3(M) * tangent);
   B = cross(T, N);
-  #if defined(POINT)
-    vec3 L = lightPos - vertexPos_World;
-  #else
-    vec3 L = -lightForward;
-  #endif
-  mat3 TBN = transpose(mat3(T, B, N));
-  lightPos_Tan = TBN * lightPos;
-  vertexPos_Tan = TBN * vertexPos_World;
+  TBN = mat3(T, B, N);
 #endif
 
 #if defined(BUMP) || defined(SPECULAR)
-  eyeDir_World = normalize(cameraPos_World - vertexPos_World);
-#endif
-
-#if defined(SPECULAR) && defined(NORMAL)
-  eyeDir_Tan = normalize(TBN * eyeDir_World);
+  eyeDir_World = cameraPos_World - vertexPos_World;
 #endif
 }

@@ -2,7 +2,7 @@
 # default texture
 
 general
-0.1 0.1 0.2
+0.0 0.0 0.0
 white.png
 
 skybox
@@ -45,6 +45,6 @@ name light4
 component model
 sphere.3ds
 component light
-1.0 1.0 0.0 0.5
-directional
+1.0 1.0 0.0 5.5
+point
 1

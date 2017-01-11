@@ -72,7 +72,7 @@ void main()
 #endif
   
   outColor +=
-    (lightColor.xyz * diff * lightPower) * texColor.rgb +
+    lightColor.xyz * diff * lightPower * texColor.rgb +
     specularComponent;
 
   outColor.rgb *= shadow;

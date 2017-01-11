@@ -21,8 +21,8 @@ in vec3 eyeDir_World;
 void main()
 {
 #if defined(BUMP)
-  vec3 dir = -eyeDir_World;
-  vec2 step = vec2(dot(dir, normalize(T)), dot(dir, normalize(B)));
+  vec3 bumpDir = -normalize(eyeDir_World);
+  vec2 step = vec2(dot(bumpDir, normalize(T)), dot(bumpDir, normalize(B)));
   float stepDepth = BUMP_DEPTH / NUM_BUMP_STEPS;
   float currentDepth = 0.0;
   float height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
