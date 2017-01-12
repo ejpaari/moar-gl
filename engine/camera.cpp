@@ -74,7 +74,7 @@ bool Camera::sphereInsideFrustum(const glm::vec3& point, float radius) const
 
 Postprocess* Camera::addPostprocess(const std::string& name, GLuint shader, int priority)
 {
-    for (auto& p : postprocs) {
+    for (const auto& p : postprocs) {
         if (p.getName() == name) {
             std::cerr << "WARNING: Post process effect already exists: " << name << "\n";
             return nullptr;

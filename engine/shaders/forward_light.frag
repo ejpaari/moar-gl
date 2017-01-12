@@ -20,18 +20,14 @@ layout (std140) uniform LightBlock {
 };
 
 in vec2 texCoord;
-
 in vec3 vertexPos_World;
-in vec4 pos_Light;
-
-in vec3 pointLightDir_World;
 in vec3 normal_World;
-
-in mat3 TBN;
+in vec3 eyeDir_World;
+in vec4 pos_Light;
+in vec3 pointLightDir_World;
 in vec3 T;
 in vec3 B;
-
-in vec3 eyeDir_World;
+in mat3 TBN;
 
 void main()
 {
@@ -44,27 +40,17 @@ void main()
 #endif
 
 #if defined(BUMP)
-  vec3 bumpDir = -normalize(eyeDir_World);
-  vec2 step = vec2(dot(bumpDir, normalize(T)), dot(bumpDir, normalize(B)));
-  float stepDepth = BUMP_DEPTH / NUM_BUMP_STEPS;
-  float currentDepth = 0.0;
-  float height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
-
-  while ((BUMP_DEPTH - currentDepth) > height) {
-    height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
-    currentDepth += stepDepth;
-  }
-  vec2 sampleCoord = texCoord + currentDepth * step;
+  vec2 sampleCoord = getBumpedTexCoord(eyeDir_World, T, B, bumpTex, texCoord);
 #else
   vec2 sampleCoord = texCoord;
 #endif    
 
 #if defined(NORMAL)
-  vec3 normal_Tan = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
-  normNormal_World = normalize(TBN * normal_Tan);
-  float diff = clamp(dot(normNormal_World, lightDir_World), 0, 1);
-#elif defined(DIFFUSE)
-  float diff = clamp(dot(normNormal_World, lightDir_World), 0, 1);
+  normNormal_World = getWorldSpaceNormal(normalTex, sampleCoord, TBN);
+#endif
+
+#if defined(DIFFUSE)
+  float diff = getDiffuse(normNormal_World, lightDir_World);
 #endif
 
 #if defined(POINT)
@@ -87,10 +73,8 @@ void main()
 
   vec3 specularComponent = vec3(0.0);
 #if defined(SPECULAR)
-  vec3 e = normalize(eyeDir_World);
-  vec3 r = reflect(-lightDir_World, normNormal_World);
-  float spec = clamp(dot(e, r), 0, 1);
-  float specular = pow(spec, 10.0f) * texture(specularTex, sampleCoord).r;
+  float power = texture(specularTex, sampleCoord).r;
+  float specular = getSpecular(normalize(eyeDir_World), lightDir_World, normNormal_World, power);
   #if defined(POINT)
     specularComponent = vec3(specular * lightPower / lightDistSqr);
   #else
@@ -113,9 +97,5 @@ void main()
 
   outColor.rgb *= shadow;
 
-  float bloom = dot(outColor.rgb, vec3(1.0));
-  outBloom = vec4(vec3(0.0), 1.0);
-  if (bloom > 2.0) {
-    outBloom.rgb = outColor.rgb;
-  }
+  outBloom.rgb = getBloom(outColor.rgb);
 }

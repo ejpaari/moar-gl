@@ -11,14 +11,25 @@
 namespace moar
 {
 
+std::string Shader::commonVertexShaderCode = "";
 std::string Shader::commonFragmentShaderCode = "";
 
-void Shader::loadCommonShaderCode(const std::string& fragment)
+void Shader::loadCommonShaderCode(GLenum type, const std::string& file)
 {
-    commonFragmentShaderCode.clear();
-    std::ifstream shaderFile(fragment.c_str());
+    std::string* code = nullptr;
+    if (type == GL_VERTEX_SHADER) {
+        code = &commonVertexShaderCode;
+    }
+    if (type == GL_FRAGMENT_SHADER) {
+        code = &commonFragmentShaderCode;
+    }
+    if (!code) {
+        return;
+    }
+    code->clear();
+    std::ifstream shaderFile(file.c_str());
     if (shaderFile) {
-        commonFragmentShaderCode.append((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
+        code->append((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
         shaderFile.close();
     } else {
         std::cerr << "WARNING: Could not open common fragment shader file: " << COMMON_FRAGMENT_FILE << "\n";
@@ -40,7 +51,12 @@ Shader::~Shader()
 bool Shader::attachShader(GLenum shaderType, const std::string& filename, const std::string& defines)
 {
     GLuint shader = glCreateShader(shaderType);
-    std::string common = shaderType == GL_FRAGMENT_SHADER ? commonFragmentShaderCode : "";
+    std::string common = "";
+    switch (shaderType) {
+    case GL_VERTEX_SHADER: common = commonVertexShaderCode; break;
+    case GL_FRAGMENT_SHADER: common = commonFragmentShaderCode; break;
+    }
+
     if (!shader || !compileShader(shader, filename, defines, common)) {
         glDeleteShader(shader);
         return false;

@@ -28,7 +28,6 @@ public:
     void deinit();
     GLuint draw(const std::vector<GLuint>& textures);
     GLuint blitColor(GLuint blitBuffer, int attachment) const;
-    GLuint blitDepth(GLuint blitBuffer) const;
 
 private:
     static GLuint quadVAO;

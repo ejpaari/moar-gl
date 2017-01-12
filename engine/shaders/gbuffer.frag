@@ -12,26 +12,15 @@ layout (location = 43) uniform float farPlane;
 in vec2 texCoord;
 in vec3 vertexPos_World;
 in vec3 normal_World;
-
-in mat3 TBN;
+in vec3 eyeDir_World;
 in vec3 T;
 in vec3 B;
-in vec3 eyeDir_World;
+in mat3 TBN;
 
 void main()
 {
 #if defined(BUMP)
-  vec3 bumpDir = -normalize(eyeDir_World);
-  vec2 step = vec2(dot(bumpDir, normalize(T)), dot(bumpDir, normalize(B)));
-  float stepDepth = BUMP_DEPTH / NUM_BUMP_STEPS;
-  float currentDepth = 0.0;
-  float height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
-
-  while ((BUMP_DEPTH - currentDepth) > height) {
-    height = texture(bumpTex, texCoord + currentDepth * step).r * BUMP_DEPTH;
-    currentDepth += stepDepth;
-  }
-  vec2 sampleCoord = texCoord + currentDepth * step;
+  vec2 sampleCoord = getBumpedTexCoord(eyeDir_World, T, B, bumpTex, texCoord);
 #else
   vec2 sampleCoord = texCoord;
 #endif    
@@ -45,8 +34,7 @@ void main()
   outPosition.xyz = vertexPos_World;
 
 #if defined(NORMAL)
-  vec3 normal = normalize(texture(normalTex, sampleCoord).rgb * 2.0 - vec3(1.0));
-  outNormal.xyz = normalize(TBN * normal); 
+  outNormal.xyz = getWorldSpaceNormal(normalTex, sampleCoord, TBN);
 #else
   outNormal.xyz = normalize(normal_World);
 #endif

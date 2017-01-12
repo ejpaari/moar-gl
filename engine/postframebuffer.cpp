@@ -115,15 +115,4 @@ GLuint PostFramebuffer::blitColor(GLuint blitBuffer, int attachment) const
     return renderedTextures[0];
 }
 
-GLuint PostFramebuffer::blitDepth(GLuint blitBuffer) const
-{
-    if (!hasDepth) {
-        std::cerr << "WARNING: Tried to blit depth bit from PostFramebuffer without depth buffer\n";
-    }
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, blitBuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    return renderedTextures[0];
-}
-
 } // moar

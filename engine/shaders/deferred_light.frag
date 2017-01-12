@@ -33,6 +33,7 @@ void main()
 
   outColor = vec3(0.0);
   vec3 vertexPos = texture(positionTex, texCoord).xyz;
+
 #if defined(POINT)
   float lightDistance = length(lightPos - vertexPos);
   float lightDistSqr = lightDistance * lightDistance;
@@ -49,13 +50,15 @@ void main()
 #else
   vec3 lightDir = -lightForward;
 #endif
-  float diff = clamp(dot(normal, lightDir), 0, 1);
+  float diff = getDiffuse(normal, lightDir);
 
-  vec3 e = normalize(cameraPos - vertexPos);
-  vec3 r = reflect(-lightDir, normal);
-  float spec = clamp(dot(e, r), 0, 1);
-  float specular = pow(spec, 10.0f) * texColor.a;
-  
+  float specular = getSpecular(normalize(cameraPos - vertexPos), lightDir, normal, texColor.a);
+#if defined(POINT)
+  vec3 specularComponent = vec3(specular * lightPower / lightDistSqr);
+#else
+  vec3 specularComponent = vec3(specular * lightPower);
+#endif
+
   float shadow = 1.0;
   if (shadowsEnabled > 0) {
 #if defined(POINT)
@@ -64,12 +67,6 @@ void main()
     shadow = calcDirShadow(depthTex, pos_Light);
 #endif
   }
-
-#if defined(POINT)
-  vec3 specularComponent = vec3(specular * lightPower / lightDistSqr);
-#else
-  vec3 specularComponent = vec3(specular * lightPower);
-#endif
   
   outColor +=
     lightColor.xyz * diff * lightPower * texColor.rgb +
@@ -77,9 +74,5 @@ void main()
 
   outColor.rgb *= shadow;
 
-  float bloom = dot(outColor.rgb, vec3(1.0));
-  outBloom = vec3(0.0);
-  if (bloom > 2.0) {
-    outBloom.rgb = outColor.rgb;
-  }
+  outBloom.rgb = getBloom(outColor.rgb);
 }

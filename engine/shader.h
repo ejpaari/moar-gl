@@ -25,7 +25,7 @@ public:
         DEPTH = 1 << 4
     };
 
-    static void loadCommonShaderCode(const std::string& fragment);
+    static void loadCommonShaderCode(GLenum type, const std::string& file);
 
     explicit Shader();
     ~Shader();
@@ -41,6 +41,7 @@ public:
     bool hasUniform(GLuint location) const;
 
 private:
+    static std::string commonVertexShaderCode;
     static std::string commonFragmentShaderCode;
 
     void deleteShaders();

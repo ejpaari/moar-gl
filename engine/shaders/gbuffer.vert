@@ -15,11 +15,10 @@ layout (std140) uniform TransformationBlock {
 out vec2 texCoord;
 out vec3 vertexPos_World;
 out vec3 normal_World;
-
-out mat3 TBN;
+out vec3 eyeDir_World;
 out vec3 T;
 out vec3 B;
-out vec3 eyeDir_World;
+out mat3 TBN;
 
 void main()
 {
@@ -28,15 +27,11 @@ void main()
   vertexPos_World = vec3(M * vec4(position, 1.0));
   normal_World = normalize(mat3(M) * normal);
 
-#if defined(NORMAL)
-  vec3 N = normal_World;
-  T = normalize(mat3(M) * tangent);
-  B = cross(T, N);
-  TBN = mat3(T, B, N);
-#endif
-
 #if defined(BUMP)
   eyeDir_World = cameraPos_World - vertexPos_World;
 #endif
 
+#if defined(NORMAL)
+  getTBN(normal_World, tangent, mat3(M), T, B, TBN);
+#endif
 }

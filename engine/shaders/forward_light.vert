@@ -20,42 +20,35 @@ layout (std140) uniform LightBlock {
 };
 
 out vec2 texCoord;
-
 out vec3 vertexPos_World;
-out vec4 pos_Light;
-
-out vec3 pointLightDir_World;
 out vec3 normal_World;
-
-out mat3 TBN;
+out vec3 eyeDir_World;
+out vec4 pos_Light;
+out vec3 pointLightDir_World;
 out vec3 T;
 out vec3 B;
-
-out vec3 eyeDir_World;
+out mat3 TBN;
 
 void main()
 {
   gl_Position = MVP * vec4(position, 1.0);
   texCoord = tex;
   vertexPos_World = vec3(M * vec4(position, 1.0));
+  normal_World = normalize(mat3(M) * normal);
+
+#if defined(BUMP) || defined(SPECULAR)
+  eyeDir_World = cameraPos_World - vertexPos_World;
+#endif
   
 #if defined(DIRECTIONAL)
   pos_Light = lightSpaceProj * M * vec4(position, 1.0);
 #endif
 
-normal_World = normalize(mat3(M) * normal);
 #if defined(POINT)
   pointLightDir_World = lightPos - vertexPos_World;
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
-  vec3 N = normal_World;
-  T = normalize(mat3(M) * tangent);
-  B = cross(T, N);
-  TBN = mat3(T, B, N);
-#endif
-
-#if defined(BUMP) || defined(SPECULAR)
-  eyeDir_World = cameraPos_World - vertexPos_World;
+  getTBN(normal_World, tangent, mat3(M), T, B, TBN);
 #endif
 }

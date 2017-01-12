@@ -29,7 +29,7 @@ MyApp::MyApp()
     } else {
         currentLevelInfo = &levelInfos[0];
     }
-    for (auto& info : levelInfos) {
+    for (const auto& info : levelInfos) {
         if (info.cameraPositions.size() != info.cameraRotations.size()) {
             std::cerr << "WARNING: Level info camera positions and camera rotations sizes mismatch\n";
         }

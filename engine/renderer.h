@@ -46,6 +46,7 @@ private:
     void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
     void renderAmbient();
+    void renderGBuffer();
     void renderShadowmaps();
     void forwardLighting(Light::Type lightType);
     void deferredPointLighting();

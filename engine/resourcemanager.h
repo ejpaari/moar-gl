@@ -50,7 +50,7 @@ public:
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
     Material* getMaterial(int id);
-    std::string getLevelPath() const;
+    const std::string& getLevelPath() const;
 
     void checkMissingTextures() const;
 

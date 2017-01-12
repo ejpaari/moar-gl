@@ -178,26 +178,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     postBuffer = &postBuffer1;
     postBuffer->bind();
     renderAmbient();
-
-    gBuffer.bind();
-    for (auto& shaderMeshMap : renderMeshes) {
-        shader = resourceManager->getGBufferShader(shaderMeshMap.first);
-        glUseProgram(shader->getProgram());
-        glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-        glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-        for (auto& meshMap : shaderMeshMap .second) {
-            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
-            for (auto& meshObject : meshMap.second) {
-                if (!objectInsideFrustum(meshObject)) {
-                   continue;
-                }
-                meshObject.parent->setUniforms();
-                meshObject.mesh->render();
-                objectsInFrustum.insert(meshObject.mesh->getId());
-            }
-        }
-    }
-
+    renderGBuffer();
     renderShadowmaps();
 
     postBuffer->bind();
@@ -253,10 +234,32 @@ void Renderer::renderAmbient()
     shader = renderSettings->ambientShader;
     glUseProgram(shader->getProgram());
     glUniform3f(AMBIENT_LOCATION, renderSettings->ambientColor.x, renderSettings->ambientColor.y, renderSettings->ambientColor.z);
-    for (auto& shaderMeshMap : renderMeshes) {
-        for (auto& meshMap : shaderMeshMap .second) {
+    for (const auto& shaderMeshMap : renderMeshes) {
+        for (const auto& meshMap : shaderMeshMap .second) {
             resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
-            for (auto& meshObject : meshMap.second) {
+            for (const auto& meshObject : meshMap.second) {
+                if (!objectInsideFrustum(meshObject)) {
+                   continue;
+                }
+                meshObject.parent->setUniforms();
+                meshObject.mesh->render();
+                objectsInFrustum.insert(meshObject.mesh->getId());
+            }
+        }
+    }
+}
+
+void Renderer::renderGBuffer()
+{
+    gBuffer.bind();
+    for (const auto& shaderMeshMap : renderMeshes) {
+        shader = resourceManager->getGBufferShader(shaderMeshMap.first);
+        glUseProgram(shader->getProgram());
+        glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+        glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
+        for (const auto& meshMap : shaderMeshMap .second) {
+            resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
+            for (const auto& meshObject : meshMap.second) {
                 if (!objectInsideFrustum(meshObject)) {
                    continue;
                 }
@@ -288,9 +291,9 @@ void Renderer::renderShadowmaps()
             depthMap->setUniforms(light->getPosition(), light->getForward());
             glClear(GL_DEPTH_BUFFER_BIT);
             if (lightComp->isShadowingEnabled()) {
-                for (auto& shaderMeshMap : renderMeshes) {
-                    for (auto& meshMap : shaderMeshMap.second) {
-                        for (auto& meshObject : meshMap.second) {
+                for (const auto& shaderMeshMap : renderMeshes) {
+                    for (const auto& meshMap : shaderMeshMap.second) {
+                        for (const auto& meshObject : meshMap.second) {
                             if (meshObject.parent->isShadowCaster()) {
                                 meshObject.parent->setUniforms();
                                 meshObject.mesh->render();
@@ -306,16 +309,16 @@ void Renderer::renderShadowmaps()
 void Renderer::forwardLighting(Light::Type lightType)
 {
     multisampleBuffer.bind();
-    for (auto& shaderMeshMap : renderMeshes) {
+    for (const auto& shaderMeshMap : renderMeshes) {
         shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
         glUseProgram(shader->getProgram());
         glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
         if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
             glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
         }
-        for (auto& meshMap : shaderMeshMap.second) {
+        for (const auto& meshMap : shaderMeshMap.second) {
             resourceManager->getMaterial(meshMap.first)->setUniforms(shader);
-            for (auto& meshObject : meshMap.second) {
+            for (const auto& meshObject : meshMap.second) {
                 if (objectsInFrustum.find(meshObject.mesh->getId()) == objectsInFrustum.end()) {
                     continue;
                 }
@@ -438,7 +441,7 @@ void Renderer::renderSkybox(Object* skybox)
         shader = renderSettings->skyboxShader;
         glUseProgram(shader->getProgram());
         skybox->setUniforms();
-        for (auto& meshObject : skybox->getMeshObjects()) {
+        for (const auto& meshObject : skybox->getMeshObjects()) {
             meshObject.material->setUniforms(shader);
             meshObject.mesh->render();
         }
@@ -521,7 +524,7 @@ void Renderer::updateObjectContainers(const std::vector<std::unique_ptr<Object>>
     }
 
     for (const auto& obj : objects) {
-        for (auto& meshObject : obj->getMeshObjects()) {
+        for (const auto& meshObject : obj->getMeshObjects()) {
             int shaderType = meshObject.material->getShaderType();
             MaterialId materialId = meshObject.material->getId();
             std::vector<Object::MeshObject>& meshes = renderMeshes[shaderType][materialId];
