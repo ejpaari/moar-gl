@@ -36,6 +36,10 @@ A simple graphics engine which utilizes OpenGL 4.x and C++11. The emphasis is on
  * With Qt / Qt Creator Build & Run
  * By running qmake and building with the Makefile
 
+Following compilers have been tested (other compilers probably work fine as well)
+- GCC 4.8
+- VS14
+
 ### Assets:
 
 - Sponza model from http://www.crytek.com/cryengine/cryengine3/downloads
