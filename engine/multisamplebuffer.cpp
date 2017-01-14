@@ -40,8 +40,10 @@ bool MultisampleBuffer::init(int numOutputs)
 
 void MultisampleBuffer::deinit()
 {
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(outputTextures.size(), &outputTextures[0]);
+	if (!outputTextures.empty()) {
+		glDeleteTextures(outputTextures.size(), &outputTextures[0]);
+	}
+    glDeleteFramebuffers(1, &framebuffer);    
     glDeleteRenderbuffers(1, &depthRenderbuffer);
 }
 

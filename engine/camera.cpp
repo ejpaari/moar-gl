@@ -9,7 +9,7 @@
 namespace moar
 {
 
-const float Camera::ROTATION_LIMIT = 85.0f * boost::math::constants::degree<double>();
+const float Camera::ROTATION_LIMIT = 85.0f * boost::math::constants::degree<float>();
 
 Camera::Camera(float fov, float ratio, float nearClip, float farClip) :
     FOV(fov),

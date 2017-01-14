@@ -98,7 +98,7 @@ bool Shader::linkProgram()
 
     deleteShaders();
 
-    return isLinked;
+    return isLinked == GL_TRUE;
 }
 
 GLuint Shader::getProgram() const
@@ -111,6 +111,7 @@ bool Shader::hasUniform(GLuint location) const
     try {
         return uniforms.test(location);
     } catch (std::out_of_range& e) {
+		std::cerr << "WARNING: Uniform not found. " << e.what() << "\n";
         return false;
     }
 }

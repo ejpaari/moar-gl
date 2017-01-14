@@ -11,7 +11,7 @@ Input::~Input()
 {
 }
 
-void Input::setCursorPosition(double x, double y)
+void Input::setCursorPosition(float x, float y)
 {
     deltaX = x - this->x;
     deltaY = y - this->y;
@@ -19,7 +19,17 @@ void Input::setCursorPosition(double x, double y)
     this->y = y;
 }
 
-void Input::setSensitivity(double sensitivity)
+void Input::setCursorPosition(double x, double y)
+{
+	float fx = static_cast<float>(x);
+	float fy = static_cast<float>(y);
+	deltaX = fx - this->x;
+	deltaY = fy - this->y;
+	this->x = fx;
+	this->y = fy;
+}
+
+void Input::setSensitivity(float sensitivity)
 {
     this->sensitivity = sensitivity;
 }
@@ -29,12 +39,12 @@ void Input::setMovementSpeed(float speed)
     movementSpeed = speed;
 }
 
-double Input::getCursorDeltaX() const
+float Input::getCursorDeltaX() const
 {
     return sensitivity * deltaX;
 }
 
-double Input::getCursorDeltaY() const
+float Input::getCursorDeltaY() const
 {
     return sensitivity * deltaY;
 }

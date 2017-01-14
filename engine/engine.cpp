@@ -226,8 +226,8 @@ bool Engine::init(const std::string& settingsFile)
     printInfo(windowWidth, windowHeight);
 
     try {
-        double sensitivity = pt.get<double>("Input.sensitivity");
-        float movementSpeed = pt.get<double>("Input.movementSpeed");
+        float sensitivity = pt.get<float>("Input.sensitivity");
+        float movementSpeed = pt.get<float>("Input.movementSpeed");
         input.setSensitivity(sensitivity);
         input.setMovementSpeed(movementSpeed);
     } catch (boost::property_tree::ptree_error& e) {
@@ -292,7 +292,7 @@ void Engine::execute()
     }
 
     double x = 0.0;
-    double y = 0.0;
+	double y = 0.0;
     glfwGetCursorPos(window, &x, &y);
     input.setCursorPosition(x, y);
     input.resetCursorDelta();

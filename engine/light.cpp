@@ -11,7 +11,7 @@ namespace moar
 {
 
 GLuint Light::lightBlockBuffer = 0; // Initialized by friend class renderer
-constexpr float DIST = 10.0f / static_cast<float>(sqrt(3.0)); // Heuristic
+constexpr float DIST = 10.0f / 1.7320508f; // Heuristic, sqrt(3)
 
 Light::Light()
 {

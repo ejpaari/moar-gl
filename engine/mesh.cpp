@@ -1,6 +1,8 @@
 #include "mesh.h"
 #include "common/globals.h"
 
+#include <algorithm>
+
 namespace moar
 {
 

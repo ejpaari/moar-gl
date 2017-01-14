@@ -82,8 +82,10 @@ bool PostFramebuffer::init(GLsizei numOutputs, bool enableDepth)
 
 void PostFramebuffer::deinit()
 {
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(renderedTextures.size(), &renderedTextures[0]);
+	if (!renderedTextures.empty()) {
+		glDeleteTextures(renderedTextures.size(), &renderedTextures[0]);
+	}
+    glDeleteFramebuffers(1, &framebuffer);    
     glDeleteRenderbuffers(1, &depthRenderbuffer);
 }
 

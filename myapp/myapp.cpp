@@ -68,14 +68,15 @@ void MyApp::levelLoaded()
     if (currentLevelInfo) {
         currentLevelInfo->positionIndex = 0;
         resetCamera();
-    }
-    if (currentLevelInfo->filename == "sponza.lvl") {
-        light1 = engine->getObjectByName("light1");
-        light2 = engine->getObjectByName("light2");
-    } else {
-        light1 = nullptr;
-        light2 = nullptr;
-    }
+		if (currentLevelInfo->filename == "sponza.lvl") {
+			light1 = engine->getObjectByName("light1");
+			light2 = engine->getObjectByName("light2");
+		}
+		else {
+			light1 = nullptr;
+			light2 = nullptr;
+		}
+    }    
 }
 
 void MyApp::handleInput(GLFWwindow* window)
@@ -120,9 +121,9 @@ void MyApp::handleInput(GLFWwindow* window)
     if (input->isKeyPressed(GLFW_KEY_R)) {
         resetCamera();
     }
-
-    camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<double>());
-    camera->rotate(moar::Object::LEFT, input->getCursorDeltaY() * boost::math::constants::degree<double>());
+	
+    camera->rotate(moar::Object::UP, -input->getCursorDeltaX() * boost::math::constants::degree<float>());
+    camera->rotate(moar::Object::LEFT, input->getCursorDeltaY() * boost::math::constants::degree<float>());
 
     bool loadLevel = true;
     try {
@@ -134,7 +135,7 @@ void MyApp::handleInput(GLFWwindow* window)
             loadLevel = false;
         }
     } catch (std::exception& e) {
-        std::cerr << "WARNING: Invalid level\n";
+        std::cerr << "WARNING: Invalid level. " << e.what() << "\n";
         loadLevel = false;
     }
 

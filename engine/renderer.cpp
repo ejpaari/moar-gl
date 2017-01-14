@@ -344,9 +344,9 @@ void Renderer::deferredPointLighting()
     glUseProgram(shader->getProgram());
     setGBufferTextures();
 
-    const std::vector<Object*>& lights = closestLights[Light::Type::POINT];
-    for (unsigned int lightNum = 0; lightNum < lights.size(); ++lightNum) {
-        Object* light = lights[lightNum];
+    const std::vector<Object*>& closestPointLights = closestLights[Light::Type::POINT];
+    for (unsigned int lightNum = 0; lightNum < closestPointLights.size(); ++lightNum) {
+        Object* light = closestPointLights[lightNum];
         Light* lightComponent = light->getComponent<Light>();
         float r = lightComponent->getRange();
         lightSphere->setScale(glm::vec3(r, r, r));
@@ -382,10 +382,10 @@ void Renderer::deferredDirectionalLighting()
     setGBufferTextures();
     PostFramebuffer::bindQuadVAO();
 
-    const std::vector<Object*>& lights = closestLights[Light::Type::DIRECTIONAL];
-    for (unsigned int lightNum = 0; lightNum < lights.size(); ++lightNum) {
+    const std::vector<Object*>& closestDirLights = closestLights[Light::Type::DIRECTIONAL];
+    for (unsigned int lightNum = 0; lightNum < closestDirLights.size(); ++lightNum) {
         activateShadowMap(lightNum, Light::Type::DIRECTIONAL);
-        Object* light = lights[lightNum];
+        Object* light = closestDirLights[lightNum];
         Light* lightComponent = light->getComponent<Light>();
         lightComponent->setUniforms(light->getPosition(), light->getForward());
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -395,7 +395,7 @@ void Renderer::deferredDirectionalLighting()
 void Renderer::setGBufferTextures()
 {
     glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-    glUniform2f(SCREEN_SIZE_LOCATION, renderSettings->windowWidth, renderSettings->windowHeight);
+    glUniform2f(SCREEN_SIZE_LOCATION, static_cast<float>(renderSettings->windowWidth), static_cast<float>(renderSettings->windowHeight));
     glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
     const std::vector<GLuint>& textures = gBuffer.getTextures();
     for (unsigned int i = 0; i < textures.size(); ++i) {
