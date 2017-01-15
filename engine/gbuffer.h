@@ -23,12 +23,14 @@ public:
     bool init();
     void deinit();
 
-    std::vector<GLuint> getTextures() const;
+    std::vector<GLuint> getDeferredTextures() const;
+    GLuint getViewSpacePositionTexture() const;
 
 private:
     GLuint positionTexture = 0;
     GLuint normalTexture = 0;
     GLuint colorTexture = 0;
+    GLuint viewSpacePositionTexture = 0;
     GLuint depthRenderbuffer = 0;
 };
 

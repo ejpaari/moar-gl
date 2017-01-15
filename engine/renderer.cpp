@@ -1,6 +1,10 @@
 #include "renderer.h"
 #include "common/globals.h"
 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/compatibility.hpp>
+
+#include <random>
 #include <utility>
 #include <algorithm>
 
@@ -24,6 +28,18 @@ Renderer::Renderer()
     for (int i = 0; i < MAX_NUM_SHADOWMAPS; ++i) {
         depthMapPointers[Light::POINT].push_back(&pointDepthMaps[i]);
         depthMapPointers[Light::DIRECTIONAL].push_back(&dirDepthMaps[i]);
+    }
+
+    std::uniform_real_distribution<GLfloat> distribution(-1.0, 1.0);
+    std::default_random_engine random;
+
+    float kernelSize = static_cast<float>(SSAO_KERNEL_SIZE);
+    for (int i = 0; i < SSAO_KERNEL_SIZE; ++i) {
+        glm::vec3 sample(distribution(random), distribution(random), distribution(random));
+        sample = glm::normalize(sample) * 0.05f;
+        float scale = static_cast<float>(i) / kernelSize;
+        sample *= glm::lerp(0.1f, 1.0f, scale * scale); // Move sample closer to center
+        ssaoKernel[i] = sample;
     }
 }
 
@@ -179,6 +195,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     postBuffer->bind();
     renderAmbient();
     renderGBuffer();
+
     renderShadowmaps();
 
     postBuffer->bind();
@@ -195,6 +212,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     glDisable(GL_DEPTH_TEST);
 
     GLuint renderedTex = blitBuffer.blitColor(postBuffer->getFramebuffer(), 0);
+    renderedTex = renderSSAO(renderedTex);
     renderedTex = renderBloom(postBuffer->getFramebuffer(), renderedTex);
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
@@ -265,7 +283,6 @@ void Renderer::renderGBuffer()
                 }
                 meshObject.parent->setUniforms();
                 meshObject.mesh->render();
-                objectsInFrustum.insert(meshObject.mesh->getId());
             }
         }
     }
@@ -338,6 +355,19 @@ void Renderer::forwardLighting(Light::Type lightType)
     }
 }
 
+void Renderer::setGBufferTextures()
+{
+    glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+    glUniform2f(SCREEN_SIZE_LOCATION, static_cast<float>(renderSettings->windowWidth), static_cast<float>(renderSettings->windowHeight));
+    glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
+    const std::vector<GLuint>& textures = gBuffer.getDeferredTextures();
+    for (unsigned int i = 0; i < textures.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i + 1);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        glUniform1i(RENDERED_TEX_LOCATION1 + i, i + 1);
+    }
+}
+
 void Renderer::deferredPointLighting()
 {
     shader = resourceManager->getDeferredLightShader(Light::Type::POINT);
@@ -392,19 +422,6 @@ void Renderer::deferredDirectionalLighting()
     }
 }
 
-void Renderer::setGBufferTextures()
-{
-    glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-    glUniform2f(SCREEN_SIZE_LOCATION, static_cast<float>(renderSettings->windowWidth), static_cast<float>(renderSettings->windowHeight));
-    glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
-    const std::vector<GLuint>& textures = gBuffer.getTextures();
-    for (unsigned int i = 0; i < textures.size(); ++i) {
-        glActiveTexture(GL_TEXTURE0 + i + 1);
-        glBindTexture(GL_TEXTURE_2D, textures[i]);
-        glUniform1i(RENDERED_TEX_LOCATION0 + i, i + 1);
-    }
-}
-
 void Renderer::activateShadowMap(int lightNum, Light::Type lightType)
 {
     if (lightNum < MAX_NUM_SHADOWMAPS) {
@@ -446,6 +463,16 @@ void Renderer::renderSkybox(Object* skybox)
             meshObject.mesh->render();
         }
     }
+}
+
+GLuint Renderer::renderSSAO(GLuint renderedTex)
+{
+    setPostFramebuffer();
+    glUseProgram(resourceManager->getShaderProgramByName("ssao"));
+    glUniform3fv(SSAO_KERNEL_LOCATION, SSAO_KERNEL_SIZE, glm::value_ptr(ssaoKernel[0]));
+    glUniformMatrix4fv(PROJECTION_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(*camera->getProjectionMatrixPointer()));
+    renderedTex = postBuffer->draw(std::vector<GLuint>{gBuffer.getViewSpacePositionTexture()});
+    return renderedTex;
 }
 
 GLuint Renderer::renderBloom(GLuint framebuffer, GLuint renderedTex)

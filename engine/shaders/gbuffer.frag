@@ -1,6 +1,7 @@
 layout(location = 0) out vec3 outPosition;
 layout(location = 1) out vec3 outNormal;
 layout(location = 2) out vec4 outColor;
+layout(location = 3) out vec3 outVSPosition;
 
 layout (location = 12) uniform vec3 cameraPos_World;
 layout (location = 20) uniform sampler2D diffuseTex;
@@ -11,6 +12,7 @@ layout (location = 43) uniform float farPlane;
 
 in vec2 texCoord;
 in vec3 vertexPos_World;
+in vec3 vertexPos_View;
 in vec3 normal_World;
 in vec3 eyeDir_World;
 in vec3 T;
@@ -44,4 +46,6 @@ void main()
 #else
   outColor.a = 0.0;
 #endif
+
+  outVSPosition = vertexPos_View;
 }

@@ -14,6 +14,7 @@ layout (std140) uniform TransformationBlock {
 
 out vec2 texCoord;
 out vec3 vertexPos_World;
+out vec3 vertexPos_View;
 out vec3 normal_World;
 out vec3 eyeDir_World;
 out vec3 T;
@@ -25,6 +26,7 @@ void main()
   gl_Position = MVP * vec4(position, 1.0);
   texCoord = tex;
   vertexPos_World = vec3(M * vec4(position, 1.0));
+  vertexPos_View = vec3(MV * vec4(position, 1.0));
   normal_World = normalize(mat3(M) * normal);
 
 #if defined(BUMP)

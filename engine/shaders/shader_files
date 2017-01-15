@@ -35,3 +35,6 @@ gbuffer.frag
 stencil_pass.vert
 stencil_pass.frag
 
+ssao.vert
+ssao.frag
+

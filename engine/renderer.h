@@ -46,15 +46,16 @@ private:
     void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
     void renderAmbient();
-    void renderGBuffer();
+    void renderGBuffer();    
     void renderShadowmaps();
     void forwardLighting(Light::Type lightType);
-    void deferredPointLighting();
-    void deferredDirectionalLighting();
     void setGBufferTextures();
+    void deferredPointLighting();
+    void deferredDirectionalLighting();    
     void activateShadowMap(int lightNum, Light::Type lightType);
     void stencilPass();
     void renderSkybox(Object* skybox = nullptr);
+    GLuint renderSSAO(GLuint renderedTex);
     GLuint renderBloom(GLuint framebuffer, GLuint renderedTex);
     GLuint renderHDR(GLuint renderedTex);
     GLuint renderPostprocess(GLuint renderedTex);
@@ -91,6 +92,7 @@ private:
 
     const Shader* shader = nullptr;
     std::unordered_set<unsigned int> objectsInFrustum;
+    std::array<glm::vec3, SSAO_KERNEL_SIZE> ssaoKernel;
 };
 
 } // moar

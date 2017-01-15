@@ -7,9 +7,9 @@ layout (location = 23) uniform samplerCube depthTex;
 #else
 layout (location = 23) uniform sampler2D depthTex;
 #endif
-layout (location = 30) uniform sampler2D colorTex;
-layout (location = 31) uniform sampler2D normalTex;
-layout (location = 32) uniform sampler2D positionTex;
+layout (location = 31) uniform sampler2D colorTex;
+layout (location = 32) uniform sampler2D normalTex;
+layout (location = 33) uniform sampler2D positionTex;
 layout (location = 41) uniform vec2 screenSize;
 layout (location = 42) uniform int shadowsEnabled;
 layout (location = 43) uniform float farPlane;
