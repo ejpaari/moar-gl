@@ -38,3 +38,6 @@ stencil_pass.frag
 ssao.vert
 ssao.frag
 
+ssao_apply.vert
+ssao_apply.frag
+

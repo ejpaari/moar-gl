@@ -5,8 +5,8 @@ general
 0.0 0.0 0.0
 white.png
 
-skybox
-sb_px.png sb_nx.png sb_py.png sb_ny.png sb_pz.png sb_nz.png
+# skybox
+# sb_px.png sb_nx.png sb_py.png sb_ny.png sb_pz.png sb_nz.png
 
 # object name
 # position
@@ -45,6 +45,6 @@ name light4
 component model
 sphere.3ds
 component light
-1.0 1.0 0.0 5.5
+1.0 1.0 1.0 9.5
 point
 1

@@ -8,7 +8,7 @@ layout (location = 46) uniform vec3 kernel[KERNEL_SIZE];
 in vec2 texCoord;
 
 const float RADIUS = 0.1;
-const float BIAS = 0.02;
+const float BIAS = 0.001;
 
 void main()
 {
@@ -33,5 +33,6 @@ void main()
   }
 
   occlusion = 1.0 - (occlusion / KERNEL_SIZE);
+  occlusion = smoothstep(0.0, 0.5, occlusion);
   outColor = vec3(occlusion);
 }

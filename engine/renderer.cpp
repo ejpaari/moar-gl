@@ -212,8 +212,9 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     glDisable(GL_DEPTH_TEST);
 
     GLuint renderedTex = blitBuffer.blitColor(postBuffer->getFramebuffer(), 0);
+    renderedTex = renderBloom(postBuffer1.getFramebuffer(), renderedTex);
+    renderedTex = blitBuffer.blitColor(postBuffer->getFramebuffer(), 0);
     renderedTex = renderSSAO(renderedTex);
-    renderedTex = renderBloom(postBuffer->getFramebuffer(), renderedTex);
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
@@ -471,7 +472,11 @@ GLuint Renderer::renderSSAO(GLuint renderedTex)
     glUseProgram(resourceManager->getShaderProgramByName("ssao"));
     glUniform3fv(SSAO_KERNEL_LOCATION, SSAO_KERNEL_SIZE, glm::value_ptr(ssaoKernel[0]));
     glUniformMatrix4fv(PROJECTION_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(*camera->getProjectionMatrixPointer()));
-    renderedTex = postBuffer->draw(std::vector<GLuint>{gBuffer.getViewSpacePositionTexture()});
+    GLuint ssaoTex = postBuffer->draw(std::vector<GLuint>{gBuffer.getViewSpacePositionTexture()});
+
+    setPostFramebuffer();
+    glUseProgram(resourceManager->getShaderProgramByName("ssao_apply"));
+    renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, ssaoTex});
     return renderedTex;
 }
 
@@ -485,7 +490,7 @@ GLuint Renderer::renderBloom(GLuint framebuffer, GLuint renderedTex)
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
             setPostFramebuffer();
             glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
-            bloomTex = postBuffer->draw(std::vector<GLuint>(1, bloomTex));
+            bloomTex = postBuffer->draw(std::vector<GLuint>{bloomTex});
             horizontal = !horizontal;
         }
         setPostFramebuffer();
