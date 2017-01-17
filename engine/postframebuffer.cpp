@@ -117,4 +117,13 @@ GLuint PostFramebuffer::blitColor(GLuint blitBuffer, int attachment) const
     return renderedTextures[0];
 }
 
+GLuint PostFramebuffer::getRenderedTex(unsigned int output) const
+{
+    if (output >= renderedTextures.size()) {
+        std::cerr << "WARNING: Invalid output value for getting a rendered texture\n";
+        return 0;
+    }
+    return renderedTextures[output];
+}
+
 } // moar

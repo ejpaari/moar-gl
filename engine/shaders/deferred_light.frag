@@ -1,5 +1,4 @@
 layout(location = 0) out vec3 outColor;
-layout(location = 1) out vec3 outBloom;
 
 layout (location = 12) uniform vec3 cameraPos;
 #if defined(POINT)
@@ -73,6 +72,4 @@ void main()
     specularComponent;
 
   outColor.rgb *= shadow;
-
-  outBloom.rgb = getBloom(outColor.rgb);
 }

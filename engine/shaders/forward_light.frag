@@ -1,5 +1,4 @@
 layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec4 outBloom;
 
 layout (location = 20) uniform sampler2D diffuseTex;
 layout (location = 21) uniform sampler2D normalTex;
@@ -96,6 +95,4 @@ void main()
     specularComponent;
 
   outColor.rgb *= shadow;
-
-  outBloom.rgb = getBloom(outColor.rgb);
 }

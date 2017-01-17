@@ -110,26 +110,25 @@ bool Renderer::setDeferredRenderPath(bool enabled)
 
     gBuffer.deinit();
     multisampleBuffer.deinit();
-    postBuffer1.deinit();
-    postBuffer2.deinit();
-    blitBuffer.deinit();
+    for (auto& postBuffer : postBuffers) {
+        postBuffer.framebuffer.deinit();
+    }
 
     bool framebuffersInitialized = false;
     if (deferred) {
-        framebuffersInitialized =
-                gBuffer.init() &&
-                postBuffer1.init(2, true) &&
-                postBuffer2.init(2, false) &&
-                blitBuffer.init(1, false);
+        framebuffersInitialized = gBuffer.init() &&
+                postBuffers[0].framebuffer.init(1, true) &&
+                postBuffers[1].framebuffer.init(1, false) &&
+                postBuffers[2].framebuffer.init(1, false);
         renderFunction = [&](const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
             this->renderDeferred(objects, skybox);
         };
     } else {
         framebuffersInitialized =
-                multisampleBuffer.init(2) &&
-                postBuffer1.init(1, false) &&
-                postBuffer2.init(1, false) &&
-                blitBuffer.init(1, false);
+                multisampleBuffer.init(1) &&
+                postBuffers[0].framebuffer.init(1, false) &&
+                postBuffers[1].framebuffer.init(1, false) &&
+                postBuffers[2].framebuffer.init(1, false);
         renderFunction = [&](const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
             this->renderForward(objects, skybox);
         };
@@ -180,8 +179,9 @@ void Renderer::renderForward(const std::vector<std::unique_ptr<Object>>& objects
     glCullFace(GL_BACK);
     glDisable(GL_DEPTH_TEST);
 
-    GLuint renderedTex = blitBuffer.blitColor(multisampleBuffer.getFramebuffer(), 0);
-    renderedTex = renderBloom(multisampleBuffer.getFramebuffer(), renderedTex);
+    PostFramebuffer* buffer = getFreePostFramebuffer();
+    GLuint renderedTex = buffer->blitColor(multisampleBuffer.getFramebuffer(), 0);
+    renderedTex = renderBloom(renderedTex);
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
@@ -191,14 +191,14 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
 {
     setup(&gBuffer, objects);
 
-    postBuffer = &postBuffer1;
-    postBuffer->bind();
+    PostFramebuffer* buffer = getPostFramebuffer(0);
+    buffer->bind();
     renderAmbient();
     renderGBuffer();
 
     renderShadowmaps();
 
-    postBuffer->bind();
+    buffer->bind();
     enableBlending();
     deferredPointLighting();
     deferredDirectionalLighting();
@@ -211,10 +211,9 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     glCullFace(GL_BACK);
     glDisable(GL_DEPTH_TEST);
 
-    GLuint renderedTex = blitBuffer.blitColor(postBuffer->getFramebuffer(), 0);
-    renderedTex = renderBloom(postBuffer1.getFramebuffer(), renderedTex);
-    renderedTex = blitBuffer.blitColor(postBuffer->getFramebuffer(), 0);
+    GLuint renderedTex = buffer->getRenderedTex(0);
     renderedTex = renderSSAO(renderedTex);
+    renderedTex = renderBloom(renderedTex);
     renderedTex = renderHDR(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
@@ -232,10 +231,11 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
 
     glDepthMask(GL_TRUE);
 
-    postBuffer1.bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    postBuffer2.bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (auto& postBuffer : postBuffers) {
+        postBuffer.inUse = false;
+        postBuffer.framebuffer.bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 
     fb->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -468,34 +468,47 @@ void Renderer::renderSkybox(Object* skybox)
 
 GLuint Renderer::renderSSAO(GLuint renderedTex)
 {
-    setPostFramebuffer();
+    PostFramebuffer* buffer1 = getFreePostFramebuffer();
+    PostFramebuffer* buffer2 = getFreePostFramebuffer();
+
     glUseProgram(resourceManager->getShaderProgramByName("ssao"));
     glUniform3fv(SSAO_KERNEL_LOCATION, SSAO_KERNEL_SIZE, glm::value_ptr(ssaoKernel[0]));
     glUniformMatrix4fv(PROJECTION_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(*camera->getProjectionMatrixPointer()));
-    GLuint ssaoTex = postBuffer->draw(std::vector<GLuint>{gBuffer.getViewSpacePositionTexture()});
+    GLuint ssaoTex = buffer1->draw(std::vector<GLuint>{gBuffer.getViewSpacePositionTexture()});
 
-    setPostFramebuffer();
     glUseProgram(resourceManager->getShaderProgramByName("ssao_apply"));
-    renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, ssaoTex});
+    renderedTex = buffer2->draw(std::vector<GLuint>{renderedTex, ssaoTex});
+    freeOtherPostFramebuffers(buffer2);
     return renderedTex;
 }
 
-GLuint Renderer::renderBloom(GLuint framebuffer, GLuint renderedTex)
+GLuint Renderer::renderBloom(GLuint renderedTex)
 {
     if (camera->getBloomIterations() > 0) {
-        setPostFramebuffer();
-        GLuint bloomTex = postBuffer->blitColor(framebuffer, 1);
+        PostFramebuffer* buffer1 = getFreePostFramebuffer();
+        PostFramebuffer* buffer2 = getFreePostFramebuffer();
+        PostFramebuffer* buffer = buffer1;
+
+        auto switchBuffer = [&]() {
+            buffer = buffer == buffer1 ? buffer2 : buffer1;
+        };
+
+        glUseProgram(resourceManager->getShaderProgramByName("bloom_generate"));
+        GLuint bloomTex = buffer->draw(std::vector<GLuint>{renderedTex});
+
         glUseProgram(resourceManager->getShaderProgramByName("bloom_blur"));
         GLboolean horizontal = true;
         for (unsigned int i = 0; i < camera->getBloomIterations(); ++i) {
-            setPostFramebuffer();
+            switchBuffer();
             glUniform1i(BLOOM_FILTER_HORIZONTAL, horizontal);
-            bloomTex = postBuffer->draw(std::vector<GLuint>{bloomTex});
+            bloomTex = buffer->draw(std::vector<GLuint>{bloomTex});
             horizontal = !horizontal;
         }
-        setPostFramebuffer();
+
+        switchBuffer();
         glUseProgram(resourceManager->getShaderProgramByName("bloom_blend"));
-        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex, bloomTex});;
+        renderedTex = buffer->draw(std::vector<GLuint>{renderedTex, bloomTex});
+        freeOtherPostFramebuffers(buffer);
     }
     return renderedTex;
 }
@@ -503,9 +516,10 @@ GLuint Renderer::renderBloom(GLuint framebuffer, GLuint renderedTex)
 GLuint Renderer::renderHDR(GLuint renderedTex)
 {
     if (camera->isHDREnabled()) {
-        setPostFramebuffer();
+        PostFramebuffer* buffer = getFreePostFramebuffer();
         glUseProgram(resourceManager->getShaderProgramByName("hdr"));
-        renderedTex = postBuffer->draw(std::vector<GLuint>{renderedTex});
+        renderedTex = buffer->draw(std::vector<GLuint>{renderedTex});
+        freeOtherPostFramebuffers(buffer);
     }
     return renderedTex;
 }
@@ -515,8 +529,9 @@ GLuint Renderer::renderPostprocess(GLuint renderedTex)
     const std::list<Postprocess>& postprocs = camera->getPostprocesses();
     for (auto iter = postprocs.begin(); iter != postprocs.end(); ++iter) {
         iter->bind();
-        setPostFramebuffer();
-        renderedTex = postBuffer->draw(std::vector<GLuint>(1, renderedTex));
+        PostFramebuffer* buffer = getFreePostFramebuffer();
+        renderedTex = buffer->draw(std::vector<GLuint>(1, renderedTex));
+        freeOtherPostFramebuffers(buffer);
     }
     return renderedTex;
 }
@@ -598,9 +613,32 @@ bool Renderer::objectInsideFrustum(const Object::MeshObject& mo) const
     return camera->sphereInsideFrustum(point, radius);
 }
 
-void Renderer::setPostFramebuffer()
+PostFramebuffer* Renderer::getPostFramebuffer(unsigned int index)
 {
-    postBuffer = postBuffer != &postBuffer1 ? &postBuffer1 : &postBuffer2;
+    PostBuffer& buffer = postBuffers[index];
+    buffer.inUse = true;
+    return &buffer.framebuffer;
+}
+
+PostFramebuffer* Renderer::getFreePostFramebuffer()
+{
+    for (auto& postBuffer : postBuffers) {
+        if (!postBuffer.inUse) {
+            postBuffer.inUse = true;
+            return &postBuffer.framebuffer;
+        }
+    }
+    std::cerr << "ERROR: No free post framebuffers\n";
+    return nullptr;
+}
+
+void Renderer::freeOtherPostFramebuffers(PostFramebuffer* used)
+{
+    for (auto& postBuffer : postBuffers) {
+        if (used != &postBuffer.framebuffer) {
+            postBuffer.inUse = false;
+        }
+    }
 }
 
 } // moar

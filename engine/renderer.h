@@ -42,6 +42,11 @@ public:
     void clear();
 
 private:
+    struct PostBuffer {
+        bool inUse;
+        PostFramebuffer framebuffer;
+    };
+
     void renderForward(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void renderDeferred(const std::vector<std::unique_ptr<Object>>& objects, Object* skybox = nullptr);
     void setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Object>>& objects);
@@ -56,13 +61,15 @@ private:
     void stencilPass();
     void renderSkybox(Object* skybox = nullptr);
     GLuint renderSSAO(GLuint renderedTex);
-    GLuint renderBloom(GLuint framebuffer, GLuint renderedTex);
+    GLuint renderBloom(GLuint renderedTex);
     GLuint renderHDR(GLuint renderedTex);
     GLuint renderPostprocess(GLuint renderedTex);
     void renderPassthrough(GLuint texture);
     void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);
     bool objectInsideFrustum(const Object::MeshObject& mo) const;
-    void setPostFramebuffer();
+    PostFramebuffer* getPostFramebuffer(unsigned int index);
+    PostFramebuffer* getFreePostFramebuffer();
+    void freeOtherPostFramebuffers(PostFramebuffer* used);
 
     bool deferred = true;
     std::function<void(const std::vector<std::unique_ptr<Object>>&, Object* skybox)> renderFunction;
@@ -85,10 +92,7 @@ private:
 
     MultisampleBuffer multisampleBuffer;
     GBuffer gBuffer;
-    PostFramebuffer postBuffer1;
-    PostFramebuffer postBuffer2;
-    PostFramebuffer blitBuffer;
-    PostFramebuffer* postBuffer = nullptr;
+    std::array<PostBuffer, 3> postBuffers;
 
     const Shader* shader = nullptr;
     std::unordered_set<unsigned int> objectsInFrustum;

@@ -80,14 +80,5 @@ bool isTransparent(float alpha)
   return alpha < 0.1;
 }
 
-vec3 getBloom(vec3 outColor)
-{
-  float bloom = dot(outColor.rgb, vec3(1.0));
-  if (bloom > 2.0) {
-    return outColor;
-  }
-  return vec3(0.0);
-}
-
 // end common.frag 
 

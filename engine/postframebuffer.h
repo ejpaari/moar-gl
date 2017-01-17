@@ -29,6 +29,8 @@ public:
     GLuint draw(const std::vector<GLuint>& textures);
     GLuint blitColor(GLuint blitBuffer, int attachment) const;
 
+    GLuint getRenderedTex(unsigned int output) const;
+
 private:
     static GLuint quadVAO;
     static GLuint quadBuffer;
