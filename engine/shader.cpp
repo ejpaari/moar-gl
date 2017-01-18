@@ -16,13 +16,7 @@ std::string Shader::commonFragmentShaderCode = "";
 
 void Shader::loadCommonShaderCode(GLenum type, const std::string& file)
 {
-    std::string* code = nullptr;
-    if (type == GL_VERTEX_SHADER) {
-        code = &commonVertexShaderCode;
-    }
-    if (type == GL_FRAGMENT_SHADER) {
-        code = &commonFragmentShaderCode;
-    }
+    std::string* code = selectCommonCode(type);
     if (!code) {
         return;
     }
@@ -34,6 +28,26 @@ void Shader::loadCommonShaderCode(GLenum type, const std::string& file)
     } else {
         std::cerr << "WARNING: Could not open common fragment shader file: " << COMMON_FRAGMENT_FILE << "\n";
     }
+}
+
+void Shader::addCommonShaderCode(GLenum type, const std::string& addition)
+{
+    std::string* code = selectCommonCode(type);
+    if (!code) {
+        return;
+    }
+    code->append(addition);
+}
+
+std::string* Shader::selectCommonCode(GLenum type)
+{
+    if (type == GL_VERTEX_SHADER) {
+        return &commonVertexShaderCode;
+    }
+    if (type == GL_FRAGMENT_SHADER) {
+        return &commonFragmentShaderCode;
+    }
+    return nullptr;
 }
 
 Shader::Shader()

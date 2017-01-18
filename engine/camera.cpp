@@ -142,6 +142,16 @@ void Camera::setHDREnabled(bool status)
     useHDR = status;
 }
 
+bool Camera::isSSAOEnabled() const
+{
+    return useSSAO;
+}
+
+void Camera::setSSAOEnabled(bool status)
+{
+    useSSAO = status;
+}
+
 void Camera::updateViewMatrix()
 {
     *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));

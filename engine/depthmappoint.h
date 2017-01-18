@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
+#include <array>
 
 namespace moar
 {
@@ -28,7 +29,7 @@ public:
 private:
     GLuint depthCubeTexture;
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, nearClipDistance, farClipDistance);
-    glm::mat4 lightSpaces[6];
+    std::array<glm::mat4, 6> lightSpaces;
 };
 
 } // moar

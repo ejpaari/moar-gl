@@ -468,17 +468,19 @@ void Renderer::renderSkybox(Object* skybox)
 
 GLuint Renderer::renderSSAO(GLuint renderedTex)
 {
-    PostFramebuffer* buffer1 = getFreePostFramebuffer();
-    PostFramebuffer* buffer2 = getFreePostFramebuffer();
+    if (camera->isSSAOEnabled()) {
+        PostFramebuffer* buffer1 = getFreePostFramebuffer();
+        PostFramebuffer* buffer2 = getFreePostFramebuffer();
 
-    glUseProgram(resourceManager->getShaderProgramByName("ssao"));
-    glUniform3fv(SSAO_KERNEL_LOCATION, SSAO_KERNEL_SIZE, glm::value_ptr(ssaoKernel[0]));
-    glUniformMatrix4fv(PROJECTION_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(*camera->getProjectionMatrixPointer()));
-    GLuint ssaoTex = buffer1->draw(std::vector<GLuint>{gBuffer.getViewSpacePositionTexture()});
+        glUseProgram(resourceManager->getShaderProgramByName("ssao"));
+        glUniform3fv(SSAO_KERNEL_LOCATION, SSAO_KERNEL_SIZE, glm::value_ptr(ssaoKernel[0]));
+        glUniformMatrix4fv(PROJECTION_MATRIX_LOCATION, 1, GL_FALSE, glm::value_ptr(*camera->getProjectionMatrixPointer()));
+        GLuint ssaoTex = buffer1->draw(std::vector<GLuint>{gBuffer.getViewSpacePositionTexture()});
 
-    glUseProgram(resourceManager->getShaderProgramByName("ssao_apply"));
-    renderedTex = buffer2->draw(std::vector<GLuint>{renderedTex, ssaoTex});
-    freeOtherPostFramebuffers(buffer2);
+        glUseProgram(resourceManager->getShaderProgramByName("ssao_apply"));
+        renderedTex = buffer2->draw(std::vector<GLuint>{renderedTex, ssaoTex});
+        freeOtherPostFramebuffers(buffer2);
+    }
     return renderedTex;
 }
 

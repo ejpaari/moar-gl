@@ -11,6 +11,7 @@
 #include <memory>
 #include <list>
 #include <string>
+#include <array>
 
 namespace moar
 {
@@ -42,8 +43,12 @@ public:
 
     unsigned int getBloomIterations() const;
     void setBloomIterations(unsigned int iterations);
+
     bool isHDREnabled() const;
     void setHDREnabled(bool status);
+
+    bool isSSAOEnabled() const;
+    void setSSAOEnabled(bool status);
 
 private:
     enum Side
@@ -69,7 +74,7 @@ private:
     float ratio;
     float nearClipDistance;
     float farClipDistance;
-    Plane frustumPlanes[SIZE];
+    std::array<Plane, SIZE> frustumPlanes;
 
     std::unique_ptr<glm::mat4> viewMatrix;
     std::unique_ptr<glm::mat4> projectionMatrix;
@@ -77,6 +82,7 @@ private:
     std::list<Postprocess> postprocs;
     unsigned int bloomIterations = 0;
     bool useHDR = false;
+    bool useSSAO = true;
 };
 
 } // moar

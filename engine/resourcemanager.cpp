@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <sstream>
 
 namespace moar
 {
@@ -65,6 +66,9 @@ void ResourceManager::setShaderPath(const std::string& path)
     shaderPath = path;
     Shader::loadCommonShaderCode(GL_VERTEX_SHADER, path + "/" + COMMON_VERTEX_FILE);
     Shader::loadCommonShaderCode(GL_FRAGMENT_SHADER, path + "/" + COMMON_FRAGMENT_FILE);
+    std::stringstream ss;
+    ss << "const int SSAO_KERNEL_SIZE = " << SSAO_KERNEL_SIZE << ";\n";
+    Shader::addCommonShaderCode(GL_FRAGMENT_SHADER, ss.str());
 }
 
 void ResourceManager::setModelPath(const std::string& path)

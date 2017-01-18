@@ -1,9 +1,8 @@
 layout(location = 0) out vec3 outColor;
 
 layout (location = 30) uniform sampler2D positionTex;
-const int KERNEL_SIZE = 64;
 layout (location = 45) uniform mat4 projection;
-layout (location = 46) uniform vec3 kernel[KERNEL_SIZE];
+layout (location = 46) uniform vec3 kernel[SSAO_KERNEL_SIZE];
 
 in vec2 texCoord;
 
@@ -15,7 +14,7 @@ void main()
   vec3 pos = texture(positionTex, texCoord).xyz;
   float occlusion = 0.0;
 
-  for (int i = 0; i < KERNEL_SIZE; i++) {
+  for (int i = 0; i < SSAO_KERNEL_SIZE; i++) {
     vec3 samplePos = pos + kernel[i];
     vec4 offset = vec4(samplePos, 1.0);
     offset = projection * offset;
@@ -32,7 +31,7 @@ void main()
     // occlusion += (sampleDepth >= samplePos.z + BIAS ? 1.0 : 0.0) * rangeCheck;
   }
 
-  occlusion = 1.0 - (occlusion / KERNEL_SIZE);
+  occlusion = 1.0 - (occlusion / SSAO_KERNEL_SIZE);
   occlusion = smoothstep(0.0, 0.5, occlusion);
   outColor = vec3(occlusion);
 }

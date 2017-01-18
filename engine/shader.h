@@ -26,6 +26,7 @@ public:
     };
 
     static void loadCommonShaderCode(GLenum type, const std::string& file);
+    static void addCommonShaderCode(GLenum type, const std::string& addition);
 
     explicit Shader();
     ~Shader();
@@ -41,6 +42,8 @@ public:
     bool hasUniform(GLuint location) const;
 
 private:
+    static std::string* selectCommonCode(GLenum type);
+
     static std::string commonVertexShaderCode;
     static std::string commonFragmentShaderCode;
 

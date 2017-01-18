@@ -54,6 +54,7 @@ void MyApp::start()
 
     camera->setBloomIterations(bloomIterations);
     camera->setHDREnabled(HDR);
+    camera->setSSAOEnabled(SSAO);
 
 //#define POSTPROC
 #ifdef POSTPROC
@@ -117,6 +118,10 @@ void MyApp::handleInput(GLFWwindow* window)
         HDR = !HDR;
         camera->setHDREnabled(HDR);
     }
+    if (input->isKeyPressed(GLFW_KEY_J)) {
+        SSAO = !SSAO;
+        camera->setSSAOEnabled(SSAO);
+    }
 
     if (input->isKeyPressed(GLFW_KEY_R)) {
         resetCamera();
@@ -173,7 +178,7 @@ void MyApp::update()
 void MyApp::initGUI()
 {
     bar = TwNewBar("GUI");
-    TwDefine(" GUI size='300 150' ");
+    TwDefine(" GUI size='300 160' ");
     TwDefine(" GUI valueswidth=140 ");
     TwDefine(" GUI refresh=0.5 ");
     TwAddVarRO(bar, "FPS", TW_TYPE_INT32, &FPS, "");
@@ -183,6 +188,7 @@ void MyApp::initGUI()
     TwAddVarRO(bar, "Rotation", TW_TYPE_DIR3F, &rotation, "");
     TwAddVarRO(bar, "Bloom", TW_TYPE_UINT32, &bloomIterations, "");
     TwAddVarRO(bar, "HDR", TW_TYPE_BOOLCPP, &HDR, "");
+    TwAddVarRO(bar, "SSAO", TW_TYPE_BOOLCPP, &SSAO, "");
 }
 
 void MyApp::resetCamera()
