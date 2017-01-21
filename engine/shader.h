@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <bitset>
+#include <array>
 
 namespace moar
 {
@@ -41,6 +42,8 @@ public:
     GLuint getProgram() const;
     bool hasUniform(GLuint location) const;
 
+    GLuint getShadowMapLocation(int num) const;
+
 private:
     static std::string* selectCommonCode(GLenum type);
 
@@ -54,6 +57,7 @@ private:
     GLuint program;    
     std::vector<GLuint> shaders;
     std::bitset<MAX_LOCATION> uniforms;
+    std::array<GLuint, MAX_NUM_SHADOWMAPS> shadowMapLocations;
 };
 
 } // moar

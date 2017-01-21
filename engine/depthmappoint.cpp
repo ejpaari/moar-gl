@@ -57,4 +57,14 @@ void DepthMapPoint::activate()
     glUniform1i(DEPTH_TEX_LOCATION, 0);
 }
 
+GLuint DepthMapPoint::getTexture()
+{
+    return depthCubeTexture;
+}
+
+GLenum DepthMapPoint::getType()
+{
+    return GL_TEXTURE_CUBE_MAP;
+}
+
 } // moar

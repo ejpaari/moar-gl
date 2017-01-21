@@ -7,7 +7,7 @@ layout (location = 12) uniform vec3 cameraPos_World;
 layout (location = 20) uniform sampler2D diffuseTex;
 layout (location = 21) uniform sampler2D normalTex;
 layout (location = 22) uniform sampler2D bumpTex;
-layout (location = 24) uniform sampler2D specularTex;
+layout (location = 23) uniform sampler2D specularTex;
 layout (location = 43) uniform float farPlane;
 
 in vec2 texCoord;

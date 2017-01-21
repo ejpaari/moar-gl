@@ -1,10 +1,13 @@
 layout(location = 0) out vec3 outColor;
 
 layout (location = 12) uniform vec3 cameraPos;
+layout (location = 13) uniform vec4 lightColor;
+layout (location = 14) uniform vec3 lightPos;
+layout (location = 15) uniform vec3 lightForward;
 #if defined(POINT)
-layout (location = 23) uniform samplerCube depthTex;
+layout (location = 24) uniform samplerCube depthTex;
 #else
-layout (location = 23) uniform sampler2D depthTex;
+layout (location = 24) uniform sampler2D depthTex;
 #endif
 layout (location = 31) uniform sampler2D colorTex;
 layout (location = 32) uniform sampler2D normalTex;
@@ -13,12 +16,6 @@ layout (location = 41) uniform vec2 screenSize;
 layout (location = 42) uniform int shadowsEnabled;
 layout (location = 43) uniform float farPlane;
 layout (location = 50) uniform mat4 lightSpaceProj;
-
-layout (std140) uniform LightBlock {
-  vec4 lightColor;
-  vec3 lightPos;
-  vec3 lightForward;
-};
 
 #if defined(DIRECTIONAL)
 in vec2 texCoord;

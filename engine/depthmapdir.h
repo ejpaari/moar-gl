@@ -24,6 +24,8 @@ public:
     virtual bool init();
     virtual void setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir);
     virtual void activate();
+    virtual GLuint getTexture();
+    virtual GLenum getType();
 
 private:
     GLuint depthTexture;

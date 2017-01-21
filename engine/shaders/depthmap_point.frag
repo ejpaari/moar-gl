@@ -1,12 +1,9 @@
 in vec4 fragPos;
 
+layout (location = 13) uniform vec4 lightColor;
+layout (location = 14) uniform vec3 lightPos;
+layout (location = 15) uniform vec3 lightForward;
 layout (location = 43) uniform float farPlane;
-
-layout (std140) uniform LightBlock {
-    vec4 lightColor;
-    vec3 lightPos;
-    vec3 lightForward;
-};
 
 void main()
 {

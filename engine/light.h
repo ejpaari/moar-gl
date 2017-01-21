@@ -31,6 +31,7 @@ public:
     void setShadowingEnabled(bool enabled);
 
     Type getLightType() const;
+    const glm::vec4& getColor() const;
     bool isShadowingEnabled() const;
     float getRange() const;
 

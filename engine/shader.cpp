@@ -93,7 +93,7 @@ bool Shader::linkProgram()
         std::vector<GLchar> infoLog(maxLength);
         glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
         std::copy(infoLog.begin(), infoLog.end(), std::ostream_iterator<GLchar>(std::cerr, ""));
-        glDeleteProgram(program);;
+        glDeleteProgram(program);
     }
 
     GLuint lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
@@ -125,9 +125,14 @@ bool Shader::hasUniform(GLuint location) const
     try {
         return uniforms.test(location);
     } catch (std::out_of_range& e) {
-		std::cerr << "WARNING: Uniform not found. " << e.what() << "\n";
+        std::cerr << "WARNING: Uniform not found. " << e.what() << "\n";
         return false;
     }
+}
+
+GLuint Shader::getShadowMapLocation(int num) const
+{
+    return shadowMapLocations[num];
 }
 
 void Shader::deleteShaders()
@@ -183,8 +188,7 @@ bool Shader::readUniformLocations()
 
     std::vector<GLenum> properties(1, GL_LOCATION);
     std::vector<GLint> values(1, -1);
-    for (int index = 0; index < numActiveUniforms; ++index)
-    {
+    for (int index = 0; index < numActiveUniforms; ++index) {
         glGetProgramResourceiv(program, GL_UNIFORM, index, properties.size(), &properties[0], values.size(), NULL, &values[0]);
         GLint uniform = values[0];
         if (uniform  != -1) {
@@ -195,6 +199,15 @@ bool Shader::readUniformLocations()
             uniforms.set(uniform);
         }
     }
+
+    glUseProgram(program);
+    for (int i = 0; i < MAX_NUM_SHADOWMAPS; ++i) {
+        std::stringstream ss;
+        ss << "depthTexs[" << i << "]";
+        GLint location = glGetUniformLocation(program, ss.str().c_str());
+        shadowMapLocations[i] = location;
+    }
+
     return true;
 }
 

@@ -21,6 +21,8 @@ public:
     virtual void bind();
     virtual void setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir) = 0;
     virtual void activate() = 0;
+    virtual GLuint getTexture() = 0;
+    virtual GLenum getType() = 0;
 
     void setSize(int width, int height);
 

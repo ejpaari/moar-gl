@@ -52,6 +52,7 @@ void MyApp::start()
 
     initGUI();
 
+    engine->setDeferredRendering(deferred);
     camera->setBloomIterations(bloomIterations);
     camera->setHDREnabled(HDR);
     camera->setSSAOEnabled(SSAO);

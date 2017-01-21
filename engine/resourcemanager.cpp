@@ -67,7 +67,9 @@ void ResourceManager::setShaderPath(const std::string& path)
     Shader::loadCommonShaderCode(GL_VERTEX_SHADER, path + "/" + COMMON_VERTEX_FILE);
     Shader::loadCommonShaderCode(GL_FRAGMENT_SHADER, path + "/" + COMMON_FRAGMENT_FILE);
     std::stringstream ss;
-    ss << "const int SSAO_KERNEL_SIZE = " << SSAO_KERNEL_SIZE << ";\n";
+    ss << "const int SSAO_KERNEL_SIZE = " << SSAO_KERNEL_SIZE << ";\n"
+       << "const int MAX_NUM_SHADOWMAPS = " << MAX_NUM_SHADOWMAPS  << ";\n"
+       << "const int MAX_NUM_LIGHTS_PER_TYPE = " << MAX_NUM_LIGHTS_PER_TYPE  << ";\n\n";
     Shader::addCommonShaderCode(GL_FRAGMENT_SHADER, ss.str());
 }
 
@@ -337,7 +339,7 @@ bool ResourceManager::loadForwardLightShader(int shaderType)
     }
 
     std::stringstream ss;
-    for (const auto& tm : textureTypeMappings) {
+    for (const auto& tm : TEXTURE_TYPE_MAPPINGS) {
         if (shaderType & tm.shaderType) {
             ss << tm.shaderDefine;
         }
@@ -346,7 +348,7 @@ bool ResourceManager::loadForwardLightShader(int shaderType)
     std::string path = shaderPath + FORWARD_LIGHT_SHADER;
     auto createForwardLightShader = [&] (Light::Type lightType, std::string defines)
     {
-        defines += lightDefineMappings.at(lightType);
+        defines += LIGHT_DEFINE_MAPPINGS.at(lightType);
         std::unique_ptr<Shader> shader;
         if (!createShader(shader, path, defines)) {
             std::cerr << "WARNING: Failed to link forward light shader for light type " << lightType << " with mask: " << std::bitset<8>(shaderType) << "\n";
@@ -374,7 +376,7 @@ bool ResourceManager::loadDeferredLightShader(Light::Type light)
         return true;
     }
 
-    std::string defines = lightDefineMappings.at(Light::Type::POINT);
+    std::string defines = LIGHT_DEFINE_MAPPINGS.at(Light::Type::POINT);
     std::unique_ptr<Shader> shader;
     if (!createShader(shader, shaderPath + DEFERRED_LIGHT_SHADER, defines)) {
         std::cerr << "WARNING: Failed to link deferred light shader with light: " << light << "\n";
@@ -394,7 +396,7 @@ bool ResourceManager::loadGBufferShader(int shaderType)
     }
 
     std::stringstream ss;
-    for (const auto& tm : textureTypeMappings) {
+    for (const auto& tm : TEXTURE_TYPE_MAPPINGS) {
         if (shaderType & tm.shaderType) {
             ss << tm.shaderDefine;
         }
@@ -531,7 +533,7 @@ bool ResourceManager::loadMaterial(aiMaterial* aMaterial, Material* material)
     };
 
     bool valid = true;
-    for (const auto& tm : textureTypeMappings) {
+    for (const auto& tm : TEXTURE_TYPE_MAPPINGS) {
         if (!loadTexture(tm.aiType, tm.materialType, tm.shaderType)) {
             valid = false;
             break;

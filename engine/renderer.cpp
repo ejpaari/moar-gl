@@ -14,6 +14,10 @@ namespace moar
 namespace
 {
 
+constexpr GLintptr colorBaseOffset = 0;
+constexpr GLintptr positionBaseOffset = MAX_NUM_LIGHTS_PER_TYPE * 16;
+constexpr GLintptr forwardBaseOffset = MAX_NUM_LIGHTS_PER_TYPE * 16 * 2;
+
 void enableBlending()
 {
     glEnable(GL_BLEND);
@@ -81,7 +85,7 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     GLuint lightBuffer;
     glGenBuffers(1, &lightBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
-    GLsizeiptr lightBufferSize = 16 + 16 + 16;
+    GLsizeiptr lightBufferSize = (16 + 16 + 16) * MAX_NUM_LIGHTS_PER_TYPE;
     glBufferData(GL_UNIFORM_BUFFER, lightBufferSize, 0, GL_DYNAMIC_DRAW);
     Light::lightBlockBuffer = lightBuffer;
 
@@ -303,7 +307,9 @@ void Renderer::renderShadowmaps()
         for (int lightNum = 0; lightNum < numShadowmaps; ++lightNum) {
             Object* light = closestLights[type][lightNum];
             Light* lightComp = light->getComponent<Light>();
-            lightComp->setUniforms(light->getPosition(), light->getForward());
+            if (type != Light::Type::DIRECTIONAL) {
+                lightComp->setUniforms(light->getPosition(), light->getForward());
+            }
             DepthMap* depthMap = depthMapPointers[type][lightNum];
             depthMap->bind();
             depthMap->setUniforms(light->getPosition(), light->getForward());
@@ -327,9 +333,39 @@ void Renderer::renderShadowmaps()
 void Renderer::forwardLighting(Light::Type lightType)
 {
     multisampleBuffer.bind();
+
+    int numLights = static_cast<int>(closestLights[lightType].size());
+    glBindBuffer(GL_UNIFORM_BUFFER, Light::lightBlockBuffer);
+    GLintptr offset = 0;
+
+    for (int lightNum = 0; lightNum < numLights; ++lightNum) {
+        Object* light = closestLights[lightType][lightNum];
+        Light* lightComp = light->getComponent<Light>();
+
+        glBufferSubData(GL_UNIFORM_BUFFER, colorBaseOffset + offset, 16, glm::value_ptr(lightComp->getColor()));
+        glBufferSubData(GL_UNIFORM_BUFFER, positionBaseOffset + offset, 12, glm::value_ptr(light->getPosition()));
+        glBufferSubData(GL_UNIFORM_BUFFER, forwardBaseOffset  + offset, 12, glm::value_ptr(light->getForward()));
+        offset += 16;
+    }
+    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, Light::lightBlockBuffer);
+
     for (const auto& shaderMeshMap : renderMeshes) {
         shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
         glUseProgram(shader->getProgram());
+
+        std::vector<GLint> enableShadows(numLights, 0);
+        for (int lightNum = 0; lightNum < numLights; ++lightNum) {
+            enableShadows[lightNum] = 1;
+            DepthMap* depthMap = depthMapPointers[lightType][lightNum];
+
+            glActiveTexture(GL_TEXTURE5 + lightNum);
+            glBindTexture(depthMap->getType(), depthMap->getTexture());
+            int location = shader->getShadowMapLocation(lightNum);            
+            glUniform1i(location, 5 + lightNum);
+        }
+        glUniform1iv(ENABLE_SHADOWS_LOCATION, numLights, &enableShadows[0]);
+
+        glUniform1i(NUM_LIGHTS_LOCATION, numLights);
         glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
         if (shader->hasUniform(FAR_CLIP_DISTANCE_LOCATION)) {
             glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
@@ -341,16 +377,7 @@ void Renderer::forwardLighting(Light::Type lightType)
                     continue;
                 }
                 meshObject.parent->setUniforms();
-
-                for (unsigned int lightNum = 0; lightNum < closestLights[lightType].size(); ++lightNum) {
-                    Object* light = closestLights[lightType][lightNum];
-                    Light* lightComp = light->getComponent<Light>();
-                    lightComp->setUniforms(light->getPosition(), light->getForward());
-
-                    activateShadowMap(lightNum, lightType);
-
-                    meshObject.mesh->render();
-                }
+                meshObject.mesh->render();
             }
         }
     }
@@ -371,11 +398,15 @@ void Renderer::setGBufferTextures()
 
 void Renderer::deferredPointLighting()
 {
+    const std::vector<Object*>& closestPointLights = closestLights[Light::Type::POINT];
+    if (closestPointLights.empty()) {
+        return;
+    }
+
     shader = resourceManager->getDeferredLightShader(Light::Type::POINT);
     glUseProgram(shader->getProgram());
     setGBufferTextures();
 
-    const std::vector<Object*>& closestPointLights = closestLights[Light::Type::POINT];
     for (unsigned int lightNum = 0; lightNum < closestPointLights.size(); ++lightNum) {
         Object* light = closestPointLights[lightNum];
         Light* lightComponent = light->getComponent<Light>();
@@ -408,12 +439,16 @@ void Renderer::deferredDirectionalLighting()
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_DEPTH_TEST);
 
+    const std::vector<Object*>& closestDirLights = closestLights[Light::Type::DIRECTIONAL];
+    if (closestDirLights.empty()) {
+        return;
+    }
+
     shader = resourceManager->getDeferredLightShader(Light::Type::DIRECTIONAL);
     glUseProgram(shader->getProgram());
     setGBufferTextures();
     PostFramebuffer::bindQuadVAO();
 
-    const std::vector<Object*>& closestDirLights = closestLights[Light::Type::DIRECTIONAL];
     for (unsigned int lightNum = 0; lightNum < closestDirLights.size(); ++lightNum) {
         activateShadowMap(lightNum, Light::Type::DIRECTIONAL);
         Object* light = closestDirLights[lightNum];
@@ -426,10 +461,10 @@ void Renderer::deferredDirectionalLighting()
 void Renderer::activateShadowMap(int lightNum, Light::Type lightType)
 {
     if (lightNum < MAX_NUM_SHADOWMAPS) {
-        glUniform1i(ENABLE_SHADOWS_LOCATION, 1);
+        glUniform1i(ENABLE_SHADOW_LOCATION, 1);
         depthMapPointers[lightType][lightNum]->activate();
     } else {
-        glUniform1i(ENABLE_SHADOWS_LOCATION, 0);
+        glUniform1i(ENABLE_SHADOW_LOCATION, 0);
     }
 
 }
@@ -603,6 +638,13 @@ void Renderer::updateObjectContainers(const std::vector<std::unique_ptr<Object>>
         }
     }
     G_COMPONENT_CHANGED = false;
+
+    for (int i = 0; i < Light::NUM_TYPES; ++i) {
+        if (lights[i].size() > MAX_NUM_LIGHTS_PER_TYPE) {
+            std::cerr << "ERROR: There are more lights than the constant MAX_NUM_LIGHTS_PER_TYPE: "
+                      << MAX_NUM_LIGHTS_PER_TYPE << "\n";
+        }
+    }
 }
 
 bool Renderer::objectInsideFrustum(const Object::MeshObject& mo) const

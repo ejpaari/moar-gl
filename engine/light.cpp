@@ -43,6 +43,11 @@ Light::Type Light::getLightType() const
     return type;
 }
 
+const glm::vec4&Light::getColor() const
+{
+    return color;
+}
+
 bool Light::isShadowingEnabled() const
 {
     return shadowingEnabled;
@@ -55,14 +60,9 @@ float Light::getRange() const
 
 void Light::setUniforms(const glm::vec3& position, const glm::vec3& forward)
 {
-    glBindBuffer(GL_UNIFORM_BUFFER, lightBlockBuffer);
-    GLintptr offset = 0;
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, 16, glm::value_ptr(color));
-    offset += 16;
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, 12, glm::value_ptr(position));
-    offset += 16;
-    glBufferSubData(GL_UNIFORM_BUFFER, offset, 12, glm::value_ptr(forward));
-    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, lightBlockBuffer);
+    glUniform4f(LIGHT_COLOR_LOCATION, color.r, color.g, color.b, color.a);
+    glUniform3f(LIGHT_POS_LOCATION, position.x, position.y, position.z);
+    glUniform3f(LIGHT_FORWARD_LOCATION, forward.x, forward.y, forward.z);
 }
 
 void Light::calculateRange()

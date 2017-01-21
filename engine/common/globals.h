@@ -34,14 +34,17 @@ extern const GLuint NORMAL_LOCATION;
 extern const GLuint TANGENT_LOCATION;
 
 extern const GLuint AMBIENT_LOCATION;
-extern const GLuint SPECULAR_LOCATION;
 extern const GLuint CAMERA_POS_LOCATION;
+extern const GLuint LIGHT_COLOR_LOCATION;
+extern const GLuint LIGHT_POS_LOCATION;
+extern const GLuint LIGHT_FORWARD_LOCATION;
+extern const GLuint NUM_LIGHTS_LOCATION;
 
 extern const GLuint DIFFUSE_TEX_LOCATION;
 extern const GLuint NORMAL_TEX_LOCATION;
 extern const GLuint BUMP_TEX_LOCATION;
-extern const GLuint DEPTH_TEX_LOCATION;
 extern const GLuint SPEC_TEX_LOCATION;
+extern const GLuint DEPTH_TEX_LOCATION;
 
 extern const GLuint RENDERED_TEX_LOCATION0;
 extern const GLuint RENDERED_TEX_LOCATION1;
@@ -50,18 +53,22 @@ extern const GLuint RENDERED_TEX_LOCATION3;
 
 extern const GLuint TIME_LOCATION;
 extern const GLuint SCREEN_SIZE_LOCATION;
-extern const GLuint ENABLE_SHADOWS_LOCATION;
+extern const GLuint ENABLE_SHADOW_LOCATION;
 extern const GLuint FAR_CLIP_DISTANCE_LOCATION;
 extern const GLuint BLOOM_FILTER_HORIZONTAL;
 extern const GLuint PROJECTION_MATRIX_LOCATION;
-extern const GLuint SSAO_KERNEL_LOCATION;
 
 extern const GLuint LIGHT_SPACE_PROJ_LOCATION;
 extern const GLuint LIGHT_SPACE_VP_LOCATION;
 
-const GLint MAX_LOCATION = 64;
+extern const GLuint ENABLE_SHADOWS_LOCATION;
+
+extern const GLuint SSAO_KERNEL_LOCATION;
+
+const GLint MAX_LOCATION = 256;
 
 const int MAX_NUM_SHADOWMAPS = 2;
+const int MAX_NUM_LIGHTS_PER_TYPE = 16;
 
 const int SSAO_KERNEL_SIZE = 64;
 

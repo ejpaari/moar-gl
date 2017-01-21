@@ -80,7 +80,7 @@ void Material::checkMissingTextures() const
         std::cerr << "WARNING: Texture type " << textureType << " missing from material with id " << id << "\n";
     };
 
-    for (const auto& tm : textureTypeMappings) {
+    for (const auto& tm : TEXTURE_TYPE_MAPPINGS) {
         if (shaderType & tm.shaderType) {
             checkTexture(tm.materialType);
         }

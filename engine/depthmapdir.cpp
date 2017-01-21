@@ -52,4 +52,14 @@ void DepthMapDirectional::activate()
     glUniformMatrix4fv(LIGHT_SPACE_PROJ_LOCATION, 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 }
 
+GLuint DepthMapDirectional::getTexture()
+{
+    return depthTexture;
+}
+
+GLenum DepthMapDirectional::getType()
+{
+    return GL_TEXTURE_2D;
+}
+
 } // moar

@@ -50,7 +50,7 @@ private:
 
     unsigned int FPS = 0;
     unsigned int drawCount = 0;
-    bool deferred = true;
+    bool deferred = false;
     glm::vec3 position;
     glm::vec3 rotation;
 

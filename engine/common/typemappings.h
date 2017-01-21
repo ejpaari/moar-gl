@@ -23,8 +23,8 @@ struct TypeMapping
     std::string shaderDefine;
 };
 
-extern const std::vector<TypeMapping> textureTypeMappings;
-extern const std::map<Light::Type, std::string> lightDefineMappings;
+extern const std::vector<TypeMapping> TEXTURE_TYPE_MAPPINGS;
+extern const std::map<Light::Type, std::string> LIGHT_DEFINE_MAPPINGS;
 
 } // moar
 

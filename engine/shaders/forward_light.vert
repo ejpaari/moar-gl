@@ -13,18 +13,11 @@ layout (std140) uniform TransformationBlock {
   mat4 MVP;
 };
 
-layout (std140) uniform LightBlock {
-  vec4 lightColor;
-  vec3 lightPos;
-  vec3 lightForward;
-};
-
 out vec2 texCoord;
 out vec3 vertexPos_World;
 out vec3 normal_World;
 out vec3 eyeDir_World;
 out vec4 pos_Light;
-out vec3 pointLightDir_World;
 out vec3 T;
 out vec3 B;
 out mat3 TBN;
@@ -42,10 +35,6 @@ void main()
   
 #if defined(DIRECTIONAL)
   pos_Light = lightSpaceProj * M * vec4(position, 1.0);
-#endif
-
-#if defined(POINT)
-  pointLightDir_World = lightPos - vertexPos_World;
 #endif
 
 #if defined(BUMP) || defined(NORMAL)
