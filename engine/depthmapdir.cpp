@@ -62,4 +62,9 @@ GLenum DepthMapDirectional::getType()
     return GL_TEXTURE_2D;
 }
 
+void DepthMapDirectional::setLightingUniforms() const
+{
+    glUniformMatrix4fv(LIGHT_SPACE_PROJ_LOCATION, 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+}
+
 } // moar

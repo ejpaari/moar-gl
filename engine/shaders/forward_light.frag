@@ -85,8 +85,9 @@ void main()
 #endif
 
     float shadow = 1.0;
-    if (enableShadows[i] > 0) {
-      // Shadow functions had to be inlined since passing an array element depthTexs[i]
+    // Shadow functions had to be inlined since passing an array element depthTexs[i]
+    if (enableShadows[i] > 0) {      
+      // shadow = calcPointShadow(depthTex, vertexPos_World, lightPos, farPlane);
       shadow = 0.0;
 #if defined(POINT)
       vec3 vertexToLight = vertexPos_World - bLightPos[i];
@@ -102,16 +103,14 @@ void main()
         }
       }
 #else
+      // shadow = calcDirShadow(depthTex, pos_Light);    
       vec3 projCoords = pos_Light.xyz / pos_Light.w;
       if (projCoords.z > 1.0) {
         shadow = 1.0;
       } else {
         projCoords = projCoords * 0.5 + 0.5;
-        float closestDepth = texture(depthTexs[i], projCoords.xy).r;
         float currentDepth = projCoords.z;
         float bias = 0.005;//max(0.05 * (1.0 - dot(normal_World, lightForward)), 0.005);
-
-        float shadow = 0.0;
         vec2 texelSize = 1.0 / textureSize(depthTexs[i], 0);
         for(int x = -1; x <= 1; ++x) {
           for(int y = -1; y <= 1; ++y) {
@@ -120,6 +119,7 @@ void main()
           }
         }
       }
+      //    outColor.rgb = vec3(shadow);
 #endif
     }
 

@@ -50,7 +50,7 @@ public:
     GLuint getTexture(const std::string& textureName);
     GLuint getCubeTexture(std::vector<std::string> textureNames);
     Material* getMaterial(int id);
-    const std::string& getLevelPath() const;
+    std::string getLevelPath() const;
 
     void checkMissingTextures() const;
 
@@ -74,12 +74,12 @@ private:
     std::string shaderPath;
     std::string modelPath;
     std::string texturePath;
-    std::string levelPath;    
+    std::string levelPath;
     std::vector<std::unique_ptr<Shader>> shaders;
     std::unordered_map<ForwardLightKey, Shader*, ForwardLightHash> forwardLightShadersByType;
     std::unordered_map<int, Shader*> deferredLightShadersByType;
     std::unordered_map<int, Shader*> depthMapShadersByType;
-    std::unordered_map<int, Shader*> gBufferShadersByType;    
+    std::unordered_map<int, Shader*> gBufferShadersByType;
     std::unordered_map<std::string, Shader*> shadersByName;
     std::unordered_map<std::string, std::unique_ptr<Model>> models;
     std::unordered_map<std::string, std::unique_ptr<Texture>> textures;

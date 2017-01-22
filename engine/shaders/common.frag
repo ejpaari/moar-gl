@@ -60,10 +60,8 @@ float calcDirShadow(sampler2D depthTex, vec4 pos_Light)
     return 1.0;
   }
   projCoords = projCoords * 0.5 + 0.5;
-  float closestDepth = texture(depthTex, projCoords.xy).r;
   float currentDepth = projCoords.z;
   float bias = 0.005;//max(0.05 * (1.0 - dot(normal_World, lightForward)), 0.005);
-
   float shadow = 0.0;
   vec2 texelSize = 1.0 / textureSize(depthTex, 0);
   for(int x = -1; x <= 1; ++x) {

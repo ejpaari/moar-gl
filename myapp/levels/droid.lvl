@@ -45,6 +45,18 @@ name light4
 component model
 sphere.3ds
 component light
-1.0 1.0 0.0 9.5
+1.0 1.0 0.0 0.5
 directional
+1
+
+name light2
+3.0 3.0 -3.0
+-0.7 0.0 0.0
+0.1 0.1 0.1
+0
+component model
+sphere.3ds
+component light
+0.0 1.0 1.0 9.5
+point
 1

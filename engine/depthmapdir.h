@@ -26,6 +26,7 @@ public:
     virtual void activate();
     virtual GLuint getTexture();
     virtual GLenum getType();
+    virtual void setLightingUniforms() const;
 
 private:
     GLuint depthTexture;
