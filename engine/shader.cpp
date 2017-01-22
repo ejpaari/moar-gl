@@ -192,7 +192,7 @@ bool Shader::readUniformLocations()
         glGetProgramResourceiv(program, GL_UNIFORM, index, properties.size(), &properties[0], values.size(), NULL, &values[0]);
         GLint uniform = values[0];
         if (uniform  != -1) {
-            if (uniform  < 0 || uniform >= MAX_LOCATION) {
+            if (uniform  < 0 || uniform >= MAX_UNIFORM_LOCATION) {
                 std::cerr << "ERROR: Uniforma locations do not match\n";
                 return false;
             }

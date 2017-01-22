@@ -56,7 +56,7 @@ private:
 
     GLuint program;    
     std::vector<GLuint> shaders;
-    std::bitset<MAX_LOCATION> uniforms;
+    std::bitset<MAX_UNIFORM_LOCATION> uniforms;
     std::array<GLuint, MAX_NUM_SHADOWMAPS> shadowMapLocations;
 };
 

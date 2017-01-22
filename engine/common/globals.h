@@ -62,15 +62,14 @@ extern const GLuint LIGHT_SPACE_PROJ_LOCATION;
 extern const GLuint LIGHT_SPACE_VP_LOCATION;
 
 extern const GLuint ENABLE_SHADOWS_LOCATION;
+const int MAX_NUM_SHADOWMAPS = 2; // Ensure there are enough uniform locations
 
 extern const GLuint SSAO_KERNEL_LOCATION;
+const int SSAO_KERNEL_SIZE = 64; // Ensure there are enough uniform locations
 
-const GLint MAX_LOCATION = 256;
+const GLint MAX_UNIFORM_LOCATION = 256;
 
-const int MAX_NUM_SHADOWMAPS = 2;
 const int MAX_NUM_LIGHTS_PER_TYPE = 16;
-
-const int SSAO_KERNEL_SIZE = 64;
 
 extern unsigned int G_DRAW_COUNT;
 extern bool G_COMPONENT_CHANGED;

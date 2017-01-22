@@ -46,6 +46,11 @@ void main()
   normNormal_World = getWorldSpaceNormal(normalTex, sampleCoord, TBN);
 #endif
 
+  vec4 texColor = texture(diffuseTex, sampleCoord);
+  if (isTransparent(texColor.a)) {
+    discard;
+  }
+
   for (int i = 0; i < numLights; ++i) {
 #if defined(POINT)
     vec3 lightDir_World = normalize(bLightPos[i] - vertexPos_World);
@@ -55,6 +60,9 @@ void main()
 
 #if defined(DIFFUSE)
     float diff = getDiffuse(normNormal_World, lightDir_World);
+#else
+    texColor = vec4(1.0);
+    float diff = 1.0;
 #endif
 
 #if defined(POINT)
@@ -63,16 +71,6 @@ void main()
     float lightPower = bLightColor[i].w / lightDistSqr;
 #else
     float lightPower = bLightColor[i].w;
-#endif
-
-#if defined(DIFFUSE)
-    vec4 texColor = texture(diffuseTex, sampleCoord);
-    if (isTransparent(texColor.a)) {
-      discard;
-    }
-#else
-    vec4 texColor = vec4(1.0);
-    float diff = 1.0;
 #endif
 
     vec3 specularComponent = vec3(0.0);
@@ -104,8 +102,6 @@ void main()
         }
       }
 #else
-      // shadow = calcDirShadow(depthTexs[i], pos_Light);
-
       vec3 projCoords = pos_Light.xyz / pos_Light.w;
       if (projCoords.z > 1.0) {
         shadow = 1.0;

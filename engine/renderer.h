@@ -56,7 +56,9 @@ private:
     void forwardLighting(Light::Type lightType);
     void setGBufferTextures();
     void deferredPointLighting();
-    void deferredDirectionalLighting();    
+    void deferredDirectionalLighting();
+    void setLightBlockData(Light::Type lightType, int numLights);
+    void activateAllShadowMaps(Light::Type lightType, int numLights);
     void activateShadowMap(int lightNum, Light::Type lightType);
     void stencilPass();
     void renderSkybox(Object* skybox = nullptr);

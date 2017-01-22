@@ -40,6 +40,8 @@ const GLuint NORMAL_TEX_LOCATION = 21;
 const GLuint BUMP_TEX_LOCATION = 22;
 const GLuint SPEC_TEX_LOCATION = 23;
 const GLuint DEPTH_TEX_LOCATION = 24;
+// Reserve locations for multiple depth maps
+
 const GLuint RENDERED_TEX_LOCATION0 = 30;
 const GLuint RENDERED_TEX_LOCATION1 = 31;
 const GLuint RENDERED_TEX_LOCATION2 = 32;
@@ -57,8 +59,10 @@ const GLuint LIGHT_SPACE_PROJ_LOCATION = 50;
 const GLuint LIGHT_SPACE_VP_LOCATION = 51;
 
 const GLuint ENABLE_SHADOWS_LOCATION = 70;
+// Reserve locations for multiple depth maps
 
 const GLuint SSAO_KERNEL_LOCATION = 80;
+// Reserve locations for kernels
 
 unsigned int G_DRAW_COUNT = 0;
 bool G_COMPONENT_CHANGED = false;

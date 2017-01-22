@@ -2,6 +2,7 @@ layout(location = 0) out vec3 outColor;
 
 layout (location = 30) uniform sampler2D positionTex;
 layout (location = 45) uniform mat4 projection;
+// SSAO_KERNEL_SIZE is defined as constant in cpp
 layout (location = 80) uniform vec3 kernel[SSAO_KERNEL_SIZE];
 
 in vec2 texCoord;

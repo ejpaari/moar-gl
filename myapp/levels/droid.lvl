@@ -46,5 +46,5 @@ component model
 sphere.3ds
 component light
 1.0 1.0 0.0 9.5
-point
+directional
 1

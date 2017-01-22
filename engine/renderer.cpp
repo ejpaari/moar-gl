@@ -14,9 +14,10 @@ namespace moar
 namespace
 {
 
-constexpr GLintptr colorBaseOffset = 0;
-constexpr GLintptr positionBaseOffset = MAX_NUM_LIGHTS_PER_TYPE * 16;
-constexpr GLintptr forwardBaseOffset = MAX_NUM_LIGHTS_PER_TYPE * 16 * 2;
+const GLint COLOR_ELEMENT_SIZE = 16;
+constexpr GLintptr COLOR_OFFSET = 0;
+constexpr GLintptr POS_OFFSET = MAX_NUM_LIGHTS_PER_TYPE * COLOR_ELEMENT_SIZE;
+constexpr GLintptr FORWARD_OFFSET = MAX_NUM_LIGHTS_PER_TYPE * COLOR_ELEMENT_SIZE * 2;
 
 void enableBlending()
 {
@@ -85,7 +86,7 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     GLuint lightBuffer;
     glGenBuffers(1, &lightBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
-    GLsizeiptr lightBufferSize = (16 + 16 + 16) * MAX_NUM_LIGHTS_PER_TYPE;
+    GLsizeiptr lightBufferSize = (COLOR_ELEMENT_SIZE * 3) * MAX_NUM_LIGHTS_PER_TYPE;
     glBufferData(GL_UNIFORM_BUFFER, lightBufferSize, 0, GL_DYNAMIC_DRAW);
     Light::lightBlockBuffer = lightBuffer;
 
@@ -333,37 +334,15 @@ void Renderer::renderShadowmaps()
 void Renderer::forwardLighting(Light::Type lightType)
 {
     multisampleBuffer.bind();
-
     int numLights = static_cast<int>(closestLights[lightType].size());
-    glBindBuffer(GL_UNIFORM_BUFFER, Light::lightBlockBuffer);
-    GLintptr offset = 0;
 
-    for (int lightNum = 0; lightNum < numLights; ++lightNum) {
-        Object* light = closestLights[lightType][lightNum];
-        Light* lightComp = light->getComponent<Light>();
-
-        glBufferSubData(GL_UNIFORM_BUFFER, colorBaseOffset + offset, 16, glm::value_ptr(lightComp->getColor()));
-        glBufferSubData(GL_UNIFORM_BUFFER, positionBaseOffset + offset, 12, glm::value_ptr(light->getPosition()));
-        glBufferSubData(GL_UNIFORM_BUFFER, forwardBaseOffset  + offset, 12, glm::value_ptr(light->getForward()));
-        offset += 16;
-    }
-    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, Light::lightBlockBuffer);
+    setLightBlockData(lightType, numLights);
 
     for (const auto& shaderMeshMap : renderMeshes) {
         shader = resourceManager->getForwardLightShader(shaderMeshMap.first, lightType);
         glUseProgram(shader->getProgram());
 
-        std::vector<GLint> enableShadows(numLights, 0);
-        for (int lightNum = 0; lightNum < numLights; ++lightNum) {
-            enableShadows[lightNum] = 1;
-            DepthMap* depthMap = depthMapPointers[lightType][lightNum];
-
-            glActiveTexture(GL_TEXTURE5 + lightNum);
-            glBindTexture(depthMap->getType(), depthMap->getTexture());
-            int location = shader->getShadowMapLocation(lightNum);            
-            glUniform1i(location, 5 + lightNum);
-        }
-        glUniform1iv(ENABLE_SHADOWS_LOCATION, numLights, &enableShadows[0]);
+        activateAllShadowMaps(lightType, numLights);
 
         glUniform1i(NUM_LIGHTS_LOCATION, numLights);
         glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
@@ -456,6 +435,38 @@ void Renderer::deferredDirectionalLighting()
         lightComponent->setUniforms(light->getPosition(), light->getForward());
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
+}
+
+void Renderer::setLightBlockData(Light::Type lightType, int numLights)
+{
+    GLintptr offset = 0;
+    glBindBuffer(GL_UNIFORM_BUFFER, Light::lightBlockBuffer);
+
+    for (int lightNum = 0; lightNum < numLights; ++lightNum) {
+        Object* light = closestLights[lightType][lightNum];
+        Light* lightComp = light->getComponent<Light>();
+
+        glBufferSubData(GL_UNIFORM_BUFFER, COLOR_OFFSET + offset, 16, glm::value_ptr(lightComp->getColor()));
+        glBufferSubData(GL_UNIFORM_BUFFER, POS_OFFSET + offset, 12, glm::value_ptr(light->getPosition()));
+        glBufferSubData(GL_UNIFORM_BUFFER, FORWARD_OFFSET  + offset, 12, glm::value_ptr(light->getForward()));
+        offset += COLOR_ELEMENT_SIZE;
+    }
+    glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, Light::lightBlockBuffer);
+}
+
+void Renderer::activateAllShadowMaps(Light::Type lightType, int numLights)
+{
+    std::vector<GLint> enableShadows(numLights, 0);
+    for (int lightNum = 0; lightNum < numLights; ++lightNum) {
+        enableShadows[lightNum] = 1;
+        DepthMap* depthMap = depthMapPointers[lightType][lightNum];
+
+        glActiveTexture(GL_TEXTURE5 + lightNum);
+        glBindTexture(depthMap->getType(), depthMap->getTexture());
+        int location = shader->getShadowMapLocation(lightNum);
+        glUniform1i(location, 5 + lightNum);
+    }
+    glUniform1iv(ENABLE_SHADOWS_LOCATION, numLights, &enableShadows[0]);
 }
 
 void Renderer::activateShadowMap(int lightNum, Light::Type lightType)
