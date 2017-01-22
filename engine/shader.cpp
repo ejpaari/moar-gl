@@ -101,6 +101,11 @@ bool Shader::linkProgram()
         glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
     }
 
+    GLuint lightProjectionBlockIndex = glGetUniformBlockIndex(program, LIGHT_PROJECTION_BLOCK_NAME);
+    if (lightProjectionBlockIndex != GL_INVALID_INDEX) {
+        glUniformBlockBinding(program, lightProjectionBlockIndex, LIGHT_PROJECTION_BINDING_POINT);
+    }
+
     GLuint transformationBlockIndex = glGetUniformBlockIndex(program, TRANSFORMATION_BLOCK_NAME);
     if (transformationBlockIndex != GL_INVALID_INDEX) {
         glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);

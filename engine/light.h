@@ -37,6 +37,7 @@ public:
 
 private:
     static GLuint lightBlockBuffer;
+    static GLuint lightProjectionBlockBuffer;
 
     void setUniforms(const glm::vec3& position, const glm::vec3& forward);
     void calculateRange();

@@ -19,9 +19,11 @@ const std::string GBUFFER_SHADER = "gbuffer";
 
 const int TRANSFORMATION_BINDING_POINT = 1;
 const int LIGHT_BINDING_POINT = 2;
+const int LIGHT_PROJECTION_BINDING_POINT = 3;
 
 const GLchar* TRANSFORMATION_BLOCK_NAME = "TransformationBlock";
 const GLchar* LIGHT_BLOCK_NAME = "LightBlock";
+const GLchar* LIGHT_PROJECTION_BLOCK_NAME = "LightProjectionBlock";
 
 const GLuint VERTEX_LOCATION = 1;
 const GLuint TEX_LOCATION = 2;

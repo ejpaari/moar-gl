@@ -25,7 +25,7 @@ in vec2 texCoord;
 in vec3 vertexPos_World;
 in vec3 normal_World;
 in vec3 eyeDir_World;
-in vec4 pos_Light;
+in vec4 pos_Light[MAX_NUM_LIGHTS_PER_TYPE];
 in vec3 T;
 in vec3 B;
 in mat3 TBN;
@@ -51,6 +51,7 @@ void main()
     discard;
   }
 
+  // Start light loop
   for (int i = 0; i < numLights; ++i) {
 #if defined(POINT)
     vec3 lightDir_World = normalize(bLightPos[i] - vertexPos_World);
@@ -104,7 +105,7 @@ void main()
       }
 #else
       // shadow = calcDirShadow(depthTex, pos_Light);    
-      vec3 projCoords = pos_Light.xyz / pos_Light.w;
+      vec3 projCoords = pos_Light[i].xyz / pos_Light[i].w;
       if (projCoords.z > 1.0) {
         shadow = 1.0;
       } else {
@@ -119,7 +120,6 @@ void main()
           }
         }
       }
-      //    outColor.rgb = vec3(shadow);
 #endif
     }
 

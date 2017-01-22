@@ -31,8 +31,20 @@ name sponza
 component model
 sponza.obj
 
+name light0
+-4.0 1.0 0.0
+0.0 0.0 0.0
+0.02 0.02 0.02
+1
+component model
+sphere.3ds
+component light
+1.0 0.1 0.1 2.2
+point
+1
+
 name light1
--1.0 1.0 0.0
+-3.0 1.0 0.0
 0.0 0.0 0.0
 0.02 0.02 0.02
 1
@@ -56,7 +68,7 @@ point
 1
 
 name light3
--3.0 1.0 0.0
+-1.0 1.0 0.0
 0.0 0.0 0.0
 0.02 0.02 0.02
 1
@@ -88,5 +100,29 @@ component model
 sphere.3ds
 component light
 0.6 1.0 0.6 2.2
+point
+1
+
+name light6
+3.0 1.0 0.0
+0.0 0.0 0.0
+0.02 0.02 0.02
+1
+component model
+sphere.3ds
+component light
+0.6 0.0 0.6 2.2
+point
+1
+
+name light7
+4.0 1.0 0.0
+0.0 0.0 0.0
+0.02 0.02 0.02
+1
+component model
+sphere.3ds
+component light
+0.6 1.0 1.0 2.2
 point
 1

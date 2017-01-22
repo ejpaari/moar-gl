@@ -27,6 +27,7 @@ void ResourceManager::setShaderPath(const std::string& path)
     ss << "const int SSAO_KERNEL_SIZE = " << SSAO_KERNEL_SIZE << ";\n"
        << "const int MAX_NUM_SHADOWMAPS = " << MAX_NUM_SHADOWMAPS  << ";\n"
        << "const int MAX_NUM_LIGHTS_PER_TYPE = " << MAX_NUM_LIGHTS_PER_TYPE  << ";\n\n";
+    Shader::addCommonShaderCode(GL_VERTEX_SHADER, ss.str());
     Shader::addCommonShaderCode(GL_FRAGMENT_SHADER, ss.str());
 }
 

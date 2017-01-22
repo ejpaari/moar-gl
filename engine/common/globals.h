@@ -24,9 +24,11 @@ extern const std::string GBUFFER_SHADER;
 
 extern const int TRANSFORMATION_BINDING_POINT;
 extern const int LIGHT_BINDING_POINT;
+extern const int LIGHT_PROJECTION_BINDING_POINT;
 
 extern const GLchar* TRANSFORMATION_BLOCK_NAME;
 extern const GLchar* LIGHT_BLOCK_NAME;
+extern const GLchar* LIGHT_PROJECTION_BLOCK_NAME;
 
 extern const GLuint VERTEX_LOCATION;
 extern const GLuint TEX_LOCATION;

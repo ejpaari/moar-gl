@@ -19,10 +19,6 @@ void DepthMap::bind()
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 }
 
-void DepthMap::setLightingUniforms() const
-{
-}
-
 void DepthMap::setSize(int width, int height)
 {
     this->width = width;

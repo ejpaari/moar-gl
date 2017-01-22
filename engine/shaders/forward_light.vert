@@ -4,6 +4,7 @@ layout (location = 3) in vec3 normal;
 layout (location = 4) in vec3 tangent;
 
 layout (location = 12) uniform vec3 cameraPos_World;
+layout (location = 16) uniform int numLights;
 layout (location = 50) uniform mat4 lightSpaceProj;
 
 layout (std140) uniform TransformationBlock {
@@ -13,11 +14,15 @@ layout (std140) uniform TransformationBlock {
   mat4 MVP;
 };
 
+layout (std140) uniform LightProjectionBlock {
+  mat4 LP[MAX_NUM_LIGHTS_PER_TYPE];
+};
+
 out vec2 texCoord;
 out vec3 vertexPos_World;
 out vec3 normal_World;
 out vec3 eyeDir_World;
-out vec4 pos_Light;
+out vec4 pos_Light[MAX_NUM_LIGHTS_PER_TYPE];
 out vec3 T;
 out vec3 B;
 out mat3 TBN;
@@ -34,7 +39,9 @@ void main()
 #endif
   
 #if defined(DIRECTIONAL)
-  pos_Light = lightSpaceProj * M * vec4(position, 1.0);
+  for (int i = 0; i < numLights; ++i) {
+    pos_Light[i] = LP[i] * M * vec4(position, 1.0);
+  }
 #endif
 
 #if defined(BUMP) || defined(NORMAL)

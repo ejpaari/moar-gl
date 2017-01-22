@@ -23,7 +23,6 @@ public:
     virtual void activate() = 0;
     virtual GLuint getTexture() = 0;
     virtual GLenum getType() = 0;
-    virtual void setLightingUniforms() const;
 
     void setSize(int width, int height);
 

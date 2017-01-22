@@ -15,6 +15,7 @@ namespace
 {
 
 const GLint COLOR_ELEMENT_SIZE = 16;
+const GLint PROJECTION_ELEMENT_SIZE = 64;
 constexpr GLintptr COLOR_OFFSET = 0;
 constexpr GLintptr POS_OFFSET = MAX_NUM_LIGHTS_PER_TYPE * COLOR_ELEMENT_SIZE;
 constexpr GLintptr FORWARD_OFFSET = MAX_NUM_LIGHTS_PER_TYPE * COLOR_ELEMENT_SIZE * 2;
@@ -49,9 +50,10 @@ Renderer::Renderer()
 }
 
 Renderer::~Renderer()
-{
-    glDeleteBuffers(1, &Object::transformationBlockBuffer);
+{    
     glDeleteBuffers(1, &Light::lightBlockBuffer);
+    glDeleteBuffers(1, &Light::lightProjectionBlockBuffer);
+    glDeleteBuffers(1, &Object::transformationBlockBuffer);
     PostFramebuffer::uninitQuad();
 }
 
@@ -89,6 +91,13 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     GLsizeiptr lightBufferSize = (COLOR_ELEMENT_SIZE * 3) * MAX_NUM_LIGHTS_PER_TYPE;
     glBufferData(GL_UNIFORM_BUFFER, lightBufferSize, 0, GL_DYNAMIC_DRAW);
     Light::lightBlockBuffer = lightBuffer;
+
+    GLuint lightProjectionBuffer;
+    glGenBuffers(1, &lightProjectionBuffer);
+    glBindBuffer(GL_UNIFORM_BUFFER, lightProjectionBuffer);
+    GLsizeiptr lightProjectionBufferSize = PROJECTION_ELEMENT_SIZE * MAX_NUM_LIGHTS_PER_TYPE;
+    glBufferData(GL_UNIFORM_BUFFER, lightProjectionBufferSize, 0, GL_DYNAMIC_DRAW);
+    Light::lightProjectionBlockBuffer = lightProjectionBuffer;
 
     GLuint transformationBuffer;
     glGenBuffers(1, &transformationBuffer);
@@ -377,6 +386,17 @@ void Renderer::setLightBlockData(Light::Type lightType, int numLights)
         offset += COLOR_ELEMENT_SIZE;
     }
     glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_BINDING_POINT, Light::lightBlockBuffer);
+
+    if (lightType == Light::DIRECTIONAL) {
+        GLintptr offset = 0;
+        glBindBuffer(GL_UNIFORM_BUFFER, Light::lightProjectionBlockBuffer);
+        for (int lightNum = 0; lightNum < numLights; ++lightNum) {
+            const glm::mat4& projMat = dirDepthMaps[lightNum].getLightSpaceMatrix();
+            glBufferSubData(GL_UNIFORM_BUFFER, offset, PROJECTION_ELEMENT_SIZE, glm::value_ptr(projMat));
+            offset += PROJECTION_ELEMENT_SIZE;
+        }
+        glBindBufferBase(GL_UNIFORM_BUFFER, LIGHT_PROJECTION_BINDING_POINT, Light::lightProjectionBlockBuffer);
+    }
 }
 
 void Renderer::activateAllShadowMaps(Light::Type lightType, int numLights)
