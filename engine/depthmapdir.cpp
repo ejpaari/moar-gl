@@ -37,14 +37,18 @@ bool DepthMapDirectional::init()
     return status;
 }
 
-void DepthMapDirectional::setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir)
+void DepthMapDirectional::updateUniformValues(const glm::vec3& lightPos, const glm::vec3& lightDir)
 {
     glm::mat4 viewMatrix = glm::lookAt(lightPos, lightPos + lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
     lightSpaceMatrix = projectionMatrix * viewMatrix;
+}
+
+void DepthMapDirectional::setUniforms() const
+{    
     glUniformMatrix4fv(LIGHT_SPACE_PROJ_LOCATION, 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 }
 
-void DepthMapDirectional::activate()
+void DepthMapDirectional::activate() const
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, depthTexture);
@@ -52,12 +56,12 @@ void DepthMapDirectional::activate()
     glUniformMatrix4fv(LIGHT_SPACE_PROJ_LOCATION, 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 }
 
-GLuint DepthMapDirectional::getTexture()
+GLuint DepthMapDirectional::getTexture() const
 {
     return depthTexture;
 }
 
-GLenum DepthMapDirectional::getType()
+GLenum DepthMapDirectional::getType() const
 {
     return GL_TEXTURE_2D;
 }

@@ -96,20 +96,16 @@ bool Shader::linkProgram()
         glDeleteProgram(program);
     }
 
-    GLuint lightBlockIndex = glGetUniformBlockIndex(program, LIGHT_BLOCK_NAME);
-    if (lightBlockIndex != GL_INVALID_INDEX) {
-        glUniformBlockBinding(program, lightBlockIndex, LIGHT_BINDING_POINT);
-    }
+    auto setUniformBlock = [&](const std::string& name, int bindingPoint) {
+        GLuint blockIndex = glGetUniformBlockIndex(program, name.c_str());
+        if (blockIndex != GL_INVALID_INDEX) {
+            glUniformBlockBinding(program, blockIndex, bindingPoint);
+        }
+    };
 
-    GLuint lightProjectionBlockIndex = glGetUniformBlockIndex(program, LIGHT_PROJECTION_BLOCK_NAME);
-    if (lightProjectionBlockIndex != GL_INVALID_INDEX) {
-        glUniformBlockBinding(program, lightProjectionBlockIndex, LIGHT_PROJECTION_BINDING_POINT);
-    }
-
-    GLuint transformationBlockIndex = glGetUniformBlockIndex(program, TRANSFORMATION_BLOCK_NAME);
-    if (transformationBlockIndex != GL_INVALID_INDEX) {
-        glUniformBlockBinding(program, transformationBlockIndex, TRANSFORMATION_BINDING_POINT);
-    }
+    setUniformBlock(LIGHT_BLOCK_NAME, LIGHT_BINDING_POINT);
+    setUniformBlock(LIGHT_PROJECTION_BLOCK_NAME, LIGHT_PROJECTION_BINDING_POINT);
+    setUniformBlock(TRANSFORMATION_BLOCK_NAME, TRANSFORMATION_BINDING_POINT);
 
     if (!readUniformLocations()) {
         return false;

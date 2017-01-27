@@ -38,7 +38,7 @@ bool DepthMapPoint::init()
     return status;
 }
 
-void DepthMapPoint::setUniforms(const glm::vec3& lightPos, const glm::vec3& /*lightDir*/)
+void DepthMapPoint::updateUniformValues(const glm::vec3& lightPos, const glm::vec3& /*lightDir*/)
 {
     lightSpaces[0] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     lightSpaces[1] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
@@ -46,23 +46,27 @@ void DepthMapPoint::setUniforms(const glm::vec3& lightPos, const glm::vec3& /*li
     lightSpaces[3] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
     lightSpaces[4] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     lightSpaces[5] = projectionMatrix * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+}
+
+void DepthMapPoint::setUniforms() const
+{
     glUniformMatrix4fv(LIGHT_SPACE_VP_LOCATION, 6, GL_FALSE, glm::value_ptr(lightSpaces[0]));
     glUniform1f(FAR_CLIP_DISTANCE_LOCATION, farClipDistance);
 }
 
-void DepthMapPoint::activate()
+void DepthMapPoint::activate() const
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeTexture);
     glUniform1i(DEPTH_TEX_LOCATION, 0);
 }
 
-GLuint DepthMapPoint::getTexture()
+GLuint DepthMapPoint::getTexture() const
 {
     return depthCubeTexture;
 }
 
-GLenum DepthMapPoint::getType()
+GLenum DepthMapPoint::getType() const
 {
     return GL_TEXTURE_CUBE_MAP;
 }

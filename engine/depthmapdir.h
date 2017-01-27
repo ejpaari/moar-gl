@@ -22,10 +22,11 @@ public:
     DepthMapDirectional& operator=(DepthMapDirectional&&) = delete;
 
     virtual bool init();
-    virtual void setUniforms(const glm::vec3& lightPos, const glm::vec3& lightDir);
-    virtual void activate();
-    virtual GLuint getTexture();
-    virtual GLenum getType();
+    virtual void updateUniformValues(const glm::vec3& lightPos, const glm::vec3& lightDir);
+    virtual void setUniforms() const;
+    virtual void activate() const;
+    virtual GLuint getTexture() const;
+    virtual GLenum getType() const;
     const glm::mat4& getLightSpaceMatrix() const;
 
 private:

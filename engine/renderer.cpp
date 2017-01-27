@@ -322,7 +322,8 @@ void Renderer::renderShadowmaps()
             }
             DepthMap* depthMap = depthMapPointers[type][lightNum];
             depthMap->bind();
-            depthMap->setUniforms(light->getPosition(), light->getForward());
+            depthMap->updateUniformValues(light->getPosition(), light->getForward());
+            depthMap->setUniforms();
             glClear(GL_DEPTH_BUFFER_BIT);
             if (lightComp->isShadowingEnabled()) {
                 for (const auto& shaderMeshMap : renderMeshes) {
@@ -402,7 +403,7 @@ void Renderer::setLightBlockData(Light::Type lightType, int numLights)
 void Renderer::activateAllShadowMaps(Light::Type lightType, int numLights)
 {
     numLights = std::min(numLights, MAX_NUM_SHADOWMAPS);
-    std::vector<GLint> enableShadows(numLights, 0);
+    std::vector<GLint> enableShadows(MAX_NUM_LIGHTS_PER_TYPE, 0);
     for (int lightNum = 0; lightNum < numLights; ++lightNum) {
         enableShadows[lightNum] = 1;
         DepthMap* depthMap = depthMapPointers[lightType][lightNum];

@@ -51,6 +51,9 @@ void main()
     discard;
   }
 
+  vec3 normEyeDir_World = normalize(eyeDir_World);
+  float specularPower = texture(specularTex, sampleCoord).r;
+
   // Start light loop
   for (int i = 0; i < numLights; ++i) {
 #if defined(POINT)
@@ -75,9 +78,8 @@ void main()
 #endif
 
     vec3 specularComponent = vec3(0.0);
-#if defined(SPECULAR)
-    float power = texture(specularTex, sampleCoord).r;
-    float specular = getSpecular(normalize(eyeDir_World), lightDir_World, normNormal_World, power);
+#if defined(SPECULAR)    
+    float specular = getSpecular(normEyeDir_World, lightDir_World, normNormal_World, specularPower);
 #if defined(POINT)
     specularComponent = vec3(specular * lightPower / lightDistSqr);
 #else
@@ -93,8 +95,7 @@ void main()
 #if defined(POINT)
       vec3 vertexToLight = vertexPos_World - bLightPos[i];
       float currentDepth = length(vertexToLight);
-      float bias = 0.02;
-      
+      float bias = 0.02;      
       vec2 texelSize = 2.0 * length(vertexToLight) / textureSize(depthTexs[i], 0);
       for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {
