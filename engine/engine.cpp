@@ -196,8 +196,7 @@ bool Engine::init(const std::string& settingsFile)
         return false;
     }
 
-    auto key = [] (GLFWwindow* w, int key, int scancode, int action, int mods)
-    {
+    auto key = [] (GLFWwindow* w, int key, int scancode, int action, int mods) {
         static_cast<Input*>(glfwGetWindowUserPointer(w))->handleKey(w, key, scancode, action, mods);
     };
 

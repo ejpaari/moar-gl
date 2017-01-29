@@ -134,7 +134,7 @@ bool Renderer::setDeferredRenderPath(bool enabled)
                 postBuffers[0].framebuffer.init(1, true) &&
                 postBuffers[1].framebuffer.init(1, false) &&
                 postBuffers[2].framebuffer.init(1, false);
-        renderFunction = [&](const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
+        renderFunction = [&] (const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
             this->renderDeferred(objects, skybox);
         };
     } else {
@@ -143,7 +143,7 @@ bool Renderer::setDeferredRenderPath(bool enabled)
                 postBuffers[0].framebuffer.init(1, false) &&
                 postBuffers[1].framebuffer.init(1, false) &&
                 postBuffers[2].framebuffer.init(1, false);
-        renderFunction = [&](const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
+        renderFunction = [&] (const std::vector<std::unique_ptr<Object>>& objects, Object* skybox) {
             this->renderForward(objects, skybox);
         };
     }
@@ -559,7 +559,7 @@ GLuint Renderer::renderBloom(GLuint renderedTex)
         PostFramebuffer* buffer2 = getFreePostFramebuffer();
         PostFramebuffer* buffer = buffer1;
 
-        auto switchBuffer = [&]() {
+        auto switchBuffer = [&] () {
             buffer = buffer == buffer1 ? buffer2 : buffer1;
         };
 

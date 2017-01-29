@@ -96,7 +96,7 @@ bool Shader::linkProgram()
         glDeleteProgram(program);
     }
 
-    auto setUniformBlock = [&](const std::string& name, int bindingPoint) {
+    auto setUniformBlock = [&] (const std::string& name, int bindingPoint) {
         GLuint blockIndex = glGetUniformBlockIndex(program, name.c_str());
         if (blockIndex != GL_INVALID_INDEX) {
             glUniformBlockBinding(program, blockIndex, bindingPoint);

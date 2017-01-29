@@ -39,7 +39,7 @@ cube.obj
 
 name light4
 1.0 3.0 1.0
--0.7 0.0 0.0
+-0.7 0.5 0.0
 0.1 0.1 0.1
 0
 component model
@@ -51,7 +51,7 @@ directional
 
 name light2
 3.0 3.0 -3.0
--0.7 0.0 0.0
+-0.9 0.0 0.0
 0.1 0.1 0.1
 0
 component model
