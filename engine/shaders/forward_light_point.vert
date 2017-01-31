@@ -37,12 +37,6 @@ void main()
 #if defined(BUMP) || defined(SPECULAR)
   eyeDir_World = cameraPos_World - vertexPos_World;
 #endif
-  
-#if defined(DIRECTIONAL)
-  for (int i = 0; i < numLights; ++i) {
-    pos_Light[i] = LP[i] * M * vec4(position, 1.0);
-  }
-#endif
 
 #if defined(BUMP) || defined(NORMAL)
   getTBN(normal_World, tangent, mat3(M), T, B, TBN);

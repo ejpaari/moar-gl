@@ -350,10 +350,10 @@ bool ResourceManager::loadForwardLightShader(int shaderType)
             ss << tm.shaderDefine;
         }
     }
+    std::string defines = ss.str();
 
-    std::string path = shaderPath + FORWARD_LIGHT_SHADER;
-    auto createForwardLightShader = [&] (Light::Type lightType, std::string defines) {
-        defines += LIGHT_DEFINE_MAPPINGS.at(lightType);
+    auto createForwardLightShader = [&] (Light::Type lightType, std::string path) {
+        path += LIGHT_SHADER_NAME_MAPPINGS.at(lightType);
         std::unique_ptr<Shader> shader(new Shader());
         if (!createShader(shader.get(), path, defines)) {
             std::cerr << "WARNING: Failed to link forward light shader for light type " << lightType << " with mask: " << std::bitset<8>(shaderType) << "\n";
@@ -367,8 +367,9 @@ bool ResourceManager::loadForwardLightShader(int shaderType)
         return true;
     };
 
+    std::string path = shaderPath + FORWARD_LIGHT_SHADER;
     for (int i = 0; i < Light::NUM_TYPES; ++i) {
-        if (!createForwardLightShader(Light::Type(i), ss.str())) {
+        if (!createForwardLightShader(Light::Type(i), path)) {
             return false;
         }
     }
@@ -381,8 +382,8 @@ bool ResourceManager::loadDeferredLightShader(Light::Type light)
         return true;
     }
 
-    std::string defines = LIGHT_DEFINE_MAPPINGS.at(light);
-    std::string path = shaderPath + DEFERRED_LIGHT_SHADER;
+    std::string defines = "";
+    std::string path = shaderPath + DEFERRED_LIGHT_SHADER + LIGHT_SHADER_NAME_MAPPINGS.at(light);;
     std::unique_ptr<Shader> shader(new Shader());
     if (!createShader(shader.get(), path, defines)) {
         std::cerr << "WARNING: Failed to link deferred light shader with light: " << light << "\n";
