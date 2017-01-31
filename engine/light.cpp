@@ -12,7 +12,7 @@ namespace moar
 
 GLuint Light::lightBlockBuffer = 0; // Initialized by friend class renderer
 GLuint Light::lightProjectionBlockBuffer = 0; // Initialized by friend class renderer
-constexpr float DIST = 10.0f / 1.7320508f; // Heuristic, sqrt(3)
+const float MIN_LIGHTING = 0.01f; // Min amount of light that still affects output (i.e. lightPower)
 
 Light::Light()
 {
@@ -68,7 +68,7 @@ void Light::setUniforms(const glm::vec3& position, const glm::vec3& forward)
 
 void Light::calculateRange()
 {
-    range = DIST * sqrt(color.w);
+    range = sqrt(color.w / MIN_LIGHTING);
 }
 
 } // moar
