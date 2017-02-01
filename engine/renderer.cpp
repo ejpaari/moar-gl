@@ -102,7 +102,7 @@ bool Renderer::init(const RenderSettings* settings, ResourceManager* manager)
     GLuint transformationBuffer;
     glGenBuffers(1, &transformationBuffer);
     glBindBuffer(GL_UNIFORM_BUFFER, transformationBuffer);
-    GLsizeiptr transformationBufferSize = 4 * sizeof(*Object::projection);
+    GLsizeiptr transformationBufferSize = 5 * sizeof(*Object::projection);
     glBufferData(GL_UNIFORM_BUFFER, transformationBufferSize, 0, GL_DYNAMIC_DRAW);
     Object::transformationBlockBuffer = transformationBuffer;
 

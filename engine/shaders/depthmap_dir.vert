@@ -7,6 +7,7 @@ layout (std140) uniform TransformationBlock {
     mat4 V;
     mat4 MV;
     mat4 MVP;
+    mat4 NormalMatrix;
 };
 
 void main()

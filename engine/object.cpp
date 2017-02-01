@@ -149,6 +149,7 @@ void Object::setUniforms()
     glBufferSubData(GL_UNIFORM_BUFFER, 0 * matrixSize, matrixSize, glm::value_ptr(modelMatrix));
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * matrixSize, matrixSize, glm::value_ptr(modelViewMatrix));
     glBufferSubData(GL_UNIFORM_BUFFER, 3 * matrixSize, matrixSize, glm::value_ptr(modelViewProjectionMatrix));
+    glBufferSubData(GL_UNIFORM_BUFFER, 4 * matrixSize, matrixSize, glm::value_ptr(normalMatrix));
     glBindBufferBase(GL_UNIFORM_BUFFER, TRANSFORMATION_BINDING_POINT, transformationBlockBuffer);
 }
 
@@ -160,6 +161,7 @@ void Object::updateModelMatrix()
             glm::scale(scale);
     modelViewMatrix = (*view) * modelMatrix;
     modelViewProjectionMatrix = viewProjection * modelMatrix;
+    normalMatrix = glm::transpose(glm::inverse(modelMatrix));
 }
 
 glm::mat4x4 Object::getModelMatrix() const

@@ -113,6 +113,7 @@ private:
     glm::mat4x4 modelMatrix;
     glm::mat4x4 modelViewMatrix;
     glm::mat4x4 modelViewProjectionMatrix;
+    glm::mat4x4 normalMatrix;
 
     std::unique_ptr<Light> light = nullptr;
     Model* model = nullptr;
