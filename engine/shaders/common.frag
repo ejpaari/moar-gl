@@ -31,8 +31,9 @@ float getDiffuse(vec3 normal, vec3 lightDir)
 
 float getSpecular(vec3 eyeDir, vec3 lightDir, vec3 normal, float power)
 {
-  float spec = clamp(dot(eyeDir, reflect(-lightDir, normal)), 0, 1);
-  return pow(spec, 10.0f) * power;
+  vec3 halfwayDir = normalize(lightDir + eyeDir);  
+  float spec = max(dot(normal, halfwayDir), 0.0);
+  return pow(spec, 32.0f) * power;
 }
 
 float calcPointShadow(samplerCube depthTex, vec3 vertexPos_World, vec3 lightPos_World, float farClipDistance)
