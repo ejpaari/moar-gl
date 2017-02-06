@@ -50,6 +50,10 @@ public:
     bool isSSAOEnabled() const;
     void setSSAOEnabled(bool status);
 
+    // Deferred rendering only.
+    bool isFXAAEnabled() const;
+    void setFXAAEnabled(bool status);
+
 private:
     enum Side
     {
@@ -83,6 +87,7 @@ private:
     unsigned int bloomIterations = 0;
     bool useHDR = false;
     bool useSSAO = true;
+    bool useFXAA = true;
 };
 
 } // moar

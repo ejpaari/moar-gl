@@ -56,6 +56,7 @@ void MyApp::start()
     camera->setBloomIterations(bloomIterations);
     camera->setHDREnabled(HDR);
     camera->setSSAOEnabled(SSAO);
+    camera->setFXAAEnabled(FXAA);
 
 //#define POSTPROC
 #ifdef POSTPROC
@@ -123,7 +124,10 @@ void MyApp::handleInput(GLFWwindow* window)
         SSAO = !SSAO;
         camera->setSSAOEnabled(SSAO);
     }
-
+    if (input->isKeyPressed(GLFW_KEY_G)) {
+        FXAA = !FXAA;
+        camera->setFXAAEnabled(FXAA);
+    }
     if (input->isKeyPressed(GLFW_KEY_R)) {
         resetCamera();
     }
@@ -154,9 +158,9 @@ void MyApp::handleInput(GLFWwindow* window)
 
 void MyApp::update()
 {
-    moar::Object* cube = engine->getObjectByName("cube");
-    if (cube) {
-        cube->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f * time->getDelta());
+    moar::Object* light = engine->getObjectByName("light4");
+    if (light) {
+        light->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f * time->getDelta());
     }
 
     FPS = static_cast<unsigned int>(1.0f / time->getDelta());

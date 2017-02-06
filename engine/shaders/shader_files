@@ -44,3 +44,6 @@ ssao.frag
 ssao_apply.vert
 ssao_apply.frag
 
+fxaa.vert
+fxaa.frag
+

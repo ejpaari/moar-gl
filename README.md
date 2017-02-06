@@ -4,12 +4,13 @@ A simple graphics engine which utilizes OpenGL 4.x and C++11. The emphasis is on
 
 ### Graphic features:
 - Forward rendering with MSAA
-- Deferred rendering with SSAO
+- Deferred rendering with FXAA
 - Diffuse, normal, bump and specular mapping
 - Real-time hard shadows
 - Point and directional lighting
 - Bloom
 - HDR
+- SSAO (deferred)
 - Custom post-processing shaders
 - Frustum culling (bounding sphere)
 - Skybox

@@ -65,6 +65,7 @@ private:
     GLuint renderSSAO(GLuint renderedTex);
     GLuint renderBloom(GLuint renderedTex);
     GLuint renderHDR(GLuint renderedTex);
+    GLuint renderFXAA(GLuint renderedTex);
     GLuint renderPostprocess(GLuint renderedTex);
     void renderPassthrough(GLuint texture);
     void updateObjectContainers(const std::vector<std::unique_ptr<Object>>& objects);

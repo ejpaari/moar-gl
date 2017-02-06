@@ -152,6 +152,16 @@ void Camera::setSSAOEnabled(bool status)
     useSSAO = status;
 }
 
+bool Camera::isFXAAEnabled() const
+{
+    return useFXAA;
+}
+
+void Camera::setFXAAEnabled(bool status)
+{
+    useFXAA = status;
+}
+
 void Camera::updateViewMatrix()
 {
     *viewMatrix = glm::mat4(glm::lookAt(position, position + getForward(), up));

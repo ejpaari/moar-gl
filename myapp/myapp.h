@@ -57,6 +57,7 @@ private:
     int bloomIterations = 0;
     bool HDR = false;
     bool SSAO = true;
+    bool FXAA = true;
 };
 
 #endif // MYAPP_H

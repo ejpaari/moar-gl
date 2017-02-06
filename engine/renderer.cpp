@@ -229,6 +229,7 @@ void Renderer::renderDeferred(const std::vector<std::unique_ptr<Object> >& objec
     renderedTex = renderSSAO(renderedTex);
     renderedTex = renderBloom(renderedTex);
     renderedTex = renderHDR(renderedTex);
+    renderedTex = renderFXAA(renderedTex);
     renderedTex = renderPostprocess(renderedTex);
     renderPassthrough(renderedTex);
 }
@@ -588,6 +589,18 @@ GLuint Renderer::renderHDR(GLuint renderedTex)
     if (camera->isHDREnabled()) {
         PostFramebuffer* buffer = getFreePostFramebuffer();
         glUseProgram(resourceManager->getShaderProgramByName("hdr"));
+        renderedTex = buffer->draw(std::vector<GLuint>{renderedTex});
+        freeOtherPostFramebuffers(buffer);
+    }
+    return renderedTex;
+}
+
+GLuint Renderer::renderFXAA(GLuint renderedTex)
+{
+    if (camera->isFXAAEnabled()) {
+        PostFramebuffer* buffer = getFreePostFramebuffer();
+        glUseProgram(resourceManager->getShaderProgramByName("fxaa"));
+        glUniform2f(SCREEN_SIZE_LOCATION, static_cast<float>(renderSettings->windowWidth), static_cast<float>(renderSettings->windowHeight));
         renderedTex = buffer->draw(std::vector<GLuint>{renderedTex});
         freeOtherPostFramebuffers(buffer);
     }
