@@ -85,8 +85,8 @@ private:
     std::array<std::vector<Object*>, Light::Type::NUM_TYPES> closestLights;
     std::unique_ptr<Object> lightSphere;
 
-    const RenderSettings* renderSettings = nullptr;
     ResourceManager* resourceManager = nullptr;
+    const RenderSettings* renderSettings = nullptr;    
     const Camera* camera = nullptr;
 
     std::array<DepthMapDirectional, MAX_NUM_SHADOWMAPS> dirDepthMaps;
@@ -100,6 +100,9 @@ private:
     const Shader* shader = nullptr;
     std::unordered_set<unsigned int> objectsInFrustum;
     std::array<glm::vec3, SSAO_KERNEL_SIZE> ssaoKernel;
+
+    float windowWidth = 0.0f;
+    float windowHeight = 0.0f;
 };
 
 } // moar

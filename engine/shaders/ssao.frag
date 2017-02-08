@@ -24,7 +24,7 @@ void main()
 
     float sampleDepth = texture(positionTex, offset.xy).z;
      if (abs(pos.z - sampleDepth) < RADIUS) {
-    //   occlusion += sampleDepth > samplePos.z + BIAS ? 1.0 : 0.0;
+    // occlusion += sampleDepth > samplePos.z + BIAS ? 1.0 : 0.0;
        occlusion += step(samplePos.z, sampleDepth);
     }
 

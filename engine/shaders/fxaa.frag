@@ -5,7 +5,9 @@ layout(location = 0) out vec3 outColor;
 layout (location = 30) uniform sampler2D renderedTex;
 layout (location = 41) uniform vec2 screenSize;
 
-const float LUMA_THRESHOLD = 0.5f;
+const vec3 TO_LUMA = vec3(0.299, 0.587, 0.114); // http://en.wikipedia.org/wiki/Grayscale
+const float LUMA_BIAS = 0.01f;
+const float LUMA_THRESHOLD = 0.7f;
 const float MUL_REDUCE = 0.125f;
 const float MIN_REDUCE = 0.0078125f;
 const float MAX_SPAN = 8.0f;
@@ -23,20 +25,17 @@ void main()
   vec3 rgbSW = textureOffset(renderedTex, texCoord, ivec2(-1, -1)).rgb;
   vec3 rgbSE = textureOffset(renderedTex, texCoord, ivec2(1, -1)).rgb;
 
-  // http://en.wikipedia.org/wiki/Grayscale
-  const vec3 toLuma = vec3(0.299, 0.587, 0.114);
-	
   // RGB to luma.
-  float lumaNW = dot(rgbNW, toLuma);
-  float lumaNE = dot(rgbNE, toLuma);
-  float lumaSW = dot(rgbSW, toLuma);
-  float lumaSE = dot(rgbSE, toLuma);
-  float lumaM = dot(rgbM, toLuma);
+  float lumaM = dot(rgbM, TO_LUMA);
+  float lumaNW = dot(rgbNW, TO_LUMA);
+  float lumaNE = dot(rgbNE, TO_LUMA);
+  float lumaSW = dot(rgbSW, TO_LUMA);
+  float lumaSE = dot(rgbSE, TO_LUMA);
 
   float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
   float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
 
-  if (lumaMax - lumaMin < lumaMax * LUMA_THRESHOLD) {
+  if ((lumaMax - lumaMin) < (lumaMax * LUMA_THRESHOLD + LUMA_BIAS)) {
     outColor = rgbM;
     return;
   }  
@@ -60,19 +59,16 @@ void main()
   // Inner samples on the tab.
   vec3 rgbSampleNeg = texture(renderedTex, texCoord + samplingDirection * (1.0/3.0 - 0.5)).rgb;
   vec3 rgbSamplePos = texture(renderedTex, texCoord + samplingDirection * (2.0/3.0 - 0.5)).rgb;
-
   vec3 rgbTwoTab = (rgbSamplePos + rgbSampleNeg) * 0.5;  
 
   // Outer samples on the tab.
   vec3 rgbSampleNegOuter = texture(renderedTex, texCoord + samplingDirection * (0.0/3.0 - 0.5)).rgb;
   vec3 rgbSamplePosOuter = texture(renderedTex, texCoord + samplingDirection * (3.0/3.0 - 0.5)).rgb;
-	
   vec3 rgbFourTab = (rgbSamplePosOuter + rgbSampleNegOuter) * 0.25 + rgbTwoTab * 0.5;   
+
+  float lumaFourTab = dot(rgbFourTab, TO_LUMA);
 	
-  // Calculate luma for checking against the minimum and maximum value.
-  float lumaFourTab = dot(rgbFourTab, toLuma);
-	
-  // Are outer samples of the tab beyond the edge
+  // Are outer samples of the tab beyond the edge?
   if (lumaFourTab < lumaMin || lumaFourTab > lumaMax) {
     outColor = rgbTwoTab;
   } else {
@@ -80,5 +76,5 @@ void main()
   }
 
   // Show edges for debug purposes.
-  // outColor.r = 1.0;  
+  //outColor.r = 1.0;
 }

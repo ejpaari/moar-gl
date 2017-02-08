@@ -21,14 +21,6 @@ white.png
 # type
 # enable shadows
 
-name monkey
-1.0 0.5 1.0
-0.0 0.0 0.0
-0.5 0.5 0.5
-1
-component model
-monkey.3ds
-
 name droid
 0.0 0.0 0.0
 0.0 0.0 0.0
@@ -45,14 +37,26 @@ name floor
 component model
 cube.obj
 
-name light4
-1.0 3.0 1.0
+name light1
+0.5 1.5 -1.2
 -0.7 0.5 0.0
 0.1 0.1 0.1
 0
 component model
 sphere.3ds
 component light
-1.0 1.0 0.0 0.5
-directional
+0.8 1.0 0.8 2.0
+point
+1
+
+name light1
+0.5 1.5 1.2
+-0.7 0.5 0.0
+0.1 0.1 0.1
+0
+component model
+sphere.3ds
+component light
+0.8 0.8 1.0 2.0
+point
 1

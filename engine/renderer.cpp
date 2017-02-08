@@ -254,6 +254,9 @@ void Renderer::setup(const Framebuffer* fb, const std::vector<std::unique_ptr<Ob
 
     fb->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    windowWidth = static_cast<float>(renderSettings->windowWidth);
+    windowHeight= static_cast<float>(renderSettings->windowHeight);
 }
 
 void Renderer::renderAmbient()
@@ -420,7 +423,7 @@ void Renderer::activateAllShadowMaps(Light::Type lightType, int numLights)
 void Renderer::setGBufferTextures()
 {
     glUniform3f(CAMERA_POS_LOCATION, camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-    glUniform2f(SCREEN_SIZE_LOCATION, static_cast<float>(renderSettings->windowWidth), static_cast<float>(renderSettings->windowHeight));
+    glUniform2f(SCREEN_SIZE_LOCATION, windowWidth, windowHeight);
     glUniform1f(FAR_CLIP_DISTANCE_LOCATION, camera->getFarClipDistance());
     const std::vector<GLuint>& textures = gBuffer.getDeferredTextures();
     for (unsigned int i = 0; i < textures.size(); ++i) {
@@ -600,7 +603,7 @@ GLuint Renderer::renderFXAA(GLuint renderedTex)
     if (camera->isFXAAEnabled()) {
         PostFramebuffer* buffer = getFreePostFramebuffer();
         glUseProgram(resourceManager->getShaderProgramByName("fxaa"));
-        glUniform2f(SCREEN_SIZE_LOCATION, static_cast<float>(renderSettings->windowWidth), static_cast<float>(renderSettings->windowHeight));
+        glUniform2f(SCREEN_SIZE_LOCATION, windowWidth, windowHeight);
         renderedTex = buffer->draw(std::vector<GLuint>{renderedTex});
         freeOtherPostFramebuffers(buffer);
     }
