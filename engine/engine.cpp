@@ -15,6 +15,18 @@
 #include <fstream>
 #include <algorithm>
 
+#define NVPERFKIT
+#ifdef NVPERFKIT
+// Set up NVPMAPI
+#define NVPM_INITGUID
+#include "NvPmApi.Manager.h"
+// Simple singleton implementation for grabbing the NvPmApi
+static NvPmApiManager S_NVPMManager;
+extern NvPmApiManager *GetNvPmApiManager() { return &S_NVPMManager; }
+const NvPmApi *GetNvPmApi() { return S_NVPMManager.Api(); }
+NVPMContext hNVPMContext(0);
+#endif
+
 namespace
 {
 
@@ -278,6 +290,20 @@ bool Engine::init(const std::string& settingsFile)
 
     resetLevel();
 
+#ifdef NVPERFKIT
+	if (GetNvPmApiManager()->Construct(L"C:\\NVIDIA\\PerfKit\\bin\\x86\\NvPmApi.Core.dll") != S_OK) {
+		return false;
+	}
+	NVPMRESULT nvResult;
+	if ((nvResult = GetNvPmApi()->Init()) != NVPM_OK) {
+		return false;
+	}	
+	if ((nvResult = GetNvPmApi()->CreateContextFromOGLContext((uint64_t)wglGetCurrentContext(), &hNVPMContext)) != NVPM_OK) {
+		return false;
+	}
+	GetNvPmApi()->AddCounterByName(hNVPMContext, "gpu_idle");
+#endif
+
     return true;
 }
 
@@ -309,6 +335,16 @@ void Engine::execute()
 
         G_DRAW_COUNT = 0;
         renderer.render(objects, skybox.get());
+
+#ifdef NVPERFKIT
+		NVPMUINT count;
+		GetNvPmApi()->Sample(hNVPMContext, NULL, &count);
+		NVPMUINT64 value;
+		NVPMUINT64 cycle;
+		GetNvPmApi()->GetCounterValueByName(hNVPMContext, "gpu_idle", 0, &value, &cycle);
+		std::cout << value << " " << cycle << " " << (static_cast<float>(value) / static_cast<float>(cycle)) << "\n";
+#endif
+
         gui.render();
 
         glfwSwapBuffers(window);
