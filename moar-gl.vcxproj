@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{63399F09-004D-4146-BCD9-6FE26282355E}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <Keyword>ManagedCProj</Keyword>
+    <RootNamespace>moargl</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\..\tools\Simple OpenGL Image Library\src;$(SolutionDir)\..\tools\boost_1_57_0\boost_1_57_0;$(SolutionDir)\external\assimp\include;$(SolutionDir)\..\tools\AntTweakBar\include;$(SolutionDir)\..\tools\glew-2.0.0\include;$(SolutionDir)\..\tools\glfw-3.2.1.bin.WIN64\include;$(SolutionDir)\external\glm;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)\..\tools\Simple OpenGL Image Library\src;$(SolutionDir)\..\tools\boost_1_57_0\boost_1_57_0;$(SolutionDir)\external\assimp\include;$(SolutionDir)\..\tools\AntTweakBar\include;$(SolutionDir)\..\tools\glew-2.0.0\include;$(SolutionDir)\..\tools\glfw-3.2.1.bin.WIN64\include;$(SolutionDir)\external\glm;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\tools\PerfKit\include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;glfw3.lib;SOIL.lib;assimp-vc140-mtd.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\assimp\lib;$(SolutionDir)\..\tools\Simple OpenGL Image Library\lib;$(SolutionDir)\..\tools\glew-2.0.0\lib\Release\Win32;$(SolutionDir)\..\tools\glfw-3.2.1.bin.WIN32\lib-vc2015;$(SolutionDir)\..\tools\AntTweakBar\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;glfw3.lib;SOIL.lib;assimp-vc140-mtd.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\assimp\lib;$(SolutionDir)\..\tools\Simple OpenGL Image Library\lib;$(SolutionDir)\..\tools\glew-2.0.0\lib\Release\Win32;$(SolutionDir)\..\tools\glfw-3.2.1.bin.WIN32\lib-vc2015;$(SolutionDir)\..\tools\AntTweakBar\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="engine\application.h" />
+    <ClInclude Include="engine\camera.h" />
+    <ClInclude Include="engine\common\globals.h" />
+    <ClInclude Include="engine\common\plane.h" />
+    <ClInclude Include="engine\common\quad.h" />
+    <ClInclude Include="engine\common\typemappings.h" />
+    <ClInclude Include="engine\depthmap.h" />
+    <ClInclude Include="engine\depthmapdir.h" />
+    <ClInclude Include="engine\depthmappoint.h" />
+    <ClInclude Include="engine\engine.h" />
+    <ClInclude Include="engine\framebuffer.h" />
+    <ClInclude Include="engine\gbuffer.h" />
+    <ClInclude Include="engine\gui.h" />
+    <ClInclude Include="engine\input.h" />
+    <ClInclude Include="engine\light.h" />
+    <ClInclude Include="engine\material.h" />
+    <ClInclude Include="engine\mesh.h" />
+    <ClInclude Include="engine\model.h" />
+    <ClInclude Include="engine\multisamplebuffer.h" />
+    <ClInclude Include="engine\object.h" />
+    <ClInclude Include="engine\postframebuffer.h" />
+    <ClInclude Include="engine\postprocess.h" />
+    <ClInclude Include="engine\renderer.h" />
+    <ClInclude Include="engine\rendersettings.h" />
+    <ClInclude Include="engine\resourcemanager.h" />
+    <ClInclude Include="engine\shader.h" />
+    <ClInclude Include="engine\texture.h" />
+    <ClInclude Include="engine\time.h" />
+    <ClInclude Include="myapp\myapp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="engine\application.cpp" />
+    <ClCompile Include="engine\camera.cpp" />
+    <ClCompile Include="engine\common\globals.cpp" />
+    <ClCompile Include="engine\common\plane.cpp" />
+    <ClCompile Include="engine\common\typemappings.cpp" />
+    <ClCompile Include="engine\depthmap.cpp" />
+    <ClCompile Include="engine\depthmapdir.cpp" />
+    <ClCompile Include="engine\depthmappoint.cpp" />
+    <ClCompile Include="engine\engine.cpp" />
+    <ClCompile Include="engine\framebuffer.cpp" />
+    <ClCompile Include="engine\gbuffer.cpp" />
+    <ClCompile Include="engine\gui.cpp" />
+    <ClCompile Include="engine\input.cpp" />
+    <ClCompile Include="engine\light.cpp" />
+    <ClCompile Include="engine\material.cpp" />
+    <ClCompile Include="engine\mesh.cpp" />
+    <ClCompile Include="engine\model.cpp" />
+    <ClCompile Include="engine\multisamplebuffer.cpp" />
+    <ClCompile Include="engine\object.cpp" />
+    <ClCompile Include="engine\postframebuffer.cpp" />
+    <ClCompile Include="engine\postprocess.cpp" />
+    <ClCompile Include="engine\renderer.cpp" />
+    <ClCompile Include="engine\rendersettings.cpp" />
+    <ClCompile Include="engine\resourcemanager.cpp" />
+    <ClCompile Include="engine\shader.cpp" />
+    <ClCompile Include="engine\texture.cpp" />
+    <ClCompile Include="engine\time.cpp" />
+    <ClCompile Include="myapp\main.cpp" />
+    <ClCompile Include="myapp\myapp.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

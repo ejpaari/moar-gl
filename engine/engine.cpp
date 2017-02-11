@@ -291,7 +291,7 @@ bool Engine::init(const std::string& settingsFile)
     resetLevel();
 
 #ifdef NVPERFKIT
-	if (GetNvPmApiManager()->Construct(L"C:\\NVIDIA\\PerfKit\\bin\\x86\\NvPmApi.Core.dll") != S_OK) {
+	if (GetNvPmApiManager()->Construct(L"NvPmApi.Core.dll") != S_OK) {
 		return false;
 	}
 	NVPMRESULT nvResult;
