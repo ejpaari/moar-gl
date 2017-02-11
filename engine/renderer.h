@@ -42,7 +42,8 @@ public:
     void clear();
 
 private:
-    struct PostBuffer {
+    struct PostBuffer 
+	{
         bool inUse;
         PostFramebuffer framebuffer;
     };

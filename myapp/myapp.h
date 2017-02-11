@@ -24,7 +24,8 @@ public:
     virtual void update() final;
 
 private:
-    struct LevelInfo {
+    struct LevelInfo 
+	{
         std::string filename;
         std::vector<glm::vec3> cameraPositions;
         std::vector<glm::vec3> cameraRotations;
@@ -48,16 +49,16 @@ private:
     std::vector<LevelInfo> levelInfos;
     LevelInfo* currentLevelInfo = nullptr;
 
-    unsigned int FPS = 0;
-    unsigned int drawCount = 0;
-    bool deferred = false;
-    glm::vec3 position;
-    glm::vec3 rotation;
-
-    int bloomIterations = 0;
-    bool HDR = false;
+	moar::Engine::PerformanceData performanceData;
+    
+	bool deferred = true;
+    int bloomIterations = 8;
+    bool HDR = true;
     bool SSAO = true;
     bool FXAA = true;
+
+	glm::vec3 camPos;
+	glm::vec3 camRot;
 };
 
 #endif // MYAPP_H

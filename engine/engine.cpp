@@ -15,8 +15,8 @@
 #include <fstream>
 #include <algorithm>
 
-#define NVPERFKIT
 #ifdef NVPERFKIT
+// Note: Consider using other tools such as Nvidia Nsight
 // Set up NVPMAPI
 #define NVPM_INITGUID
 #include "NvPmApi.Manager.h"
@@ -310,12 +310,7 @@ bool Engine::init(const std::string& settingsFile)
 void Engine::execute()
 {
     app->start();
-
-    if (!renderer.setDeferredRenderPath(deferred)) {
-        std::cerr << "ERROR: Failed to initialize renderer framebuffers\n";
-        return;
-    }
-
+	
     double x = 0.0;
 	double y = 0.0;
     glfwGetCursorPos(window, &x, &y);
@@ -335,17 +330,8 @@ void Engine::execute()
 
         G_DRAW_COUNT = 0;
         renderer.render(objects, skybox.get());
-
-#ifdef NVPERFKIT
-		NVPMUINT count;
-		GetNvPmApi()->Sample(hNVPMContext, NULL, &count);
-		NVPMUINT64 value;
-		NVPMUINT64 cycle;
-		GetNvPmApi()->GetCounterValueByName(hNVPMContext, "gpu_idle", 0, &value, &cycle);
-		std::cout << value << " " << cycle << " " << (static_cast<float>(value) / static_cast<float>(cycle)) << "\n";
-#endif
-
-        gui.render();
+		updatePerformanceData();
+        gui.render();	
 
         glfwSwapBuffers(window);
         glfwPollEvents();        
@@ -496,16 +482,15 @@ bool Engine::loadLevel(const std::string& level)
 
 void Engine::setDeferredRendering(bool enabled)
 {
-    deferred = enabled;
-    if (!renderer.setDeferredRenderPath(deferred)) {
+    if (!renderer.setDeferredRenderPath(enabled)) {
         std::cerr << "ERROR: Failed to initialize renderer framebuffers\n";
         return;
     }
 }
 
-unsigned int Engine::getDrawCount() const
+const Engine::PerformanceData& Engine::getPerformanceData() const
 {
-    return G_DRAW_COUNT;
+	return performanceData;
 }
 
 void Engine::resetLevel()
@@ -529,6 +514,41 @@ void Engine::updateObjects()
     }
 }
 
+void Engine::updatePerformanceData()
+{
+	performanceData.FPS = static_cast<int>(1.0f / time.getDelta());
+	performanceData.drawCount = G_DRAW_COUNT;
+#ifdef NVPERFKIT
+	NVPMUINT count;
+	GetNvPmApi()->Sample(hNVPMContext, NULL, &count);
+	NVPMUINT64 value;
+	NVPMUINT64 cycle;
+	GetNvPmApi()->GetCounterValueByName(hNVPMContext, "gpu_idle", 0, &value, &cycle);
+	performanceData.gpuIdle = (static_cast<float>(value) / static_cast<float>(cycle)) * 100.0f;
+#endif
+}
+
+bool Engine::createSkybox()
+{
+	if (!renderSettings.isLoaded()) {
+		return false;
+	}
+
+	skybox.reset(new Object());
+	skybox->addComponent<Model>(manager.getModel("cube.3ds"));
+
+	Material* material = manager.createMaterial();
+	GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);
+	material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);
+	for (auto& meshObject : skybox->getMeshObjects()) {
+		meshObject.material = material;
+	}
+
+	skybox->setShadowCaster(false);
+
+	return true;
+}
+
 void Engine::printInfo(int windowWidth, int windowHeight)
 {
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
@@ -545,27 +565,6 @@ void Engine::printInfo(int windowWidth, int windowHeight)
     std::cout << "Monitor size: " << monitorWidth << "mm x " << monitorHeight << "mm\n\n";
 
     std::cout << "Window resolution: " << windowWidth << " x " << windowHeight << "\n\n";
-}
-
-bool Engine::createSkybox()
-{
-    if (!renderSettings.isLoaded()) {
-        return false;
-    }
-
-    skybox.reset(new Object());
-    skybox->addComponent<Model>(manager.getModel("cube.3ds"));
-
-    Material* material = manager.createMaterial();
-    GLuint texture = manager.getCubeTexture(renderSettings.skyboxTextures);
-    material->setTexture(texture, Material::TextureType::DIFFUSE, GL_TEXTURE_CUBE_MAP);
-    for (auto& meshObject : skybox->getMeshObjects()) {
-        meshObject.material = material;
-    }
-
-    skybox->setShadowCaster(false);
-
-    return true;
 }
 
 } // moar

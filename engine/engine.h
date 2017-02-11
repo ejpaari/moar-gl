@@ -23,6 +23,13 @@ namespace moar
 class Engine
 {
 public:
+	struct PerformanceData 
+	{
+		int FPS = -1;
+		int drawCount = -1;
+		float gpuIdle = -1.0f;
+	};
+
     explicit Engine();
     ~Engine();
     Engine(const Engine&) = delete;
@@ -45,13 +52,14 @@ public:
     bool loadLevel(const std::string& level);
     void setDeferredRendering(bool enabled);
 
-    unsigned int getDrawCount() const;
+	const PerformanceData& getPerformanceData() const;
 
 private:
     void resetLevel();
     void updateObjects();
-    void printInfo(int windowWidth, int windowHeight);
-    bool createSkybox();
+	void updatePerformanceData();
+	bool createSkybox();
+    void printInfo(int windowWidth, int windowHeight);    
 
     std::shared_ptr<Application> app;
 
@@ -67,7 +75,7 @@ private:
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Object> skybox;
 
-    bool deferred = true;
+	PerformanceData performanceData;
 };
 
 } // moar

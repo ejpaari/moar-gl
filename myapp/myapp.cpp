@@ -27,7 +27,7 @@ MyApp::MyApp()
     if (levelInfos.empty()) {
         std::cerr << "WARNING: Empty level infos\n";
     } else {
-        currentLevelInfo = &levelInfos[0];
+        currentLevelInfo = &levelInfos[1];
     }
     for (const auto& info : levelInfos) {
         if (info.cameraPositions.size() != info.cameraRotations.size()) {
@@ -163,10 +163,9 @@ void MyApp::update()
         light->rotate(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f * time->getDelta());
     }
 
-    FPS = static_cast<unsigned int>(1.0f / time->getDelta());
-    drawCount = engine->getDrawCount();
-    position = camera->getPosition();
-    rotation = camera->getRotation();
+	performanceData = engine->getPerformanceData();
+    camPos = camera->getPosition();
+    camRot = camera->getRotation();
 
 //    if (light1 && light2) {
 //        float t = time->getTime();
@@ -183,17 +182,18 @@ void MyApp::update()
 void MyApp::initGUI()
 {
     bar = TwNewBar("GUI");
-    TwDefine(" GUI size='300 160' ");
+    TwDefine(" GUI size='300 180' ");
     TwDefine(" GUI valueswidth=140 ");
     TwDefine(" GUI refresh=0.5 ");
-    TwAddVarRO(bar, "FPS", TW_TYPE_INT32, &FPS, "");
-    TwAddVarRO(bar, "Draw count", TW_TYPE_UINT32, &drawCount, "");
-    TwAddVarRO(bar, "Deferred", TW_TYPE_BOOLCPP, &deferred, "");
-    TwAddVarRO(bar, "Position", TW_TYPE_DIR3F, &position, "");
-    TwAddVarRO(bar, "Rotation", TW_TYPE_DIR3F, &rotation, "");
+    TwAddVarRO(bar, "FPS", TW_TYPE_INT32, &performanceData.FPS, "");
+    TwAddVarRO(bar, "Draw count", TW_TYPE_UINT32, &performanceData.drawCount, "");
+	TwAddVarRO(bar, "GPU Idle time %", TW_TYPE_FLOAT, &performanceData.gpuIdle, "");
+    TwAddVarRO(bar, "Deferred", TW_TYPE_BOOLCPP, &deferred, "");    
     TwAddVarRO(bar, "Bloom", TW_TYPE_UINT32, &bloomIterations, "");
     TwAddVarRO(bar, "HDR", TW_TYPE_BOOLCPP, &HDR, "");
     TwAddVarRO(bar, "SSAO", TW_TYPE_BOOLCPP, &SSAO, "");
+	TwAddVarRO(bar, "Camera position", TW_TYPE_DIR3F, &camPos, "");
+	TwAddVarRO(bar, "Camera rotation", TW_TYPE_DIR3F, &camRot, "");
 }
 
 void MyApp::resetCamera()

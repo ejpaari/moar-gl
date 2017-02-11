@@ -15,10 +15,11 @@ class Input
   friend class Engine;
 
 public:
-    struct KeyStatus {
-      bool pressed;
-      bool down;
-    };
+	struct KeyStatus
+	{
+		bool pressed;
+		bool down;
+	};
   
     explicit Input();
     ~Input();
