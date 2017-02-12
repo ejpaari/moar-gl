@@ -41,6 +41,7 @@ private:
     moar::Time* time = nullptr;
     moar::Postprocess* offset = nullptr;
 
+    moar::Object* light0 = nullptr;
     moar::Object* light1 = nullptr;
     moar::Object* light2 = nullptr;
 
@@ -52,7 +53,7 @@ private:
 	moar::Engine::PerformanceData performanceData;
     
 	bool deferred = true;
-    int bloomIterations = 8;
+    int bloomIterations = 20;
     bool HDR = true;
     bool SSAO = true;
     bool FXAA = true;

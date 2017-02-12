@@ -20,7 +20,8 @@ A simple graphics engine which utilizes OpenGL 4.x and C++11. The emphasis is on
 - Boost 1.57.0 https://sourceforge.net/projects/boost/files/boost/1.57.0/
 - SOIL July 7, 2008 http://www.lonesock.net/soil.html
 - AntTweakBar 1.16 http://anttweakbar.sourceforge.net/doc/tools:anttweakbar:download
-- Qt 5.x / Qt Creator 3.x (optional, qmake is enough)
+- IDE Qt / Visual Studio (optional, qmake is enough)
+- Nvidia PerfKit (optional)
 
 ### Submodules
 - GLM
@@ -30,9 +31,9 @@ A simple graphics engine which utilizes OpenGL 4.x and C++11. The emphasis is on
 ### Setup
 1. Clone using "--recursive" to get the submodules
 2. Build / install required tools, libraries and submodules
-3. Build the myapp example project (two ways which are essentially the same)
- * With Qt / Qt Creator Build & Run
- * By running qmake and building with the Makefile
+3. Build the myapp example project
+ * Open the Qt project in myapp-folder (or run qmake & make)
+ * Open the Visual Studio -project
 
 Following compilers have been tested (other compilers probably work fine as well)
 - GCC 4.8
@@ -44,4 +45,4 @@ Following compilers have been tested (other compilers probably work fine as well
 
 ### Screenshots
 
-http://imgur.com/a/IxZIF
+http://imgur.com/a/sqz0Z

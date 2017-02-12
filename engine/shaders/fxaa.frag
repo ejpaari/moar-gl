@@ -7,7 +7,7 @@ layout (location = 41) uniform vec2 screenSize;
 
 const vec3 TO_LUMA = vec3(0.299, 0.587, 0.114); // http://en.wikipedia.org/wiki/Grayscale
 const float LUMA_BIAS = 0.01f;
-const float LUMA_THRESHOLD = 0.7f;
+const float LUMA_THRESHOLD = 0.4f;
 const float MUL_REDUCE = 0.125f;
 const float MIN_REDUCE = 0.0078125f;
 const float MAX_SPAN = 8.0f;
@@ -76,5 +76,5 @@ void main()
   }
 
   // Show edges for debug purposes.
-  //outColor.r = 1.0;
+  // outColor.r = 1.0;
 }

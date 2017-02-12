@@ -20,8 +20,14 @@ MyApp::MyApp()
              glm::vec3(-0.1f, -4.2f, 0.0f)},
          0},
         {"sponza.lvl",
-         std::vector<glm::vec3>{glm::vec3(-0.3f, 2.2f, 0.4f), glm::vec3(0.0f, 0.4f, -0.8f)},
-         std::vector<glm::vec3>{glm::vec3(-0.5f, -4.9f, 0.0f), glm::vec3(0.3f, -4.4f, 0.0f)},
+         std::vector<glm::vec3>{
+             glm::vec3(-0.3f, 2.2f, 0.4f),
+             glm::vec3(0.0f, 0.4f, -0.8f),
+             glm::vec3(-5.3f, 0.9f, -0.5f)},
+         std::vector<glm::vec3>{
+             glm::vec3(-0.5f, -4.9f, 0.0f),
+             glm::vec3(0.3f, -4.4f, 0.0f),
+             glm::vec3(-0.3f, -1.6f, 0.0f)},
          0}
     };
     if (levelInfos.empty()) {
@@ -72,10 +78,12 @@ void MyApp::levelLoaded()
         currentLevelInfo->positionIndex = 0;
         resetCamera();
 		if (currentLevelInfo->filename == "sponza.lvl") {
+            light0 = engine->getObjectByName("light0");
 			light1 = engine->getObjectByName("light1");
 			light2 = engine->getObjectByName("light2");
 		}
 		else {
+            light0 = nullptr;
 			light1 = nullptr;
 			light2 = nullptr;
 		}
@@ -167,12 +175,14 @@ void MyApp::update()
     camPos = camera->getPosition();
     camRot = camera->getRotation();
 
-//    if (light1 && light2) {
-//        float t = time->getTime();
-//        float sint = static_cast<float>(sin(t));
-//        light1->setPosition(glm::vec3(-1.5 + sin(t * 0.2), 1.8 + (sint * 0.15), 0.0f));
-//        light2->setPosition(glm::vec3(1.5 - sin(t * 0.2), 1.7 + (sint * 0.12), 0.0f));
-//    }
+    if (light0 && light1 && light2) {
+        float t = time->getTime();
+        float sint = static_cast<float>(sin(t));
+        float cost = static_cast<float>(cos(t));
+        light0->setPosition(glm::vec3(-4.0f, 1.0 + (sint * 0.3), 0.0f));
+        light1->setPosition(glm::vec3(-3.0f, 1.5 + (cost * 0.3), 0.0f));
+        light2->setPosition(glm::vec3(-2.0f, 1.8 + (sint * 0.3), 0.0f));
+    }
 
 #ifdef POSTPROC
     offset->setUniform("time", std::bind(glUniform1f, moar::TIME_LOCATION, glfwGetTime()));
@@ -182,7 +192,7 @@ void MyApp::update()
 void MyApp::initGUI()
 {
     bar = TwNewBar("GUI");
-    TwDefine(" GUI size='300 180' ");
+    TwDefine(" GUI size='300 200' ");
     TwDefine(" GUI valueswidth=140 ");
     TwDefine(" GUI refresh=0.5 ");
     TwAddVarRO(bar, "FPS", TW_TYPE_INT32, &performanceData.FPS, "");
@@ -192,6 +202,7 @@ void MyApp::initGUI()
     TwAddVarRO(bar, "Bloom", TW_TYPE_UINT32, &bloomIterations, "");
     TwAddVarRO(bar, "HDR", TW_TYPE_BOOLCPP, &HDR, "");
     TwAddVarRO(bar, "SSAO", TW_TYPE_BOOLCPP, &SSAO, "");
+    TwAddVarRO(bar, "FXAA", TW_TYPE_BOOLCPP, &FXAA, "");
 	TwAddVarRO(bar, "Camera position", TW_TYPE_DIR3F, &camPos, "");
 	TwAddVarRO(bar, "Camera rotation", TW_TYPE_DIR3F, &camRot, "");
 }
